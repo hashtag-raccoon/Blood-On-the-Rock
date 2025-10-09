@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "BloodOnTheRock.sln"
+    "dotnet.defaultSolution": "Blood-On-the-Rock.sln"
 }
