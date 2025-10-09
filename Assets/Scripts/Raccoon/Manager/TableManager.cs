@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+
 public class TableManager : MonoBehaviour
 {
     [Header("탁자 오브젝트들")]
@@ -84,7 +85,7 @@ public class TableManager : MonoBehaviour
         List<GameObject> customerTables = new List<GameObject>();
         for (int i = 0; i < tables.Count; i++)
         {
-            Table tableComp = tables[i].GetComponent<Table>();
+            TableClass tableComp = tables[i].GetComponent<TableClass>();
             if (tableComp.isCustomerSeated) // 손님이 앉아있는 테이블이면
             {
                 if (!customerTables.Contains(tables[i])) // 중복 체크
@@ -126,7 +127,7 @@ public class TableManager : MonoBehaviour
         availableTables.Clear(); // 예약되지 않은 테이블 초기화
         foreach (GameObject table in tables)
         {
-            Table tableComp = table.GetComponent<Table>(); // Table 컴포넌트 가져오기
+            TableClass tableComp = table.GetComponent<TableClass>(); // Table 컴포넌트 가져오기
 
             if (tableComp.isCustomerSeated) // 앉은 손님이 있는 테이블
             {
@@ -150,7 +151,7 @@ public class TableManager : MonoBehaviour
         {
             GameObject table = kvp.Key; // 딕셔너리의 키( 테이블 오브젝트 )
             int seatedCount = kvp.Value.count; // 딕셔너리의 값( 앉은 손님 수 )
-            Table tableComp = table.GetComponent<Table>();
+            TableClass tableComp = table.GetComponent<TableClass>();
 
             // 예약된 손님 수 = tableReservations 딕셔너리에서 확인, 없으면 0 있으면 그 수
             int reservedCount = tableReservations.ContainsKey(table) ? tableReservations[table].Count : 0;
@@ -172,7 +173,7 @@ public class TableManager : MonoBehaviour
         // 예약되지 않은 테이블(빈 테이블) 리스트 수 만큼 반복
         foreach (GameObject table in availableTables)
         {
-            Table tableComp = table.GetComponent<Table>();
+            TableClass tableComp = table.GetComponent<TableClass>();
 
             // 예약된 손님 수 확인
             // 예약된 수 = tableReservations 딕셔너리에서 확인, 없으면 0 있으면 그 수
@@ -195,7 +196,7 @@ public class TableManager : MonoBehaviour
             return;
         }
 
-        Table tableComp = table.GetComponent<Table>();
+        TableClass tableComp = table.GetComponent<TableClass>();
 
         if (tableComp == null)
         {
@@ -214,7 +215,7 @@ public class TableManager : MonoBehaviour
         // MAX_Capacity 초과 방지
         if (totalCount >= tableComp.MAX_Capacity) // 총 인원 수 >= 최대 수용량
         {
-            Debug.LogWarning($"테이블 예약 실패: 최대 수용 인원 초과. 테이블: {table.name}, 앉은: {seatedCount}명, 예약: {reservedCount}명, 최대: {tableComp.MAX_Capacity}명");
+            //Debug.LogWarning($"테이블 예약 실패: 최대 수용 인원 초과. 테이블: {table.name}, 앉은: {seatedCount}명, 예약: {reservedCount}명, 최대: {tableComp.MAX_Capacity}명");
             return;
         }
 
@@ -226,7 +227,7 @@ public class TableManager : MonoBehaviour
         if (!tableReservations[table].Contains(guest)) // 이미 예약된 손님이 아니면 예약 추가
         {
             tableReservations[table].Add(guest); // 예약된 테이블에 손님 추가
-            Debug.Log($"테이블 예약 완료. 테이블: {table.name}, 착석: {seatedCount}명, 예약: {tableReservations[table].Count}명, 최대: {tableComp.MAX_Capacity}명");
+            //Debug.Log($"테이블 예약 완료. 테이블: {table.name}, 착석: {seatedCount}명, 예약: {tableReservations[table].Count}명, 최대: {tableComp.MAX_Capacity}명");
         }
     }
 
@@ -241,7 +242,7 @@ public class TableManager : MonoBehaviour
         if (tableReservations.ContainsKey(table)) // 테이블이 딕셔너리에 있으면
         {
             tableReservations[table].Remove(guest); // 해당 손님 예약 취소
-            Debug.Log($"테이블 예약 취소. 테이블: {table.name}, 착석 예약: {tableReservations[table].Count}");
+            //Debug.Log($"테이블 예약 취소. 테이블: {table.name}, 착석 예약: {tableReservations[table].Count}");
 
             if (tableReservations[table].Count == 0) // 예약된 손님이 없으면
             {
@@ -261,7 +262,7 @@ public class TableManager : MonoBehaviour
             waitingLine.Add(guest); // 대기열에 손님 추가
             waitingCustomerCount++; // 대기 손님 수 증가
             int position = waitingLine.Count - 1; // 대기열에서의 위치 (0부터 시작)
-            Debug.Log($"🚶 손님이 대기열에 추가됨. 위치: {position}, 총 대기 인원: {waitingCustomerCount}");
+            //Debug.Log($"🚶 손님이 대기열에 추가됨. 위치: {position}, 총 대기 인원: {waitingCustomerCount}");
             return position; // 대기열에서의 위치 반환
         }
         return waitingLine.IndexOf(guest); // 이미 대기열에 있으면 현재 위치 반환
@@ -276,7 +277,7 @@ public class TableManager : MonoBehaviour
         {
             waitingLine.RemoveAt(removedIndex); // 대기열에서 손님 제거
             waitingCustomerCount--; // 대기 손님 수 감소
-            Debug.Log($"✅ 손님이 아이소메트릭 대기열에서 제거됨. 제거된 위치: {removedIndex}, 남은 대기 인원: {waitingCustomerCount}");
+            //Debug.Log($"✅ 손님이 아이소메트릭 대기열에서 제거됨. 제거된 위치: {removedIndex}, 남은 대기 인원: {waitingCustomerCount}");
 
             // 뒤에 있던 손님들을 한 칸씩 앞으로 이동
             UpdateWaitingLinePositions(removedIndex);
@@ -297,7 +298,7 @@ public class TableManager : MonoBehaviour
                 {
                     // 각 손님의 대기 위치를 재계산하여 업데이트
                     guestController.UpdateWaitingPosition(i);
-                    Debug.Log($"⬆️ 아이소메트릭 대기 위치 업데이트: {waitingLine[i].name} -> {i}번째 위치");
+                    //Debug.Log($"⬆️ 아이소메트릭 대기 위치 업데이트: {waitingLine[i].name} -> {i}번째 위치");
                 }
             }
         }
@@ -309,7 +310,7 @@ public class TableManager : MonoBehaviour
     {
         if (CustomerPath == null || CustomerWaitingTransform == null) // 필수 컴포넌트 체크
         {
-            Debug.LogError("CustomerPath 또는 CustomerWaitingTransform이 없습니다!");
+            //Debug.LogError("CustomerPath 또는 CustomerWaitingTransform이 없습니다!");
             return Vector3.zero; // 기본 위치 반환
         }
 
@@ -378,19 +379,19 @@ public class TableManager : MonoBehaviour
     [ContextMenu("아이소메트릭 대기열 상태 출력")]
     public void PrintWaitingLineStatus()
     {
-        Debug.Log($"🎮 현재 아이소메트릭 대기열 상황: {waitingLine.Count}명 대기 중");
-        Debug.Log($"📐 대기 방향: {waitingDirection}, 여러 줄: {useMultipleLines}, 줄당 최대: {maxGuestsPerLine}명");
+        //Debug.Log($"🎮 현재 아이소메트릭 대기열 상황: {waitingLine.Count}명 대기 중");
+        //Debug.Log($"📐 대기 방향: {waitingDirection}, 여러 줄: {useMultipleLines}, 줄당 최대: {maxGuestsPerLine}명");
 
         for (int i = 0; i < waitingLine.Count; i++)
         {
             if (waitingLine[i] != null)
             {
                 Vector3 pos = CalculateIsometricWaitingPosition(i);
-                Debug.Log($"  {i}번째: {waitingLine[i].name} - 위치: {pos}");
+                //Debug.Log($"  {i}번째: {waitingLine[i].name} - 위치: {pos}");
             }
             else
             {
-                Debug.Log($"  {i}번째: null (정리 필요)");
+                //Debug.Log($"  {i}번째: null (정리 필요)");
             }
         }
     }
@@ -418,7 +419,7 @@ public class TableManager : MonoBehaviour
                 {
                     waitingLine.RemoveAt(i); // 대기열에서 제거
                     waitingCustomerCount--; // 대기 손님 수 감소
-                    Debug.Log($"🧹 아이소메트릭 대기열에서 null 객체 제거됨. 인덱스: {i}");
+                    //Debug.Log($"🧹 아이소메트릭 대기열에서 null 객체 제거됨. 인덱스: {i}");
                 }
             }
 

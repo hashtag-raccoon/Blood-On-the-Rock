@@ -28,7 +28,7 @@ public class GuestController : MonoBehaviour
         // pathfinder가 없으면 경고
         if (pathfinder == null)
         {
-            Debug.LogError("IsometricPathfinder를 찾을 수 없습니다! GuestController에 할당해주세요.");
+            //Debug.LogError("IsometricPathfinder를 찾을 수 없습니다! GuestController에 할당해주세요.");
             return;
         }
 
@@ -114,7 +114,7 @@ public class GuestController : MonoBehaviour
         GameObject partialTable = tableManager.GetPartiallyOccupiedTable(); // 부분 점유 테이블 가져오기
         if (partialTable != null)
         {
-            Table tableComp = partialTable.GetComponent<Table>();
+            TableClass tableComp = partialTable.GetComponent<TableClass>();
             int seatedCount = tableComp.Seated_Customer.Count; // 앉아있는 손님 수
             // 예약된 손님 수 , 예약된 손님 수가 없으면 0 있으면 그 수
             int reservedCount = tableManager.tableReservations.ContainsKey(partialTable) ?
@@ -136,7 +136,7 @@ public class GuestController : MonoBehaviour
                     assignedTable = partialTable; // 예약된 테이블 설정
                     Target = partialTable.transform; // 타겟 설정
                     isMoving = false; // 새로운 경로 계산을 위해
-                    Debug.Log("🍽️ 대기 중 부분 점유 테이블 발견! 이동 시작");
+                    //Debug.Log("🍽️ 대기 중 부분 점유 테이블 발견! 이동 시작");
                     return;
                 }
             }
@@ -146,7 +146,7 @@ public class GuestController : MonoBehaviour
         GameObject availableTable = tableManager.GetAvailableTable(); // 빈 테이블 가져오기
         if (availableTable != null) // 빈 테이블이 있으면
         {
-            Table tableComp = availableTable.GetComponent<Table>();
+            TableClass tableComp = availableTable.GetComponent<TableClass>();
             // 예약된 손님 수 , 예약된 손님 수가 없으면 0 있으면 그 수
             int reservedCount = tableManager.tableReservations.ContainsKey(availableTable) ?
                                 tableManager.tableReservations[availableTable].Count : 0;
@@ -167,7 +167,7 @@ public class GuestController : MonoBehaviour
                     assignedTable = availableTable; // 예약된 테이블 설정
                     Target = availableTable.transform; // 타겟 설정
                     isMoving = false; // 새로운 경로 계산을 위해
-                    Debug.Log("🍽️ 대기 중 빈 테이블 발견! 이동 시작");
+                    //Debug.Log("🍽️ 대기 중 빈 테이블 발견! 이동 시작");
                 }
             }
         }
@@ -179,7 +179,7 @@ public class GuestController : MonoBehaviour
         GameObject partialTable = tableManager.GetPartiallyOccupiedTable();
         if (partialTable != null)
         {
-            Table tableComp = partialTable.GetComponent<Table>();
+            TableClass tableComp = partialTable.GetComponent<TableClass>();
             int seatedCount = tableComp.Seated_Customer.Count; // 앉아있는 손님 수
             // 예약된 손님 수 , 예약된 손님 수가 없으면 0 있으면 그 수
             int reservedCount = tableManager.tableReservations.ContainsKey(partialTable) ?
@@ -198,7 +198,7 @@ public class GuestController : MonoBehaviour
                     isWaiting = false;
                     assignedTable = partialTable; // 예약된 테이블 설정
                     Target = partialTable.transform; // 타겟 설정
-                    Debug.Log("🎯 타겟: 부분 점유 테이블 (예약 완료)");
+                    //Debug.Log("🎯 타겟: 부분 점유 테이블 (예약 완료)");
                     return;
                 }
             }
@@ -208,7 +208,7 @@ public class GuestController : MonoBehaviour
         GameObject availableTable = tableManager.GetAvailableTable();
         if (availableTable != null)
         {
-            Table tableComp = availableTable.GetComponent<Table>();
+            TableClass tableComp = availableTable.GetComponent<TableClass>();
             // 예약된 손님 수 , 예약된 손님 수가 없으면 0 있으면 그 수
             int reservedCount = tableManager.tableReservations.ContainsKey(availableTable) ?
                                 tableManager.tableReservations[availableTable].Count : 0;
@@ -226,7 +226,7 @@ public class GuestController : MonoBehaviour
                     isWaiting = false;
                     assignedTable = availableTable; // 예약된 테이블 설정
                     Target = availableTable.transform; // 타겟 설정
-                    Debug.Log("🎯 타겟: 빈 테이블 (예약 완료)");
+                    //Debug.Log("🎯 타겟: 빈 테이블 (예약 완료)");
                     return;
                 }
             }
@@ -237,7 +237,7 @@ public class GuestController : MonoBehaviour
         {
             AddToWaitingLine();
             assignedTable = null;
-            Debug.Log("🚶 타겟: 아이소메트릭 대기 위치 (모든 테이블 만석)");
+            //Debug.Log("🚶 타겟: 아이소메트릭 대기 위치 (모든 테이블 만석)");
         }
     }
 
@@ -285,7 +285,7 @@ public class GuestController : MonoBehaviour
         Target.position = waitingPos;
         isMoving = false; // 새로운 경로 계산을 위해
 
-        Debug.Log($"🎮 아이소메트릭 대기 위치 설정: {myWaitingPosition}번째, 좌표: {waitingPos}");
+        //Debug.Log($"🎮 아이소메트릭 대기 위치 설정: {myWaitingPosition}번째, 좌표: {waitingPos}");
     }
 
     // 대기 위치를 업데이트하는 메서드 (TableManager에서 호출)
@@ -296,7 +296,7 @@ public class GuestController : MonoBehaviour
         {
             myWaitingPosition = newPosition;
             SetIsometricWaitingTarget();
-            Debug.Log($"⬆️ 아이소메트릭 대기 위치 업데이트: {myWaitingPosition}번째");
+            //Debug.Log($"⬆️ 아이소메트릭 대기 위치 업데이트: {myWaitingPosition}번째");
         }
     }
 
@@ -323,12 +323,12 @@ public class GuestController : MonoBehaviour
         // 테이블에 도착한 경우
         if (assignedTable != null)
         {
-            Table tableComp = assignedTable.GetComponent<Table>();
+            TableClass tableComp = assignedTable.GetComponent<TableClass>();
 
             // MAX_Capacity 최종 체크
             if (tableComp.Seated_Customer.Count >= tableComp.MAX_Capacity)
             {
-                Debug.LogWarning($"⚠️ 테이블이 이미 가득 참! 현재: {tableComp.Seated_Customer.Count}명, 최대: {tableComp.MAX_Capacity}명");
+                //Debug.LogWarning($"⚠️ 테이블이 이미 가득 참! 현재: {tableComp.Seated_Customer.Count}명, 최대: {tableComp.MAX_Capacity}명");
 
                 // 예약 취소
                 tableManager.CancelReservation(assignedTable, this.gameObject);
@@ -352,7 +352,7 @@ public class GuestController : MonoBehaviour
 
                 // 착석 완료 상태로 변경
                 isSeated = true;
-                Debug.Log($"🍽️ 손님이 테이블에 착석. 현재 인원: {tableComp.Seated_Customer.Count}/{tableComp.MAX_Capacity}");
+                //Debug.Log($"🍽️ 손님이 테이블에 착석. 현재 인원: {tableComp.Seated_Customer.Count}/{tableComp.MAX_Capacity}");
             }
         }
         // 아이소메트릭 대기 위치에 도착한 경우
@@ -362,7 +362,7 @@ public class GuestController : MonoBehaviour
             {
                 isWaiting = true;
                 Vector3 currentPos = tableManager.CalculateIsometricWaitingPosition(myWaitingPosition); // 현재 대기 위치 좌표
-                Debug.Log($"🎮 손님이 아이소메트릭 대기열 {myWaitingPosition}번째 위치에 도착 - 좌표: {currentPos}");
+                //Debug.Log($"🎮 손님이 아이소메트릭 대기열 {myWaitingPosition}번째 위치에 도착 - 좌표: {currentPos}");
             }
         }
     }
