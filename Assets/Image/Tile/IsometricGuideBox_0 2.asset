@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: IsometricGuideBox_0
+  m_Name: IsometricGuideBox_0 2
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: -1638735995, guid: 2d2c9b62ce4dfa14bae15cca1372457c, type: 3}
-  m_Color: {r: 0.9622642, g: 0.9622642, b: 0.9622642, a: 1}
+  m_Color: {r: 0.19517621, g: 0.32257947, b: 0.8113208, a: 1}
   m_Transform:
     e00: 1
     e01: 0

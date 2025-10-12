@@ -1203,7 +1203,8 @@ MonoBehaviour:
   startButton: {fileID: 394350768}
   exitButton: {fileID: 59189362}
   settingButton: {fileID: 1007633150}
-  gameSceneName: SampleScene
+  gameSceneName: BarScene_Raccoon
+  settingSceneName: SettingScene
 --- !u!1 &2094546428
 GameObject:
   m_ObjectHideFlags: 0

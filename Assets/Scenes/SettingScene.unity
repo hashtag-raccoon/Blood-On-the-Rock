@@ -1098,7 +1098,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Display
+  m_text: "\uD654\uBA74\uC124\uC815\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1469,21 +1469,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d75808dc1ef91d64a994c2f2dc126d77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  normalColor:
-    r: 1
-    g: 1
-    b: 1
-    a: 1
-  highlightColor:
-    r: 1
-    g: 0.92156863
-    b: 0.015686275
-    a: 1
-  waitingColor:
-    r: 1
-    g: 0
-    b: 0
-    a: 1
 --- !u!114 &1258974622
 MonoBehaviour:
   m_ObjectHideFlags: 0
