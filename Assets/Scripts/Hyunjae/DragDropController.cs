@@ -12,11 +12,13 @@ public class DragDropController : MonoBehaviour
     
     [Header("드래그 설정")]
     [SerializeField] private Camera mainCamera;
+    [SerializeField] private Tilemap previewTilemap; // 미리보기용 타일맵
     
     private bool isDragging = false;
     private Vector3Int originalCell;
     private TileBase draggedTile;
     private Vector3 offset;
+    private Vector3Int lastPreviewCell = Vector3Int.zero;
     
     void Start()
     {
@@ -63,6 +65,21 @@ public class DragDropController : MonoBehaviour
             }
         }
         
+        // 프리뷰 타일맵 자동 찾기
+        if (previewTilemap == null)
+        {
+            Tilemap[] tilemaps = FindObjectsOfType<Tilemap>();
+            foreach (Tilemap tilemap in tilemaps)
+            {
+                if (tilemap.name.ToLower().Contains("preview"))
+                {
+                    previewTilemap = tilemap;
+                    Debug.Log($"Preview 타일맵 찾음: {tilemap.name}");
+                    break;
+                }
+            }
+        }
+        
         // 모든 타일맵의 타일 개수 확인 (모든 Z 레벨에서)
         if (buildingTilemap != null)
         {
@@ -92,11 +109,13 @@ public class DragDropController : MonoBehaviour
         Debug.Log($"Grid: {(grid != null ? "찾음" : "없음")}");
         Debug.Log($"Ground Tilemap: {(groundTilemap != null ? "찾음" : "없음")}");
         Debug.Log($"Building Tilemap: {(buildingTilemap != null ? "찾음" : "없음")}");
+        Debug.Log($"Preview Tilemap: {(previewTilemap != null ? "찾음" : "없음")}");
     }
     
     void Update()
     {
         HandleMouseInput();
+        UpdatePreview();
     }
     
     private void HandleMouseInput()
@@ -161,17 +180,42 @@ public class DragDropController : MonoBehaviour
     
     private void UpdateDragPosition()
     {
-        // 마우스 위치를 월드 좌표로 변환
-        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = 0; // 2D이므로 z는 0으로 고정
+        // 이 함수는 더 이상 사용하지 않음 (UpdatePreview에서 처리)
+    }
+    
+    private void UpdatePreview()
+    {
+        if (!isDragging || draggedTile == null || previewTilemap == null)
+            return;
+            
+        Vector3Int currentCell = GetMouseCell();
         
-        // 건물을 마우스 위치에 따라 이동 (실제로는 타일맵에 표시하지 않고 마우스만 따라감)
-        // 실제 구현에서는 여기에 건물 오브젝트를 마우스 위치에 배치하는 코드를 추가할 수 있습니다
+        // 이전 미리보기 지우기
+        if (lastPreviewCell != Vector3Int.zero)
+        {
+            previewTilemap.SetTile(lastPreviewCell, null);
+        }
+        
+        // 현재 위치에 미리보기 표시
+        previewTilemap.SetTile(currentCell, draggedTile);
+        
+        // 설치 가능 여부에 따라 색상 변경
+        bool canPlace = CanPlaceAt(currentCell);
+        Color previewColor = canPlace ? 
+            new Color(1f, 1f, 1f, 0.6f) :  // 흰색 반투명 (설치 가능)
+            new Color(1f, 0.3f, 0.3f, 0.6f); // 빨간색 반투명 (설치 불가)
+            
+        previewTilemap.SetColor(currentCell, previewColor);
+        
+        lastPreviewCell = currentCell;
     }
     
     private void EndDrag()
     {
         Vector3Int dropCell = GetMouseCell();
+        
+        // 미리보기 제거
+        ClearPreview();
         
         // 그라운드에 타일이 있고, 건물 위치가 비어있는지 확인
         if (CanPlaceAt(dropCell))
@@ -194,6 +238,9 @@ public class DragDropController : MonoBehaviour
     
     private void CancelDrag()
     {
+        // 미리보기 제거
+        ClearPreview();
+        
         // 원래 위치로 되돌리기
         if (draggedTile != null)
         {
@@ -205,6 +252,16 @@ public class DragDropController : MonoBehaviour
         draggedTile = null;
         
         Debug.Log("드래그를 취소했습니다.");
+    }
+    
+    private void ClearPreview()
+    {
+        if (previewTilemap != null && lastPreviewCell != Vector3Int.zero)
+        {
+            previewTilemap.SetTile(lastPreviewCell, null);
+            previewTilemap.SetColor(lastPreviewCell, Color.white);
+            lastPreviewCell = Vector3Int.zero;
+        }
     }
     
     private Vector3Int GetMouseCell()
