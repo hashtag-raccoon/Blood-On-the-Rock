@@ -349,7 +349,7 @@ public class GuestController : MonoBehaviour
 
                 // 착석 완료
                 isSeated = true;
-                Debug.Log($"✅ 손님이 좌석에 착석 완료: {assignedTable.name}");
+                //Debug.Log($"손님이 좌석에 착석 완료: {assignedTable.name}");
             }
         }
         else if (myWaitingPosition != -1)

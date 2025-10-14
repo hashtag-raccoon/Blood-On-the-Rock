@@ -16,7 +16,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private GameObject MouseFollowingObj;
     [Header("플레이어 시점 오브젝트")]
     [SerializeField] private GameObject PlayerObj;
-    [Header("바 시점 오브젝트")]
+    [Header("작업 시점 오브젝트")]
     [SerializeField] private GameObject WorkspaceObj;
 
     [Header("평소 시점 카메라 콜라이더")]
