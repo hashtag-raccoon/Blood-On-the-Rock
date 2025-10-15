@@ -25,6 +25,25 @@ public class DragDropController : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
             
+        // Isometric에서 겹침 방지: 카메라 투명도 정렬축을 Y 축으로 설정
+        if (mainCamera != null)
+        {
+            mainCamera.transparencySortMode = TransparencySortMode.CustomAxis;
+            mainCamera.transparencySortAxis = Vector3.up; // (0,1,0)
+        }
+
+        // 프리뷰 타일맵이 있다면, 항상 최상단에 보이도록 정렬 순서 상향
+        if (previewTilemap != null)
+        {
+            var pr = previewTilemap.GetComponent<TilemapRenderer>();
+            if (pr != null)
+            {
+                // 다른 타일맵보다 충분히 높은 Order in Layer 보장
+                if (pr.sortingOrder < 100)
+                    pr.sortingOrder = 100;
+            }
+        }
+
         // Grid를 자동으로 찾기
         if (grid == null)
         {
@@ -147,34 +166,24 @@ public class DragDropController : MonoBehaviour
     
     private void StartDrag()
     {
-        Vector3Int cell = GetMouseCell();
+        Vector3Int cellForPlacement = GetMouseCell(); // 현재 설정된 배치 Z(예: 2)
         
-        Debug.Log($"마우스 클릭 위치: {cell}");
+        Debug.Log($"마우스 클릭 위치(배치 Z): {cellForPlacement}");
         Debug.Log($"Building Tilemap이 null인가? {buildingTilemap == null}");
         
-        if (buildingTilemap != null)
+        // 클릭 지점(x,y)에서 모든 Z 레벨을 위에서 아래로 탐색하여 실제 존재하는 건물을 찾음
+        if (buildingTilemap != null && TryFindBuildingAtXY(cellForPlacement.x, cellForPlacement.y, out Vector3Int foundCell, out TileBase foundTile))
         {
-            Debug.Log($"해당 위치에 타일이 있는가? {buildingTilemap.HasTile(cell)}");
-        }
-        
-        // 건물 타일맵에서 클릭한 위치에 타일이 있는지 확인
-        if (buildingTilemap != null && buildingTilemap.HasTile(cell))
-        {
-            // 드래그할 타일 저장
-            draggedTile = buildingTilemap.GetTile(cell);
-            originalCell = cell;
+            draggedTile = foundTile;
+            originalCell = foundCell;
             
-            // 원래 위치에서 타일 제거 (들고 있는 상태)
-            buildingTilemap.SetTile(cell, null);
-            
-            // 드래그 시작
+            buildingTilemap.SetTile(foundCell, null); // 들고 있는 상태
             isDragging = true;
-            
-            Debug.Log("건물을 잡았습니다!");
+            Debug.Log($"건물을 잡았습니다! 원위치: {foundCell}");
         }
         else
         {
-            Debug.Log("건물을 잡을 수 없습니다. 건물 타일을 정확히 클릭해주세요.");
+            Debug.Log("건물을 잡을 수 없습니다. 건물 타일을 정확히 클릭했는지, 또는 올바른 타일맵에 그려졌는지 확인하세요.");
         }
     }
     
@@ -194,10 +203,15 @@ public class DragDropController : MonoBehaviour
         if (lastPreviewCell != Vector3Int.zero)
         {
             previewTilemap.SetTile(lastPreviewCell, null);
+            // 색상 원복 안전 처리
+            previewTilemap.SetTileFlags(lastPreviewCell, TileFlags.None);
+            previewTilemap.SetColor(lastPreviewCell, Color.white);
         }
         
         // 현재 위치에 미리보기 표시
         previewTilemap.SetTile(currentCell, draggedTile);
+        // per-cell color 적용 위해 TileFlags 해제 필요
+        previewTilemap.SetTileFlags(currentCell, TileFlags.None);
         
         // 설치 가능 여부에 따라 색상 변경
         bool canPlace = CanPlaceAt(currentCell);
@@ -206,6 +220,8 @@ public class DragDropController : MonoBehaviour
             new Color(1f, 0.3f, 0.3f, 0.6f); // 빨간색 반투명 (설치 불가)
             
         previewTilemap.SetColor(currentCell, previewColor);
+        
+        Debug.Log($"프리뷰 표시 셀: {currentCell}, 설치가능: {canPlace}");
         
         lastPreviewCell = currentCell;
     }
@@ -259,9 +275,32 @@ public class DragDropController : MonoBehaviour
         if (previewTilemap != null && lastPreviewCell != Vector3Int.zero)
         {
             previewTilemap.SetTile(lastPreviewCell, null);
+            previewTilemap.SetTileFlags(lastPreviewCell, TileFlags.None);
             previewTilemap.SetColor(lastPreviewCell, Color.white);
             lastPreviewCell = Vector3Int.zero;
         }
+    }
+
+    // 클릭된 x,y에서 모든 Z를 탐색하여 실제로 존재하는 건물 타일을 찾는다 (가장 높은 Z 우선)
+    private bool TryFindBuildingAtXY(int x, int y, out Vector3Int foundCell, out TileBase foundTile)
+    {
+        foundCell = new Vector3Int(x, y, 0);
+        foundTile = null;
+        if (buildingTilemap == null)
+            return false;
+
+        BoundsInt bounds = buildingTilemap.cellBounds;
+        for (int z = bounds.zMax - 1; z >= bounds.zMin; z--)
+        {
+            Vector3Int pos = new Vector3Int(x, y, z);
+            if (buildingTilemap.HasTile(pos))
+            {
+                foundCell = pos;
+                foundTile = buildingTilemap.GetTile(pos);
+                return true;
+            }
+        }
+        return false;
     }
     
     private Vector3Int GetMouseCell()
