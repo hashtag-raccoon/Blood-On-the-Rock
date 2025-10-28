@@ -1,83 +1,180 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    [Header("Ä«¸Ş¶ó ÇÒ´ç(°¡»óÄ«¸Ş¶ó)")]
+    [Header("ì¹´ë©”ë¼ í• ë‹¹(ê°€ìƒì¹´ë©”ë¼)")]
     public CinemachineVirtualCamera virtualCamera;
-    [Header("Confiner ÇÒ´ç(°¡»óÄ«¸Ş¶ó)")]
+    [Header("Confiner í• ë‹¹(ê°€ìƒì¹´ë©”ë¼)")]
     [SerializeField] private CinemachineConfiner2D confiner;
 
     private bool isMouse = false;
     [HideInInspector] public bool isMaking = false;
-    [Header("¸¶¿ì½º ½ÃÁ¡ ¿ÀºêÁ§Æ®")]
+    [Header("ì„¬ ì”¬ ì—¬ë¶€")]
+    [SerializeField] private bool isIsland = false;
+    [Header("ë§ˆìš°ìŠ¤ ì‹œì  ì˜¤ë¸Œì íŠ¸")]
     [SerializeField] private GameObject MouseFollowingObj;
-    [Header("ÇÃ·¹ÀÌ¾î ½ÃÁ¡ ¿ÀºêÁ§Æ®")]
+    [Header("í”Œë ˆì´ì–´ ì‹œì  ì˜¤ë¸Œì íŠ¸")]
     [SerializeField] private GameObject PlayerObj;
-    [Header("ÀÛ¾÷ ½ÃÁ¡ ¿ÀºêÁ§Æ®")]
+    [Header("ì‘ì—… ì‹œì  ì˜¤ë¸Œì íŠ¸")]
     [SerializeField] private GameObject WorkspaceObj;
 
-    [Header("Æò¼Ò ½ÃÁ¡ Ä«¸Ş¶ó Äİ¶óÀÌ´õ")]
+    [Header("í‰ì†Œ ì‹œì  ì¹´ë©”ë¼ ì½œë¼ì´ë”")]
     [SerializeField] private PolygonCollider2D defaultCollider;
 
-    [Header("Ä«¸Ş¶ó ´ïÇÎ °ª")]
+    [Header("ì¹´ë©”ë¼ ëŒí•‘ ê°’")]
     [SerializeField] private float DampingValue = 0.2f;
+
+    [Header("ì„¬ ì”¬/ìµœëŒ€ ì¤Œì•„ì›ƒ ê°’")]
+    [SerializeField] private float MaxZoomIn = 50;
+
+    [Header("ì„¬ ì”¬/ìµœì†Œ ì¤Œì¸ ê°’")]
+    [SerializeField] private float MinZoomOut = 1;
+
+    [Header("ì„¬ ì”¬/ì¤Œ ì†ë„")]
+    [SerializeField] private float ZoomSpeed = 2f;
+
+    private Vector3 _tmpClickPos;
+    private Vector3 _tmpCameraPos;
 
     private void Start()
     {
-        confiner.m_Damping = 0.2f; // Ä«¸Ş¶ó ´ïÇÎ
+        confiner.m_Damping = 0.2f; // ì¹´ë©”ë¼ ëŒí•‘
+        if(isIsland)
+        {
+            IslandInit();
+        }
     }
     // Update is called once per frame
     void Update()
     {
-        // ¸¶¿ì½º À§Ä¡¸¦ ¿ùµå ÁÂÇ¥·Î º¯È¯
+        // ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¥¼ ì›”ë“œ ì¢Œí‘œë¡œ ë³€í™˜
         Vector3 mouseScreenPos = Input.mousePosition;
-        mouseScreenPos.z = Mathf.Abs(Camera.main.transform.position.z); // Ä«¸Ş¶ó¿ÍÀÇ °Å¸® ÁöÁ¤
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-        mouseWorldPos.z = 0; // 2D È¯°æÀÏ °æ¿ì z°ª °íÁ¤
+        mouseScreenPos.z = Mathf.Abs(Camera.main.transform.position.z); // ì¹´ë©”ë¼ì™€ì˜ ê±°ë¦¬ ì§€ì •
 
-        // ´ïÇÎ
-        MouseFollowingObj.transform.position = Vector3.Lerp(MouseFollowingObj.transform.position, mouseWorldPos, DampingValue);
-
-        if ((Input.GetKeyDown(KeyCode.T) && isMaking == false)) // ¹Ù ½ÃÁ¡ X ÀÏ¶§, TÅ°·Î ½ÃÁ¡ ÀüÈ¯
+        if (!isIsland) // BarScene ì¼ë•Œ
         {
-            switch(isMouse)
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+            mouseWorldPos.z = 0; // 2D í™˜ê²½ì¼ ê²½ìš° zê°’ ê³ ì •
+
+            // ëŒí•‘
+            MouseFollowingObj.transform.position = Vector3.Lerp(MouseFollowingObj.transform.position, mouseWorldPos, DampingValue);
+
+            if ((Input.GetKeyDown(KeyCode.T) && isMaking == false)) // ë°” ì‹œì  X ì¼ë•Œ, Tí‚¤ë¡œ ì‹œì  ì „í™˜
             {
-                case true:
-                    isMouse = false;
-                    break;
-                case false:
-                    isMouse = true;
-                    break;
+                switch (isMouse)
+                {
+                    case true:
+                        isMouse = false;
+                        break;
+                    case false:
+                        isMouse = true;
+                        break;
+                }
             }
-        }
 
-        if(isMaking == true) // ¹Ù ½ÃÁ¡ O ÀÏ¶§, ¹«Á¶°Ç ¹Ù ½ÃÁ¡
-        {
-            isMouse = false;
-            confiner.m_BoundingShape2D = null; // ¹Ù ½ÃÁ¡ Äİ¶óÀÌ´õ ÃÊ±âÈ­
-            virtualCamera.Follow = WorkspaceObj.transform; // ¹Ù ½ÃÁ¡
-            virtualCamera.OnTargetObjectWarped(
-                WorkspaceObj.transform,
-                WorkspaceObj.transform.position - virtualCamera.Follow.position
-            );
-            virtualCamera.PreviousStateIsValid = false;
-        }
-        else
-        {
-            confiner.m_BoundingShape2D = defaultCollider; // Æò¼Ò ½ÃÁ¡ Äİ¶óÀÌ´õ
-            virtualCamera.PreviousStateIsValid = true;
-            if (isMouse == true)
+            if (isMaking == true) // ë°” ì‹œì  O ì¼ë•Œ, ë¬´ì¡°ê±´ ë°” ì‹œì 
             {
-                virtualCamera.Follow = MouseFollowingObj.transform; // ¸¶¿ì½º ½ÃÁ¡
-
+                isMouse = false;
+                confiner.m_BoundingShape2D = null; // ë°” ì‹œì  ì½œë¼ì´ë” ì´ˆê¸°í™”
+                virtualCamera.Follow = WorkspaceObj.transform; // ë°” ì‹œì 
+                virtualCamera.OnTargetObjectWarped(
+                    WorkspaceObj.transform,
+                    WorkspaceObj.transform.position - virtualCamera.Follow.position
+                );
+                virtualCamera.PreviousStateIsValid = false;
             }
             else
             {
-                virtualCamera.Follow = PlayerObj.transform; // ÇÃ·¹ÀÌ¾î ½ÃÁ¡
+                confiner.m_BoundingShape2D = defaultCollider; // í‰ì†Œ ì‹œì  ì½œë¼ì´ë”
+                virtualCamera.PreviousStateIsValid = true;
+                if (isMouse == true)
+                {
+                    virtualCamera.Follow = MouseFollowingObj.transform; // ë§ˆìš°ìŠ¤ ì‹œì 
+
+                }
+                else
+                {
+                    virtualCamera.Follow = PlayerObj.transform; // í”Œë ˆì´ì–´ ì‹œì 
+                }
             }
+        }
+        else // IslandScene ì¼ë•Œ
+        {
+            DragToCameramMove();
+
+            WheelToZoom();
+        }
+    }
+
+
+    // ì„¬ ì´ˆê¸° ì¹´ë©”ë¼ ì„¤ì •
+    private void IslandInit()
+    {
+        PlayerObj = null;
+        WorkspaceObj = null;
+
+        virtualCamera.Follow = MouseFollowingObj.transform; // ë§ˆìš°ìŠ¤ ì‹œì 
+        confiner.m_BoundingShape2D = defaultCollider; // í‰ì†Œ ì‹œì  ì½œë¼ì´ë”
+    }
+
+
+    // ë“œë˜ê·¸ë¡œ ì¹´ë©”ë¼ ì´ë™
+    private void DragToCameramMove()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            _tmpClickPos = Input.mousePosition;
+            _tmpCameraPos = MouseFollowingObj.transform.position; // virtualCamera â†’ MouseFollowingObj
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            Vector3 movePos = Camera.main.ScreenToViewportPoint(_tmpClickPos - Input.mousePosition);
+            movePos.z = 0;
+            Vector2 clampedPos = ClampToPolygon(_tmpCameraPos +
+                new Vector3(movePos.x * virtualCamera.m_Lens.OrthographicSize * 2,
+                movePos.y * virtualCamera.m_Lens.OrthographicSize * 2, 0));
+            MouseFollowingObj.transform.position = clampedPos;
+        }
+    }
+
+    // íœ ë¡œ ì¤Œ ì¸ / ì¤Œ ì•„ì›ƒ
+    private void WheelToZoom()
+    {
+        float scrollWheelInput = Input.GetAxis("Mouse ScrollWheel");
+        if (scrollWheelInput != 0)
+        { virtualCamera.m_Lens.OrthographicSize += (1 * -Mathf.Sign(scrollWheelInput)) * ZoomSpeed; }
+
+        if (virtualCamera.m_Lens.OrthographicSize < MinZoomOut)
+        {
+            virtualCamera.m_Lens.OrthographicSize = MinZoomOut;
+        }
+        if (virtualCamera.m_Lens.OrthographicSize > MaxZoomIn)
+        {
+            virtualCamera.m_Lens.OrthographicSize = MaxZoomIn;
+        }
+    }
+
+    private Vector2 ClampToPolygon(Vector2 targetPosition)
+    {
+        if (defaultCollider == null)
+        { return targetPosition; }
+
+        // PolygonColliderì˜ ê°€ì¥ ê°€ê¹Œìš´ ì  ì°¾ê¸°
+        Vector2 closestPoint = defaultCollider.ClosestPoint(targetPosition);
+
+        // íƒ€ê²Ÿ ìœ„ì¹˜ê°€ Collider ë‚´ë¶€ì— ìˆëŠ”ì§€ í™•ì¸
+        if (defaultCollider.OverlapPoint(targetPosition))
+        {
+            // ë‚´ë¶€ì— ìˆìœ¼ë©´ ê·¸ëŒ€ë¡œ ë°˜í™˜
+            return targetPosition;
+        }
+        else
+        {
+            // ì™¸ë¶€ì— ìˆìœ¼ë©´ ê°€ì¥ ê°€ê¹Œìš´ ê²½ê³„ ì§€ì  ë°˜í™˜
+            return closestPoint;
         }
     }
 }
