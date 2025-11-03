@@ -6,16 +6,29 @@ using UnityEngine;
 public class CameraManager : MonoBehaviour
 {
     [Header("카메라 할당(가상카메라)")]
-    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+    public CinemachineVirtualCamera virtualCamera;
+    [Header("Confiner 할당(가상카메라)")]
+    [SerializeField] private CinemachineConfiner2D confiner;
 
     private bool isMouse = false;
+    [HideInInspector] public bool isMaking = false;
     [Header("마우스 시점 오브젝트")]
     [SerializeField] private GameObject MouseFollowingObj;
     [Header("플레이어 시점 오브젝트")]
     [SerializeField] private GameObject PlayerObj;
+    [Header("바 시점 오브젝트")]
+    [SerializeField] private GameObject WorkspaceObj;
+
+    [Header("평소 시점 카메라 콜라이더")]
+    [SerializeField] private PolygonCollider2D defaultCollider;
+
     [Header("카메라 댐핑 값")]
     [SerializeField] private float DampingValue = 0.2f;
 
+    private void Start()
+    {
+        confiner.m_Damping = 0.2f; // 카메라 댐핑
+    }
     // Update is called once per frame
     void Update()
     {
@@ -28,18 +41,42 @@ public class CameraManager : MonoBehaviour
         // 댐핑
         MouseFollowingObj.transform.position = Vector3.Lerp(MouseFollowingObj.transform.position, mouseWorldPos, DampingValue);
 
-        if (Input.GetKeyDown(KeyCode.T))
+        if ((Input.GetKeyDown(KeyCode.T) && isMaking == false)) // 바 시점 X 일때, T키로 시점 전환
         {
             switch(isMouse)
             {
                 case true:
                     isMouse = false;
-                    virtualCamera.Follow = MouseFollowingObj.transform;
                     break;
                 case false:
                     isMouse = true;
-                    virtualCamera.Follow = PlayerObj.transform;
                     break;
+            }
+        }
+
+        if(isMaking == true) // 바 시점 O 일때, 무조건 바 시점
+        {
+            isMouse = false;
+            confiner.m_BoundingShape2D = null; // 바 시점 콜라이더 초기화
+            virtualCamera.Follow = WorkspaceObj.transform; // 바 시점
+            virtualCamera.OnTargetObjectWarped(
+                WorkspaceObj.transform,
+                WorkspaceObj.transform.position - virtualCamera.Follow.position
+            );
+            virtualCamera.PreviousStateIsValid = false;
+        }
+        else
+        {
+            confiner.m_BoundingShape2D = defaultCollider; // 평소 시점 콜라이더
+            virtualCamera.PreviousStateIsValid = true;
+            if (isMouse == true)
+            {
+                virtualCamera.Follow = MouseFollowingObj.transform; // 마우스 시점
+
+            }
+            else
+            {
+                virtualCamera.Follow = PlayerObj.transform; // 플레이어 시점
             }
         }
     }
