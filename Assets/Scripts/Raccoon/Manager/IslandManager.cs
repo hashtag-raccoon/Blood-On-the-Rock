@@ -1,31 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+//using UnityEngine.UIElements;
 
 public class IslandManager : MonoBehaviour
 {
+    [Header("데이터 매니저 할당")]
+    [SerializeField] private DataManager dataManager;
+
     [Header("하루 시간 설정(시)")]
-    [SerializeField] private float SetDayTime = 3; // 시간 기준으로 설정할 것
-    private float convertedDayTime = 0;
+    [SerializeField] private float SetDayTime = 3f; // 시간 기준으로 설정할 것
+    [SerializeField] private float wait_convertedDayTime = 0;
 
-    [Header("바 현재 선호도")]
-    public float storeFavor = 100f;
+    [Header("화면 블러 패널")]
+    public GameObject BlurUI;
 
-    public int barLevel = 1;
-    public int wood = 0;
-    public int money = 0;
+    private Coroutine dayCoroutine;
+
+    [SerializeField] private Button StoreOpenButton;
+
+    public List<GameObject> leftUI = new List<GameObject>();
+    public List<GameObject> rightUI = new List<GameObject>();
 
     void Start()
     {
-        convertedDayTime = SetDayTime * 60 * 60f; // 초 단위로 변환
-
+        wait_convertedDayTime = SetDayTime * 60 * 60f; // 초 단위로 변환
+        StoreOpenButton.onClick.AddListener(StoreOpenButtonClicked);
         // 낮 -> 밤 코루틴 시작
-        StartCoroutine(DayCoroutine());
+        dayCoroutine = StartCoroutine(DayCoroutine());
     }
 
     void Update()
     {
-        if (storeFavor <= 0)
+        if (dataManager.storeFavor <= 0)
         {
             // 게임종료
             Debug.Log("가게 호감도가 0이 되어 게임이 종료됩니다.");
@@ -35,7 +44,28 @@ public class IslandManager : MonoBehaviour
     // 낮 -> 밤 코루틴
     IEnumerator DayCoroutine()
     {
-        yield return new WaitForSeconds(convertedDayTime);
-        Debug.Log("하루가 지났습니다.");
+        yield return new WaitForSeconds(wait_convertedDayTime);
+        OnDayEnd();
     }
+
+    // 하루 종료 시 호출될 함수
+    private void OnDayEnd()
+    {
+        Debug.Log("하루가 종료됨");
+        // 다음 씬으로 넘어감
+        //SceneManager.LoadScene("BarScene");
+    }
+
+    // 하루 종료 후 바로 바로 넘어가기 위한 함수
+    private void StoreOpenButtonClicked()
+    {
+        if (dayCoroutine != null)
+        {
+            StopCoroutine(dayCoroutine);
+            dayCoroutine = null;
+
+            OnDayEnd();
+        }
+    }
+
 }

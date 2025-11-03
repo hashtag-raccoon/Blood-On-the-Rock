@@ -12,7 +12,7 @@ public class GuestController : MonoBehaviour
     public TableManager tableManager;
 
     [Header("손님 그룹 설정")]
-    public int desiredPartySize = 1; // 원하는 테이블 크기 (1인 or 2인 등)
+    public int desiredPartySize = 1;
 
     private Transform Target;
     private List<Vector3Int> currentPath;
@@ -23,7 +23,7 @@ public class GuestController : MonoBehaviour
     private int myWaitingPosition = -1;
     private GameObject waitingTargetObject;
     private bool isSeated = false;
-    private Transform assignedSeat; // 배정된 좌석 (겹치지 않게)
+    private Transform assignedSeat; 
 
     void Start()
     {
@@ -79,7 +79,6 @@ public class GuestController : MonoBehaviour
 
     void OnDestroy()
     {
-        // 좌석 배정 해제
         if (assignedTable != null && assignedSeat != null)
         {
             TableClass tableComp = assignedTable.GetComponent<TableClass>();
@@ -97,7 +96,6 @@ public class GuestController : MonoBehaviour
 
     void CheckForAvailableTable()
     {
-        // 1번: 부분 점유 테이블 확인 (원하는 크기와 일치하는지 확인)
         GameObject partialTable = tableManager.GetPartiallyOccupiedTable(desiredPartySize);
         if (partialTable != null)
         {
@@ -108,7 +106,6 @@ public class GuestController : MonoBehaviour
 
             if (seatedCount + reservedCount < tableComp.MAX_Capacity)
             {
-                // 빈 좌석 확인
                 Transform availableSeat = tableComp.GetAvailableSeatForGuest(this.gameObject);
                 if (availableSeat != null)
                 {
@@ -128,7 +125,6 @@ public class GuestController : MonoBehaviour
             }
         }
 
-        // 2번: 빈 테이블 확인 (원하는 크기와 일치하는지 확인)
         GameObject availableTable = tableManager.GetAvailableTable(desiredPartySize);
         if (availableTable != null)
         {
@@ -138,7 +134,6 @@ public class GuestController : MonoBehaviour
 
             if (reservedCount < tableComp.MAX_Capacity)
             {
-                // 빈 좌석 확인
                 Transform availableSeat = tableComp.GetAvailableSeatForGuest(this.gameObject);
                 if (availableSeat != null)
                 {
@@ -160,7 +155,6 @@ public class GuestController : MonoBehaviour
 
     void DetermineTarget()
     {
-        // 1번: 부분 점유 테이블 (원하는 크기 체크)
         GameObject partialTable = tableManager.GetPartiallyOccupiedTable(desiredPartySize);
         if (partialTable != null)
         {
@@ -171,7 +165,6 @@ public class GuestController : MonoBehaviour
 
             if (seatedCount + reservedCount < tableComp.MAX_Capacity)
             {
-                // 빈 좌석 확인
                 Transform availableSeat = tableComp.GetAvailableSeatForGuest(this.gameObject);
                 if (availableSeat != null)
                 {
@@ -190,7 +183,6 @@ public class GuestController : MonoBehaviour
             }
         }
 
-        // 2번: 빈 테이블 (원하는 크기 체크)
         GameObject availableTable = tableManager.GetAvailableTable(desiredPartySize);
         if (availableTable != null)
         {
@@ -200,7 +192,6 @@ public class GuestController : MonoBehaviour
 
             if (reservedCount < tableComp.MAX_Capacity)
             {
-                // 빈 좌석 확인
                 Transform availableSeat = tableComp.GetAvailableSeatForGuest(this.gameObject);
                 if (availableSeat != null)
                 {
@@ -219,7 +210,6 @@ public class GuestController : MonoBehaviour
             }
         }
 
-        // 3번: 대기 위치
         if (tableManager.CustomerWaitingTransform != null)
         {
             AddToWaitingLine();
@@ -299,16 +289,12 @@ public class GuestController : MonoBehaviour
         if (assignedTable != null && assignedSeat != null)
         {
             TableClass tableComp = assignedTable.GetComponent<TableClass>();
-
-            // MAX_Capacity 최종 체크
             if (tableComp.Seated_Customer.Count >= tableComp.MAX_Capacity)
             {
-                Debug.LogWarning($"⚠️ 테이블이 이미 가득 찼습니다!");
+                Debug.LogWarning($" 테이블이 이미 가득 참");
 
-                // 좌석 배정 해제
                 tableComp.ReleaseSeat(this.gameObject);
 
-                // 예약 취소
                 tableManager.CancelReservation(assignedTable, this.gameObject);
 
                 assignedTable = null;
@@ -319,12 +305,10 @@ public class GuestController : MonoBehaviour
                 return;
             }
 
-            // 좌석이 내게 배정되었는지 확인
             if (!tableComp.IsSeatAssignedToGuest(assignedSeat, this.gameObject))
             {
-                Debug.LogWarning($"⚠️ 좌석이 다른 손님에게 배정되었습니다!");
+                Debug.LogWarning($"좌석이 다른 손님에게 배정됨");
 
-                // 예약 취소
                 tableManager.CancelReservation(assignedTable, this.gameObject);
 
                 assignedTable = null;
@@ -335,21 +319,16 @@ public class GuestController : MonoBehaviour
                 return;
             }
 
-            // 중복 체크 후 손님 추가
             if (!tableComp.Seated_Customer.Contains(this.gameObject))
             {
                 tableComp.Seated_Customer.Add(this.gameObject);
                 tableComp.isCustomerSeated = true;
 
-                // 예약 취소 (실제 착석 완료)
                 tableManager.CancelReservation(assignedTable, this.gameObject);
 
-                // 좌석에 정확히 위치
                 transform.position = assignedSeat.position;
 
-                // 착석 완료
                 isSeated = true;
-                //Debug.Log($"손님이 좌석에 착석 완료: {assignedTable.name}");
             }
         }
         else if (myWaitingPosition != -1)

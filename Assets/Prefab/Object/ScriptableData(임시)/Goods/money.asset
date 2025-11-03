@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa6e979415d98214a926f916c5f2ea9e, type: 3}
   m_Name: money
   m_EditorClassIdentifier: 
-  goodsName: 
-  type: 0
-  icon: {fileID: 0}
+  id: 0
+  goodsName: Money
+  type: 4
+  icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  amount: 1000
+  price: 0

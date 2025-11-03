@@ -12,7 +12,7 @@ public enum goodsType
 }
 
 [CreateAssetMenu(fileName = "goods", menuName = "goods")]
-public class goodsData : ScriptableObject
+public class goodsData : ScriptableObject, IScrollItemData
 {
     public int id;
     public string goodsName;

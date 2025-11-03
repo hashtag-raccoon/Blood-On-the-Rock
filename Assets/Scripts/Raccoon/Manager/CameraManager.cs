@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using Cinemachine;
+using System.Collections;
 using System.Collections.Generic;
-using Cinemachine;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraManager : MonoBehaviour
 {
@@ -39,6 +40,7 @@ public class CameraManager : MonoBehaviour
     private Vector3 _tmpClickPos;
     private Vector3 _tmpCameraPos;
 
+    private bool _isDragging = false;
     private void Start()
     {
         confiner.m_Damping = 0.2f; // 카메라 댐핑
@@ -104,7 +106,7 @@ public class CameraManager : MonoBehaviour
         else // IslandScene 일때
         {
             DragToCameramMove();
-
+            
             WheelToZoom();
         }
     }
@@ -124,12 +126,17 @@ public class CameraManager : MonoBehaviour
     // 드래그로 카메라 이동
     private void DragToCameramMove()
     {
+
         if (Input.GetMouseButtonDown(0))
         {
-            _tmpClickPos = Input.mousePosition;
-            _tmpCameraPos = MouseFollowingObj.transform.position; // virtualCamera → MouseFollowingObj
+            if (!IsPointerOverUI())
+            {
+                _isDragging = true;
+                _tmpClickPos = Input.mousePosition;
+                _tmpCameraPos = MouseFollowingObj.transform.position;
+            }
         }
-        else if (Input.GetMouseButton(0))
+        else if (Input.GetMouseButton(0) && _isDragging)
         {
             Vector3 movePos = Camera.main.ScreenToViewportPoint(_tmpClickPos - Input.mousePosition);
             movePos.z = 0;
@@ -138,8 +145,11 @@ public class CameraManager : MonoBehaviour
                 movePos.y * virtualCamera.m_Lens.OrthographicSize * 2, 0));
             MouseFollowingObj.transform.position = clampedPos;
         }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            _isDragging = false;
+        }
     }
-
     // 휠로 줌 인 / 줌 아웃
     private void WheelToZoom()
     {
@@ -176,5 +186,15 @@ public class CameraManager : MonoBehaviour
             // 외부에 있으면 가장 가까운 경계 지점 반환
             return closestPoint;
         }
+    }
+
+    // UI 위에 마우스가 있는지 확인
+    private bool IsPointerOverUI()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
     }
 }
