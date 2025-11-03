@@ -25,6 +25,7 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
 
     [Header("Layout Settings")]
     [SerializeField] protected float itemWidth = 100f;
+    [SerializeField] protected float itemHeight = 100f;
     [SerializeField] protected float spacing = 10f;
     [SerializeField] protected int paddingLeft = 10;
     [SerializeField] protected int paddingRight = 10;
@@ -58,7 +59,10 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     protected virtual void InitializeLayout()
     {
         if (itemPrefab != null)
-        { itemWidth = itemPrefab.GetComponent<RectTransform>().sizeDelta.x; }
+        {
+            itemWidth = itemPrefab.GetComponent<RectTransform>().sizeDelta.x;
+            itemHeight = itemPrefab.GetComponent<RectTransform>().sizeDelta.y;   
+        }
 
         padding = new RectOffset(paddingLeft, paddingRight, paddingTop, paddingBottom);
     }
@@ -68,7 +72,7 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
         if (scrollRect != null)
         {
             scrollRect.horizontal = true;
-            scrollRect.vertical = false;
+            scrollRect.vertical = true;
             scrollRect.movementType = ScrollRect.MovementType.Elastic;
         }
 
@@ -98,7 +102,7 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
         { fitter = content.gameObject.AddComponent<ContentSizeFitter>(); }
 
         fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-        fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
     }
 
     public virtual void GenerateItems(List<TData> dataList)
@@ -124,6 +128,7 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
         { layoutElement = itemObj.AddComponent<LayoutElement>(); }
 
         layoutElement.preferredWidth = itemWidth;
+        layoutElement.preferredHeight = itemHeight;
         layoutElement.flexibleHeight = 1f;
 
         TItemUI itemUI = itemObj.GetComponent<TItemUI>();
