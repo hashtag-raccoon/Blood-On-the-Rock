@@ -559,7 +559,7 @@ Tilemap:
   - m_RefCount: 1
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   - m_RefCount: 1
-    m_Data: {r: 0.93645805, g: 0.45695975, b: 0.48550075, a: 1}
+    m_Data: {r: 0.78369325, g: 0.4550989, b: 0.5134503, a: 1}
   - m_RefCount: 39
     m_Data: {r: 0.9622642, g: 0.9622642, b: 0.9622642, a: 1}
   - m_RefCount: 1
@@ -639,7 +639,7 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
---- !u!114 &4833840732317353233
+--- !u!114 &5267719535091648582
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
