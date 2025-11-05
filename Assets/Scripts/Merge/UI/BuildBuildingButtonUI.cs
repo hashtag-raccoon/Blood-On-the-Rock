@@ -22,10 +22,10 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
         BuildingData = data;
         var buildingData = data as BuildingData;
         BuildingiconImage.sprite = buildingData.icon;
-        BuildingNameText.text = buildingData.BuildingName;
-        BuildingAmountText.text = buildingData.amount.ToString();
-        BuildingPriceText.text = buildingData.price.ToString();
-        PriceIconImage.sprite = buildingData.priceType.icon;
+        BuildingNameText.text = buildingData.Building_Name;
+        BuildingAmountText.text = "10";
+        BuildingPriceText.text = buildingData.construction_cost_gold.ToString();
+        //PriceIconImage.sprite = buildingData.priceType.icon;
 
         BuyButton.onClick.RemoveAllListeners();
         BuyButton.onClick.AddListener(() => onClickCallback?.Invoke(this));

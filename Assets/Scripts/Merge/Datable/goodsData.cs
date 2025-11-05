@@ -4,11 +4,11 @@ using UnityEngine;
 
 public enum goodsType
 {
-    vegetable,    // Ã¤¼Ò
-    blood,       // ÇÇ
-    meet,       // °í±â
-    wood,      // ³ª¹«
-    money     // µ·
+    vegetable,    // Ã¤ï¿½ï¿½
+    blood,       // ï¿½ï¿½
+    meet,       // ï¿½ï¿½ï¿½ï¿½
+    wood,      // ï¿½ï¿½ï¿½ï¿½
+    money     // ï¿½ï¿½
 }
 
 [CreateAssetMenu(fileName = "goods", menuName = "goods")]

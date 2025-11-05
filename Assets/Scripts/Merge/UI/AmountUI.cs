@@ -17,8 +17,8 @@ public class AmountUI : MonoBehaviour
 
     void Start()
     {
-        goodsSprite.sprite = goodsdata.icon;
-        Amount = goodsdata.amount;
+        if (goodsdata != null) goodsSprite.sprite = goodsdata.icon;
+        if (goodsdata != null) Amount = goodsdata.amount;
         this.transform.SetAsFirstSibling();
     }
 

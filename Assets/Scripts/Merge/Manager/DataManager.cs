@@ -6,14 +6,19 @@ public class DataManager : MonoBehaviour
 {
     public static DataManager instance;
 
-    public List<goodsData> goodsDatas = new List<goodsData>(); 
+    public List<goodsData> goodsDatas = new List<goodsData>();
+    // ScriptableObject로 관리되는 모든 건물 정의
     public List<BuildingData> BuildingDatas = new List<BuildingData>();
+    // 건물 타입별 생산 정보 (JSON 또는 다른 방식으로 로드)
+    public List<BuildingProductionInfo> BuildingProductionInfos = new List<BuildingProductionInfo>();
+    // 현재 건설된 건물의 생산 상태 (플레이어 세이브 파일에서 로드)
+    public List<ConstructedBuildingProduction> ConstructedBuildingProductions = new List<ConstructedBuildingProduction>();
 
     [Space(2)]
-    [Header("��/�ڿ� ��Ȳ")]
+    [Header("섬/자원 현황")]
     public int wood = 0;
     public int money = 0;
-    [Header("�� ���� ��ȣ��/�� ���� ����")]
+    [Header("바 현재 선호도/바 현재 레벨")]
     public float storeFavor = 100f;
     public int barLevel = 1;
 
