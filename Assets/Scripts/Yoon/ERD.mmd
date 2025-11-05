@@ -1,0 +1,274 @@
+---
+config:
+  layout: dagre
+---
+
+erDiagram
+    direction TB
+
+    %% 칵테일 및 레시피 그룹
+    COCKTAIL {
+        int cocktail_id PK "칵테일ID(기본키)"
+        string cocktail_name UK "칵테일명(고유)"
+        string technique "제조기법(빌드/플로팅/쉐이킹)"
+        string grade "등급(기본/고급/전설)"
+        string taste "맛특성(단맛/쓴맛/신맛/복합)"
+        int difficulty "난이도(1-5)"
+        int production_time "제조시간(분)"
+        text description "설명"
+        json production_steps "제조단계순서"
+        float similarity_threshold "유사성비교기준(70%)"
+        json unlock_condition "해금조건"
+        int sell_price "판매가격"
+        int production_cost "제작원가"
+        int glass_id FK "잔종류"
+    }
+    GLASS {
+        int glass_id PK "잔ID(기본키)"
+        string glass_name "잔명"
+        int capacity_ml "용량(ml)"
+        string suitable_cocktails "적합칵테일종류"
+        int price "가격"
+        json unlock_condition "해금조건"
+    }
+    COCKTAIL_INGREDIENT {
+        int cocktail_id FK "칵테일ID(외래키)"
+        int ingredient_id FK "재료ID(외래키)"
+        string ingredient_type "재료타입(기주/음료/가니쉬)"
+        float amount_ml "비율(ml)"
+        boolean is_ice "얼음여부"
+        int order_sequence "투입순서"
+    }
+    INGREDIENT {
+        int ingredient_id PK "재료ID(기본키)"
+        string ingredient_name "재료명"
+        string category "카테고리"
+        string grade "등급(일반/고급/희귀)"
+        int origin_island_id FK "원산지섬"
+        string acquisition_method "획득방법(생산/무역)"
+        int base_price "기본가격"
+        text description "설명"
+    }
+    RECIPE_BUILD {
+        int cocktail_id PK,FK "칵테일ID(기본/외래키)"
+        string bar_spoon_type "바스푼종류"
+        json mixing_motion_steps "섞기모션단계"
+        json step_order "단계순서"
+    }
+    RECIPE_FLOATING {
+        int cocktail_id PK,FK "칵테일ID(기본/외래키)"
+        json layer_order "층별투입순서"
+        string minigame_type "미니게임종류(키맞추기)"
+        float difficulty_coefficient "난이도계수"
+        json layer_ingredients "층별재료"
+    }
+    RECIPE_SHAKING {
+        int cocktail_id PK,FK "칵테일ID(기본/외래키)"
+        string shaker_type "쉐이커종류"
+        string minigame_type "미니게임종류(박자맞추기)"
+        json rhythm_pattern "박자패턴"
+        json success_criteria "성공판정기준"
+    }
+    RECIPE_COLLECTION {
+        int collection_id PK "수집ID(기본키)"
+        int cocktail_id FK "칵테일ID(외래키)"
+        boolean is_unlocked "해금여부"
+        int craft_count "제작횟수"
+    }
+
+    %% 손님 및 평판 그룹
+    CUSTOMER {
+        int customer_id PK "손님ID(기본키)"
+        string customer_name "손님명"
+        int race_id FK "종족ID(외래키)"
+        string personality "성격유형"
+        boolean is_vip "VIP여부"
+        boolean is_regular "단골여부"
+        json preferred_tastes "선호맛"
+        int affinity "호감도(0-100)"
+        float tip_probability "팁지불확률(%)"
+        int avg_tip_amount "팁평균금액"
+        string order_speed "주문속도"
+        int patience_minutes "인내심(분)"
+    }
+    RACE {
+        int race_id PK "종족ID(기본키)"
+        string race_name UK "종족명(고유)"
+        text characteristics "특성"
+        json preferred_ingredients "선호재료"
+        string difficulty "난이도"
+    }
+    CUSTOMER_COCKTAIL_PREFERENCE {
+        int customer_id FK "손님ID(외래키)"
+        int cocktail_id FK "칵테일ID(외래키)"
+        int preference_score "선호도점수(0-100)"
+    }
+
+    %% 건물 및 생산 그룹
+    MAIN_ISLAND {
+        int island_id PK "메인섬ID(기본키)"
+        string island_name "섬명(Blood_On_The_Rock)"
+        int island_level "섬레벨(1-10+)"
+        int construction_slots "건설슬롯수"
+        int current_building_count "현재건물수"
+        int max_building_count "최대건물수"
+        int required_gold "레벨업요구골드"
+        int required_reputation "요구평판"
+    }
+    BUILDING {
+        int building_id PK "건물ID(기본키)"
+        string building_name "건물명"
+        string building_type "건물타입"
+        int island_id FK "섬ID(외래키)"
+        int level "레벨(1-10)"
+        int construction_cost_gold "건설비용(골드)"
+        int construction_cost_wood "건설비용(목재)"
+        float construction_time_minutes "건설시간(분)"
+    }
+    BUILDING_PRODUCTION_INFO {
+        string building_type PK "건물타입(기본키)"
+        int resource_id FK "생산자원ID"
+        int output_amount "생산량"
+        float base_production_time_minutes "기본생산시간(분)"
+    }
+    CONSTRUCTED_BUILDING_PRODUCTION {
+        int building_id PK,FK "건물ID(기본/외래키)"
+        datetime last_production_time "마지막생산시간"
+        datetime next_production_time "다음생산완료시간"
+        boolean is_producing "생산중여부"
+    }
+
+    %% 무역 및 외부 섬 그룹
+    EXTERNAL_ISLAND {
+        int island_id PK "외부섬ID(기본키)"
+        string island_name "섬명(인간의농장섬/오크의열섬/요정의섬)"
+        string resident_race "거주종족"
+        string difficulty "난이도(쉬움/중간/어려움)"
+        int base_trade_time_minutes "기본무역시간(분)"
+        boolean is_liberated "해방여부"
+        int current_stage "현재단계(0-4+)"
+        json stage_1_condition "1단계조건"
+        json stage_2_condition "2단계조건"
+        json stage_3_condition "3단계조건"
+        json specialty_items "특산품목록"
+    }
+    TRADE_PORT {
+        int building_id PK,FK "건물ID(기본/외래키)"
+        int max_trade_ships "최대무역선수(3척)"
+    }
+    TRADE_SHIP {
+        int ship_id PK "무역선ID(기본키)"
+        string ship_name "무역선명"
+        int port_building_id FK "무역항(건물)ID(외래키)"
+        int level "레벨(1-10)"
+        int capacity_kg "적재량(kg)"
+        string dispatch_status "파견상태(대기/출항중/귀환중)"
+        int destination_island_id FK "목적지섬ID(외래키)"
+        datetime departure_time "출발시간"
+        datetime arrival_time "도착예정시간"
+        int assigned_part_timer_id FK "담당알바ID(외래키)"
+        json cargo_items "적재품목"
+        json exchange_items "교환품목"
+    }
+    ISLAND_AFFINITY {
+        int affinity_id PK "호감도ID(기본키)"
+        int island_id FK "섬ID(외래키)"
+        int current_affinity "현재호감도(0-100)"
+        string affinity_grade "호감도등급"
+        json effects "효과(무역할인/특수계약/섬해방)"
+    }
+
+    %% 알바 및 성장 그룹
+    PART_TIMER {
+        int part_timer_id PK "알바ID(기본키)"
+        string part_timer_name "알바명"
+        string race "종족"
+        int personality_id FK "성격ID(외래키)"
+        int level "레벨(1-10)"
+        int exp "경험치"
+        date hire_date "고용일자"
+        string employment_status "고용상태"
+        int serving_ability "서빙능력(0-3)"
+        int cooking_ability "요리능력(0-3)"
+        int cleaning_ability "정리능력(0-3)"
+        int total_ability "총합능력치"
+        int fatigue "피로도(0-100)"
+        int daily_wage "급여(골드/일)"
+        boolean need_rest "휴식필요여부"
+        int house_id FK "알바집ID(외래키)"
+    }
+    PERSONALITY {
+        int personality_id PK "성격ID(기본키)"
+        string personality_name UK "성격명(고유)"
+        text description "설명"
+        json trait_effects "특성효과"
+        int serving "서빙능력"
+        int cooking "요리능력"
+        int cleaning "정리능력"
+        int total "총합"
+    }
+    PART_TIMER_HOUSE {
+        int house_id PK "알바집ID(기본키)"
+        int building_id FK,UK "건물ID(외래/고유키)"
+        float efficiency_bonus_percent "능률보너스(%)"
+        float fatigue_recovery_per_hour "피로도회복(%/시간)"
+    }
+
+    %% 게임 진행 및 자원 그룹
+    RESOURCE {
+        int resource_id PK "자원ID(기본키)"
+        string resource_name "자원명(골드/채소/혈액팩/고기/나무)"
+        int current_amount "현재보유량"
+        int max_storage "최대저장량"
+    }
+    BAR_REPUTATION {
+        int reputation_id PK "평판ID(기본키)"
+        int current_reputation "현재평판(0-10000+)"
+        string reputation_grade "평판등급"
+    }
+    BAR_LEVEL {
+        int bar_level PK "바레벨(기본키)"
+        int required_reputation "요구평판"
+        int required_revenue "요구수입"
+        json unlocked_recipes "해금레시피"
+        int part_timer_slots "알바슬롯"
+        int customer_capacity "수용인원"
+    }
+    INTERIOR {
+        int interior_id PK "인테리어ID(기본키)"
+        string interior_name "인테리어명"
+        string category "카테고리(화분/테이블/의자/그림/TV)"
+        int capacity_increase "수용인원증가"
+        float satisfaction_bonus "만족도보너스"
+        int price "가격"
+        boolean is_unlocked "해금여부"
+    }
+
+    %% 관계 정의
+    COCKTAIL ||--|| GLASS : "사용한다"
+    COCKTAIL ||--o| RECIPE_BUILD : "빌드기법"
+    COCKTAIL ||--o| RECIPE_FLOATING : "플로팅기법"
+    COCKTAIL ||--o| RECIPE_SHAKING : "쉐이킹기법"
+    COCKTAIL ||--o{ COCKTAIL_INGREDIENT : "재료포함"
+    COCKTAIL_INGREDIENT }o--|| INGREDIENT : "재료참조"
+    COCKTAIL ||--o{ CUSTOMER_COCKTAIL_PREFERENCE : "선호도"
+    COCKTAIL ||--o| RECIPE_COLLECTION : "도감등록"
+
+    CUSTOMER }o--|| RACE : "종족"
+    CUSTOMER ||--o{ CUSTOMER_COCKTAIL_PREFERENCE : "선호"
+
+    BUILDING }o--|| MAIN_ISLAND : "위치"
+    BUILDING ||--o| PART_TIMER_HOUSE : "알바집"
+    BUILDING ||--o| CONSTRUCTED_BUILDING_PRODUCTION : "생산현황"
+    BUILDING ||--o| TRADE_PORT : "무역항"
+    BUILDING_PRODUCTION_INFO ||--o{ BUILDING : "생산정보"
+    BUILDING_PRODUCTION_INFO ||--o{ RESOURCE : "생산자원"
+
+    EXTERNAL_ISLAND ||--|| ISLAND_AFFINITY : "호감도"
+    INGREDIENT }o--o| EXTERNAL_ISLAND : "생산"
+    TRADE_SHIP }o--|| TRADE_PORT : "정박"
+    TRADE_SHIP }o--|| EXTERNAL_ISLAND : "항해"
+
+    PART_TIMER }o--|| PERSONALITY : "성격"
+    PART_TIMER }o--o| PART_TIMER_HOUSE : "거주"
+    TRADE_SHIP }o--o| PART_TIMER : "배정"
