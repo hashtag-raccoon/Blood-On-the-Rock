@@ -8,14 +8,16 @@ public class DragDropController : MonoBehaviour
     [Header("타일맵 설정")]
     [SerializeField] private Grid grid;
     [SerializeField] private Tilemap groundTilemap; // 그라운드 타일맵
-    [SerializeField] private Tilemap buildingTilemap; // 건물 타일맵
+    [SerializeField] private int buildingTilemapCount = 1; // 건물 타일맵 개수
+    [SerializeField] private Tilemap[] buildingTilemaps; // 건물 타일맵 배열
 
     [Header("드래그 설정")]
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Tilemap previewTilemap; // 미리보기용 타일맵
 
     private bool isDragging = false;
-    private Vector3Int originalCell; // 기준 셀 (건물의 왼쪽 아래 모서리)
+    private Vector3Int originalCell; // 기준 셀 (클릭한 타일)
+    private int currentBuildingTilemapIndex = -1; // 현재 드래그 중인 타일맵 인덱스
     private List<Vector3Int> buildingCells = new List<Vector3Int>(); // 연결된 모든 건물 타일 좌표
     private Dictionary<Vector3Int, TileBase> buildingTiles = new Dictionary<Vector3Int, TileBase>(); // 각 셀의 타일 정보
     private Vector3 offset;
@@ -33,8 +35,48 @@ public class DragDropController : MonoBehaviour
     // 선택 하이라이트 이전 원본 색상 복원용
     private Dictionary<Vector3Int, Color> originalTileColors = new Dictionary<Vector3Int, Color>();
 
+    void OnValidate()
+    {
+        // Inspector에서 buildingTilemapCount가 변경되면 배열 크기 조정
+        if (buildingTilemapCount < 1)
+            buildingTilemapCount = 1;
+
+        if (buildingTilemaps == null || buildingTilemaps.Length != buildingTilemapCount)
+        {
+            // 기존 값 보존
+            Tilemap[] oldTilemaps = buildingTilemaps;
+            buildingTilemaps = new Tilemap[buildingTilemapCount];
+            
+            // 기존 값 복사
+            if (oldTilemaps != null)
+            {
+                for (int i = 0; i < Mathf.Min(oldTilemaps.Length, buildingTilemapCount); i++)
+                {
+                    buildingTilemaps[i] = oldTilemaps[i];
+                }
+            }
+        }
+    }
+
     void Start()
     {
+        // 건물 타일맵 배열 크기 초기화
+        if (buildingTilemaps == null || buildingTilemaps.Length != buildingTilemapCount)
+        {
+            // 기존 값 보존
+            Tilemap[] oldTilemaps = buildingTilemaps;
+            buildingTilemaps = new Tilemap[buildingTilemapCount];
+            
+            // 기존 값 복사
+            if (oldTilemaps != null)
+            {
+                for (int i = 0; i < Mathf.Min(oldTilemaps.Length, buildingTilemapCount); i++)
+                {
+                    buildingTilemaps[i] = oldTilemaps[i];
+                }
+            }
+        }
+
         if (mainCamera == null)
             mainCamera = Camera.main;
 
@@ -83,16 +125,18 @@ public class DragDropController : MonoBehaviour
             }
         }
 
-        if (buildingTilemap == null)
+        // Building 타일맵 배열 자동 찾기 (비어있는 슬롯만)
+        Tilemap[] allTilemaps = FindObjectsOfType<Tilemap>();
+        int foundIndex = 0;
+        foreach (Tilemap tilemap in allTilemaps)
         {
-            Tilemap[] tilemaps = FindObjectsOfType<Tilemap>();
-            foreach (Tilemap tilemap in tilemaps)
+            if (tilemap.name.ToLower().Contains("building") && foundIndex < buildingTilemaps.Length)
             {
-                if (tilemap.name.ToLower().Contains("building"))
+                if (buildingTilemaps[foundIndex] == null)
                 {
-                    buildingTilemap = tilemap;
-                    Debug.Log($"Building 타일맵 찾음: {tilemap.name}");
-                    break;
+                    buildingTilemaps[foundIndex] = tilemap;
+                    Debug.Log($"Building 타일맵 [{foundIndex}] 찾음: {tilemap.name}");
+                    foundIndex++;
                 }
             }
         }
@@ -112,35 +156,13 @@ public class DragDropController : MonoBehaviour
             }
         }
 
-        // 모든 타일맵의 타일 개수 확인 (모든 Z 레벨에서)
-        if (buildingTilemap != null)
-        {
-            int tileCount = 0;
-            BoundsInt bounds = buildingTilemap.cellBounds;
-            Debug.Log($"Building 타일맵 bounds: {bounds}");
-
-            for (int x = bounds.xMin; x < bounds.xMax; x++)
-            {
-                for (int y = bounds.yMin; y < bounds.yMax; y++)
-                {
-                    for (int z = bounds.zMin; z < bounds.zMax; z++)
-                    {
-                        Vector3Int pos = new Vector3Int(x, y, z);
-                        if (buildingTilemap.HasTile(pos))
-                        {
-                            tileCount++;
-                            Debug.Log($"Building 타일 위치: {pos}");
-                        }
-                    }
-                }
-            }
-            Debug.Log($"Building 타일맵에 총 {tileCount}개의 타일이 있습니다.");
-        }
-
         // 찾은 오브젝트들 확인
         Debug.Log($"Grid: {(grid != null ? "찾음" : "없음")}");
         Debug.Log($"Ground Tilemap: {(groundTilemap != null ? "찾음" : "없음")}");
-        Debug.Log($"Building Tilemap: {(buildingTilemap != null ? "찾음" : "없음")}");
+        for (int i = 0; i < buildingTilemaps.Length; i++)
+        {
+            Debug.Log($"Building Tilemap [{i}]: {(buildingTilemaps[i] != null ? buildingTilemaps[i].name : "없음")}");
+        }
         Debug.Log($"Preview Tilemap: {(previewTilemap != null ? "찾음" : "없음")}");
     }
 
@@ -219,41 +241,43 @@ public class DragDropController : MonoBehaviour
         Vector3Int cellForPlacement = GetMouseCell(); // 현재 설정된 배치 Z(예: 2)
 
         Debug.Log($"마우스 클릭 위치(배치 Z): {cellForPlacement}");
-        Debug.Log($"Building Tilemap이 null인가? {buildingTilemap == null}");
 
-        // 클릭한 위치의 건물 타일 찾기
-        if (buildingTilemap != null && TryFindBuildingAtXY(cellForPlacement.x, cellForPlacement.y, out Vector3Int foundCell, out TileBase foundTile))
+        // 모든 타일맵을 확인하여 클릭한 위치의 건물 찾기
+        for (int tilemapIndex = 0; tilemapIndex < buildingTilemaps.Length; tilemapIndex++)
         {
-            // 클릭한 타일에서 연결된 모든 타일 찾기 (연결된 컴포넌트)
-            buildingCells.Clear();
-            buildingTiles.Clear();
-            
-            FindConnectedTiles(foundCell, foundTile);
+            Tilemap tilemap = buildingTilemaps[tilemapIndex];
+            if (tilemap == null)
+                continue;
 
-            if (buildingCells.Count > 0)
+            if (TryFindBuildingAtXY(cellForPlacement.x, cellForPlacement.y, tilemapIndex, out Vector3Int foundCell, out TileBase foundTile))
             {
-                // 기준 셀을 클릭한 타일로 설정
-                originalCell = foundCell;
+                // 클릭한 타일에서 연결된 모든 타일 찾기 (연결된 컴포넌트)
+                buildingCells.Clear();
+                buildingTiles.Clear();
+                
+                FindConnectedTiles(foundCell, foundTile, tilemapIndex);
 
-                // 모든 타일 제거 (들고 있는 상태)
-                foreach (var cell in buildingCells)
+                if (buildingCells.Count > 0)
                 {
-                    buildingTiles[cell] = buildingTilemap.GetTile(cell);
-                    buildingTilemap.SetTile(cell, null);
-                }
+                    // 기준 셀을 클릭한 타일로 설정
+                    originalCell = foundCell;
+                    currentBuildingTilemapIndex = tilemapIndex;
 
-                isDragging = true;
-                Debug.Log($"{buildingCells.Count}개의 타일로 구성된 건물을 잡았습니다! 기준 위치(클릭한 타일): {originalCell}");
-            }
-            else
-            {
-                Debug.Log("연결된 타일을 찾을 수 없습니다.");
+                    // 모든 타일 제거 (들고 있는 상태)
+                    foreach (var cell in buildingCells)
+                    {
+                        buildingTiles[cell] = tilemap.GetTile(cell);
+                        tilemap.SetTile(cell, null);
+                    }
+
+                    isDragging = true;
+                    Debug.Log($"{buildingCells.Count}개의 타일로 구성된 건물을 타일맵 [{tilemapIndex}]에서 잡았습니다! 기준 위치(클릭한 타일): {originalCell}");
+                    return;
+                }
             }
         }
-        else
-        {
-            Debug.Log("건물을 잡을 수 없습니다. 건물 타일을 정확히 클릭했는지 확인하세요.");
-        }
+
+        Debug.Log("건물을 잡을 수 없습니다. 건물 타일을 정확히 클릭했는지 확인하세요.");
     }
 
     private void UpdateDragPosition()
@@ -310,7 +334,11 @@ public class DragDropController : MonoBehaviour
 
     private void EndDrag()
     {
+        if (currentBuildingTilemapIndex < 0 || currentBuildingTilemapIndex >= buildingTilemaps.Length)
+            return;
+
         Vector3Int dropCell = GetMouseCell();
+        Tilemap currentTilemap = buildingTilemaps[currentBuildingTilemapIndex];
 
         // 미리보기 제거
         ClearPreview();
@@ -337,10 +365,10 @@ public class DragDropController : MonoBehaviour
                 TileBase tile = buildingTiles.ContainsKey(cell) ? buildingTiles[cell] : null;
                 if (tile != null)
                 {
-                    buildingTilemap.SetTile(placeCell, tile);
+                    currentTilemap.SetTile(placeCell, tile);
                 }
             }
-            Debug.Log($"{buildingCells.Count}개 타일로 구성된 건물을 ({dropCell.x}, {dropCell.y})에 설치했습니다!");
+            Debug.Log($"{buildingCells.Count}개 타일로 구성된 건물을 타일맵 [{currentBuildingTilemapIndex}]의 ({dropCell.x}, {dropCell.y})에 설치했습니다!");
         }
         else
         {
@@ -353,6 +381,7 @@ public class DragDropController : MonoBehaviour
         isDragging = false;
         buildingCells.Clear();
         buildingTiles.Clear();
+        currentBuildingTilemapIndex = -1;
     }
 
     private void CancelDrag()
@@ -370,6 +399,7 @@ public class DragDropController : MonoBehaviour
         isDragging = false;
         buildingCells.Clear();
         buildingTiles.Clear();
+        currentBuildingTilemapIndex = -1;
 
         Debug.Log("드래그를 취소했습니다.");
     }
@@ -402,55 +432,68 @@ public class DragDropController : MonoBehaviour
     private void ToggleSelectionAtMouse()
     {
         Vector3Int cell = GetMouseCell();
-        if (buildingTilemap != null && TryFindBuildingAtXY(cell.x, cell.y, out Vector3Int foundCell, out TileBase foundTile))
+        
+        // 모든 타일맵을 확인하여 클릭한 위치의 건물 찾기
+        for (int tilemapIndex = 0; tilemapIndex < buildingTilemaps.Length; tilemapIndex++)
         {
-            if (selectedCells.Contains(foundCell))
+            if (TryFindBuildingAtXY(cell.x, cell.y, tilemapIndex, out Vector3Int foundCell, out TileBase foundTile))
             {
-                // 해제
-                DeselectCell(foundCell);
-            }
-            else
-            {
-                // 선택
-                SelectCell(foundCell);
+                if (selectedCells.Contains(foundCell))
+                {
+                    // 해제
+                    DeselectCell(foundCell);
+                }
+                else
+                {
+                    // 선택
+                    SelectCell(foundCell);
+                }
+                return;
             }
         }
-        else
-        {
-            // 빈 공간 Alt+우클릭 시 전체 해제
-            if (selectedCells.Count > 0)
-                ClearSelectionState();
-        }
+
+        // 빈 공간 Alt+우클릭 시 전체 해제
+        if (selectedCells.Count > 0)
+            ClearSelectionState();
     }
 
     private void SelectCell(Vector3Int cell)
     {
         selectedCells.Add(cell);
-        if (!selectedTiles.ContainsKey(cell))
+        
+        Tilemap targetTilemap = GetTilemapForCell(cell);
+        if (targetTilemap != null)
         {
-            TileBase t = buildingTilemap.GetTile(cell);
-            if (t != null)
+            if (!selectedTiles.ContainsKey(cell))
             {
-                selectedTiles[cell] = t;
+                TileBase t = targetTilemap.GetTile(cell);
+                if (t != null)
+                {
+                    selectedTiles[cell] = t;
+                }
             }
+            // 하이라이트 (기존 색 저장 후 적용)
+            targetTilemap.SetTileFlags(cell, TileFlags.None);
+            if (!originalTileColors.ContainsKey(cell))
+            {
+                originalTileColors[cell] = targetTilemap.GetColor(cell);
+            }
+            targetTilemap.SetColor(cell, new Color(0.3f, 0.9f, 1f, 1f));
         }
-        // 하이라이트 (기존 색 저장 후 적용)
-        buildingTilemap.SetTileFlags(cell, TileFlags.None);
-        if (!originalTileColors.ContainsKey(cell))
-        {
-            originalTileColors[cell] = buildingTilemap.GetColor(cell);
-        }
-        buildingTilemap.SetColor(cell, new Color(0.3f, 0.9f, 1f, 1f));
     }
 
     private void DeselectCell(Vector3Int cell)
     {
-        // 색상 복구 (원본 저장값이 있으면 그걸로, 없으면 흰색)
-        buildingTilemap.SetTileFlags(cell, TileFlags.None);
-        if (originalTileColors.TryGetValue(cell, out var orig))
-            buildingTilemap.SetColor(cell, orig);
-        else
-            buildingTilemap.SetColor(cell, Color.white);
+        Tilemap targetTilemap = GetTilemapForCell(cell);
+        if (targetTilemap != null)
+        {
+            // 색상 복구 (원본 저장값이 있으면 그걸로, 없으면 흰색)
+            targetTilemap.SetTileFlags(cell, TileFlags.None);
+            if (originalTileColors.TryGetValue(cell, out var orig))
+                targetTilemap.SetColor(cell, orig);
+            else
+                targetTilemap.SetColor(cell, Color.white);
+        }
         selectedCells.Remove(cell);
         selectedTiles.Remove(cell);
         originalTileColors.Remove(cell);
@@ -460,11 +503,15 @@ public class DragDropController : MonoBehaviour
     {
         foreach (var cell in selectedCells)
         {
-            buildingTilemap.SetTileFlags(cell, TileFlags.None);
-            if (originalTileColors.TryGetValue(cell, out var orig))
-                buildingTilemap.SetColor(cell, orig);
-            else
-                buildingTilemap.SetColor(cell, Color.white);
+            Tilemap targetTilemap = GetTilemapForCell(cell);
+            if (targetTilemap != null)
+            {
+                targetTilemap.SetTileFlags(cell, TileFlags.None);
+                if (originalTileColors.TryGetValue(cell, out var orig))
+                    targetTilemap.SetColor(cell, orig);
+                else
+                    targetTilemap.SetColor(cell, Color.white);
+            }
         }
     }
 
@@ -478,7 +525,7 @@ public class DragDropController : MonoBehaviour
 
     private void StartGroupDrag()
     {
-        if (selectedCells.Count == 0 || buildingTilemap == null)
+        if (selectedCells.Count == 0)
             return;
 
         // 기준 셀 결정: 마우스 아래 셀 우선
@@ -495,16 +542,24 @@ public class DragDropController : MonoBehaviour
         List<Vector3Int> toRemove = new List<Vector3Int>();
         foreach (var c in selectedCells)
         {
-            TileBase t = buildingTilemap.GetTile(c);
-            if (t != null)
+            Tilemap targetTilemap = GetTilemapForCell(c);
+            if (targetTilemap != null)
             {
-                selectedTiles[c] = t;
-                toRemove.Add(c);
+                TileBase t = targetTilemap.GetTile(c);
+                if (t != null)
+                {
+                    selectedTiles[c] = t;
+                    toRemove.Add(c);
+                }
             }
         }
         foreach (var c in toRemove)
         {
-            buildingTilemap.SetTile(c, null);
+            Tilemap targetTilemap = GetTilemapForCell(c);
+            if (targetTilemap != null)
+            {
+                targetTilemap.SetTile(c, null);
+            }
         }
 
         isGroupDragging = true;
@@ -573,7 +628,11 @@ public class DragDropController : MonoBehaviour
             // 신규 위치에 설치
             foreach (var p in placements)
             {
-                buildingTilemap.SetTile(p.target, p.tile);
+                Tilemap targetTilemap = GetTilemapForCell(p.origin);
+                if (targetTilemap != null)
+                {
+                    targetTilemap.SetTile(p.target, p.tile);
+                }
             }
 
             // 옵션: 배치 후 자동 선택 해제
@@ -595,8 +654,12 @@ public class DragDropController : MonoBehaviour
                 selectedTiles = newSelectedTiles;
                 foreach (var c in selectedCells)
                 {
-                    buildingTilemap.SetTileFlags(c, TileFlags.None);
-                    buildingTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
+                    Tilemap targetTilemap = GetTilemapForCell(c);
+                    if (targetTilemap != null)
+                    {
+                        targetTilemap.SetTileFlags(c, TileFlags.None);
+                        targetTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
+                    }
                 }
             }
         }
@@ -605,13 +668,21 @@ public class DragDropController : MonoBehaviour
             // 원위치로 복원
             foreach (var kv in selectedTiles)
             {
-                buildingTilemap.SetTile(kv.Key, kv.Value);
+                Tilemap targetTilemap = GetTilemapForCell(kv.Key);
+                if (targetTilemap != null)
+                {
+                    targetTilemap.SetTile(kv.Key, kv.Value);
+                }
             }
             // 하이라이트 복구
             foreach (var c in selectedCells)
             {
-                buildingTilemap.SetTileFlags(c, TileFlags.None);
-                buildingTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
+                Tilemap targetTilemap = GetTilemapForCell(c);
+                if (targetTilemap != null)
+                {
+                    targetTilemap.SetTileFlags(c, TileFlags.None);
+                    targetTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
+                }
             }
             Debug.Log("설치할 수 없는 위치가 있어 원위치로 되돌렸습니다.");
         }
@@ -630,13 +701,21 @@ public class DragDropController : MonoBehaviour
         // 원래 위치로 되돌리기
         foreach (var kv in selectedTiles)
         {
-            buildingTilemap.SetTile(kv.Key, kv.Value);
+            Tilemap targetTilemap = GetTilemapForCell(kv.Key);
+            if (targetTilemap != null)
+            {
+                targetTilemap.SetTile(kv.Key, kv.Value);
+            }
         }
         // 하이라이트 복구
         foreach (var c in selectedCells)
         {
-            buildingTilemap.SetTileFlags(c, TileFlags.None);
-            buildingTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
+            Tilemap targetTilemap = GetTilemapForCell(c);
+            if (targetTilemap != null)
+            {
+                targetTilemap.SetTileFlags(c, TileFlags.None);
+                targetTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
+            }
         }
 
         isGroupDragging = false;
@@ -657,21 +736,26 @@ public class DragDropController : MonoBehaviour
     }
 
     // 클릭된 x,y에서 모든 Z를 탐색하여 실제로 존재하는 건물 타일을 찾는다 (가장 높은 Z 우선)
-    private bool TryFindBuildingAtXY(int x, int y, out Vector3Int foundCell, out TileBase foundTile)
+    private bool TryFindBuildingAtXY(int x, int y, int tilemapIndex, out Vector3Int foundCell, out TileBase foundTile)
     {
         foundCell = new Vector3Int(x, y, 0);
         foundTile = null;
-        if (buildingTilemap == null)
+        
+        if (tilemapIndex < 0 || tilemapIndex >= buildingTilemaps.Length)
+            return false;
+            
+        Tilemap tilemap = buildingTilemaps[tilemapIndex];
+        if (tilemap == null)
             return false;
 
-        BoundsInt bounds = buildingTilemap.cellBounds;
+        BoundsInt bounds = tilemap.cellBounds;
         for (int z = bounds.zMax - 1; z >= bounds.zMin; z--)
         {
             Vector3Int pos = new Vector3Int(x, y, z);
-            if (buildingTilemap.HasTile(pos))
+            if (tilemap.HasTile(pos))
             {
                 foundCell = pos;
-                foundTile = buildingTilemap.GetTile(pos);
+                foundTile = tilemap.GetTile(pos);
                 return true;
             }
         }
@@ -699,9 +783,18 @@ public class DragDropController : MonoBehaviour
         Vector3Int groundCell = new Vector3Int(cell.x, cell.y, 0);
         bool hasGround = groundTilemap != null && groundTilemap.HasTile(groundCell);
 
-        // 건물은 Z=2에서 확인
+        // 모든 타일맵에서 건물 타일 확인
         Vector3Int buildingCell = new Vector3Int(cell.x, cell.y, 2);
-        bool emptyBuilding = buildingTilemap != null && !buildingTilemap.HasTile(buildingCell);
+        bool emptyBuilding = true;
+        for (int i = 0; i < buildingTilemaps.Length; i++)
+        {
+            Tilemap tilemap = buildingTilemaps[i];
+            if (tilemap != null && tilemap.HasTile(buildingCell))
+            {
+                emptyBuilding = false;
+                break;
+            }
+        }
 
         return hasGround && emptyBuilding;
     }
@@ -709,7 +802,7 @@ public class DragDropController : MonoBehaviour
     // 건물 설치 가능 여부 체크 (모든 연결된 셀 확인)
     private bool CanPlaceBuildingAt(Vector3Int baseCell)
     {
-        if (buildingCells.Count == 0)
+        if (buildingCells.Count == 0 || currentBuildingTilemapIndex < 0)
             return false;
 
         // 기준점으로부터의 오프셋 계산
@@ -736,12 +829,15 @@ public class DragDropController : MonoBehaviour
                 return false; // 그라운드가 없으면 설치 불가
             }
 
-            // 건물 타일 확인
+            // 모든 타일맵에서 건물 타일 확인
             Vector3Int buildingCell = new Vector3Int(checkCell.x, checkCell.y, 2);
-            bool emptyBuilding = buildingTilemap != null && !buildingTilemap.HasTile(buildingCell);
-            if (!emptyBuilding)
+            for (int i = 0; i < buildingTilemaps.Length; i++)
             {
-                return false; // 이미 건물이 있으면 설치 불가
+                Tilemap tilemap = buildingTilemaps[i];
+                if (tilemap != null && tilemap.HasTile(buildingCell))
+                {
+                    return false; // 이미 건물이 있으면 설치 불가
+                }
             }
         }
 
@@ -752,7 +848,11 @@ public class DragDropController : MonoBehaviour
     // 원래 위치에 건물 복원
     private void RestoreOriginalBuilding()
     {
-        if (buildingCells.Count == 0)
+        if (buildingCells.Count == 0 || currentBuildingTilemapIndex < 0 || currentBuildingTilemapIndex >= buildingTilemaps.Length)
+            return;
+
+        Tilemap currentTilemap = buildingTilemaps[currentBuildingTilemapIndex];
+        if (currentTilemap == null)
             return;
 
         // 모든 타일을 원래 위치로 복원
@@ -761,15 +861,19 @@ public class DragDropController : MonoBehaviour
             TileBase tile = buildingTiles.ContainsKey(cell) ? buildingTiles[cell] : null;
             if (tile != null)
             {
-                buildingTilemap.SetTile(cell, tile);
+                currentTilemap.SetTile(cell, tile);
             }
         }
     }
 
     // 연결된 타일 찾기 (연결된 컴포넌트 알고리즘)
-    private void FindConnectedTiles(Vector3Int startCell, TileBase startTile)
+    private void FindConnectedTiles(Vector3Int startCell, TileBase startTile, int tilemapIndex)
     {
-        if (buildingTilemap == null || startTile == null)
+        if (tilemapIndex < 0 || tilemapIndex >= buildingTilemaps.Length)
+            return;
+
+        Tilemap tilemap = buildingTilemaps[tilemapIndex];
+        if (tilemap == null || startTile == null)
             return;
 
         HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
@@ -806,7 +910,7 @@ public class DragDropController : MonoBehaviour
                     continue;
 
                 // 같은 타일이고 같은 Z 레벨인지 확인
-                TileBase neighborTile = buildingTilemap.GetTile(neighbor);
+                TileBase neighborTile = tilemap.GetTile(neighbor);
                 if (neighborTile != null && neighborTile == startTile)
                 {
                     visited.Add(neighbor);
@@ -814,5 +918,19 @@ public class DragDropController : MonoBehaviour
                 }
             }
         }
+    }
+
+    // 셀 좌표로부터 해당하는 타일맵 찾기
+    private Tilemap GetTilemapForCell(Vector3Int cell)
+    {
+        for (int i = 0; i < buildingTilemaps.Length; i++)
+        {
+            Tilemap tilemap = buildingTilemaps[i];
+            if (tilemap != null && tilemap.HasTile(cell))
+            {
+                return tilemap;
+            }
+        }
+        return null;
     }
 }
