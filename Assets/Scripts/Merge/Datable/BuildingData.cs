@@ -12,4 +12,8 @@ public class BuildingData : ScriptableObject, IScrollItemData
     public int price;
     public goodsData priceType; // 상품의 가격 유형
     public int demandLevel; // 요구 레벨
+
+    public int construction_cost_gold;
+    public int construction_cost_wood;
+    public int construction_time_minutes;
 }

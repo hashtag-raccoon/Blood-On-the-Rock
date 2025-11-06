@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
     public static DataManager instance;
-
-    public List<goodsData> goodsDatas = new List<goodsData>(); 
+    private const string BuildingPath = "Data/Building";
+    private const string GoodsPath = "Data/Goods";
+    public List<goodsData> goodsDatas = new List<goodsData>();
     public List<BuildingData> BuildingDatas = new List<BuildingData>();
 
     [Space(2)]
@@ -28,10 +30,27 @@ public class DataManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        BuildingDatas.Clear();
+        goodsDatas.Clear();
+
+        BuildingDatas.AddRange(Resources.LoadAll<BuildingData>(BuildingPath));
+        goodsDatas.AddRange(Resources.LoadAll<goodsData>(GoodsPath));
     }
 
     public void GetGoodsData()
     {
 
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            BuildingDatas.Clear();
+            goodsDatas.Clear();
+            BuildingDatas = null;
+            goodsDatas = null;
+            instance = null;
+        }
     }
 }

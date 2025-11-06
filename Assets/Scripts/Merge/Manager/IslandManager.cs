@@ -26,6 +26,15 @@ public class IslandManager : MonoBehaviour
     public List<GameObject> leftUI = new List<GameObject>();
     public List<GameObject> rightUI = new List<GameObject>();
 
+    int island_id;
+    public string island_name;
+    int island_level;
+    int construction_slots;
+    int current_building_count;
+    int max_bulding_count;
+    int required_gold;
+    int required_reputaion;
+
     void Start()
     {
         wait_convertedDayTime = SetDayTime * 60 * 60f; // 초 단위로 변환
