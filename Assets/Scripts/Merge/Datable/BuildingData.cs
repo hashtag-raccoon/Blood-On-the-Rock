@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEditor.ShaderKeywordFilter;
 
 [CreateAssetMenu(fileName = "Building", menuName = "Building")]
 public class BuildingData : ScriptableObject, IScrollItemData
@@ -47,6 +48,7 @@ public class ConstructedBuildingProduction
 /// <summary>
 /// 게임 내에 실제로 건설된 건물의 모든 정보를 통합하여 관리하는 클래스입니다.
 /// </summary>
+[Serializable]
 public class ConstructedBuilding
 {
     // BuildingData에서 가져온 정보
