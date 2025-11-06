@@ -24,6 +24,14 @@ public class DragDropController : MonoBehaviour
     private Vector3Int lastPreviewCell = Vector3Int.zero;
     private List<Vector3Int> lastPreviewCells = new List<Vector3Int>(); // 프리뷰용
 
+    // 스프라이트 오브젝트 드래그 관련
+    private bool isDraggingSprite = false; // 스프라이트 오브젝트 드래그 중인지
+    private GameObject draggedSpriteObject = null; // 현재 드래그 중인 스프라이트 오브젝트
+    private Vector3Int originalSpriteCell; // 스프라이트 오브젝트의 원래 셀 위치
+    private Vector3 originalSpritePosition; // 스프라이트 오브젝트의 원래 월드 위치
+    private SpriteRenderer draggedSpriteRenderer = null; // 드래그 중인 스프라이트 렌더러
+    private Color originalSpriteColor; // 원래 스프라이트 색상 (프리뷰용)
+
     // 다중 선택/그룹 이동 관련 상태
     private HashSet<Vector3Int> selectedCells = new HashSet<Vector3Int>();
     private Dictionary<Vector3Int, TileBase> selectedTiles = new Dictionary<Vector3Int, TileBase>();
@@ -173,6 +181,10 @@ public class DragDropController : MonoBehaviour
         {
             UpdateGroupPreview();
         }
+        else if (isDraggingSprite)
+        {
+            UpdateSpritePreview();
+        }
         else
         {
             UpdatePreview();
@@ -197,12 +209,21 @@ public class DragDropController : MonoBehaviour
             }
             else
             {
-                StartDrag();
+                // 스프라이트 오브젝트를 먼저 확인
+                if (TryStartSpriteDrag())
+                {
+                    // 스프라이트 드래그 시작됨
+                }
+                else
+                {
+                    // 타일맵 드래그 시도
+                    StartDrag();
+                }
             }
         }
 
         // 드래그 중일 때 마우스 따라가기
-        if (isDragging && !isGroupDragging)
+        if (isDragging && !isGroupDragging && !isDraggingSprite)
         {
             UpdateDragPosition();
         }
@@ -213,6 +234,10 @@ public class DragDropController : MonoBehaviour
             if (isGroupDragging)
             {
                 EndGroupDrag();
+            }
+            else if (isDraggingSprite)
+            {
+                EndSpriteDrag();
             }
             else if (isDragging)
             {
@@ -225,6 +250,8 @@ public class DragDropController : MonoBehaviour
         {
             if (isGroupDragging)
                 CancelGroupDrag();
+            else if (isDraggingSprite)
+                CancelSpriteDrag();
             else if (isDragging)
                 CancelDrag();
         }
@@ -932,5 +959,118 @@ public class DragDropController : MonoBehaviour
             }
         }
         return null;
+    }
+
+    // ====== 스프라이트 오브젝트 드래그 관련 ======
+    
+    // 마우스 클릭 위치에서 스프라이트 오브젝트 찾기 및 드래그 시작
+    private bool TryStartSpriteDrag()
+    {
+        // 마우스 위치에서 레이캐스트로 스프라이트 오브젝트 찾기
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0;
+        
+        // 2D 레이캐스트 사용
+        RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
+        
+        if (hit.collider != null)
+        {
+            GameObject hitObject = hit.collider.gameObject;
+            SpriteRenderer spriteRenderer = hitObject.GetComponent<SpriteRenderer>();
+            
+            // SpriteRenderer가 있고 TilemapRenderer가 없는 오브젝트만 처리
+            if (spriteRenderer != null && hitObject.GetComponent<TilemapRenderer>() == null)
+            {
+                draggedSpriteObject = hitObject;
+                draggedSpriteRenderer = spriteRenderer;
+                originalSpritePosition = hitObject.transform.position;
+                originalSpriteCell = grid.WorldToCell(originalSpritePosition);
+                originalSpriteColor = spriteRenderer.color;
+                
+                isDraggingSprite = true;
+                
+                Debug.Log($"스프라이트 오브젝트 드래그 시작: {hitObject.name}, 원래 위치: {originalSpriteCell}");
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    // 스프라이트 오브젝트 프리뷰 업데이트
+    private void UpdateSpritePreview()
+    {
+        if (!isDraggingSprite || draggedSpriteObject == null || draggedSpriteRenderer == null)
+            return;
+        
+        Vector3Int currentCell = GetMouseCell();
+        Vector3 worldPos = grid.CellToWorld(currentCell);
+        worldPos.z = originalSpritePosition.z; // 원래 Z 위치 유지
+        
+        // 오브젝트 위치 업데이트
+        draggedSpriteObject.transform.position = worldPos;
+        
+        // 설치 가능 여부 체크
+        bool canPlace = CanPlaceAt(currentCell);
+        
+        // 프리뷰 색상 적용 (설치 가능하면 반투명, 불가능하면 빨간색 반투명)
+        Color previewColor = canPlace ?
+            new Color(1f, 1f, 1f, 0.6f) :  // 흰색 반투명 (설치 가능)
+            new Color(1f, 0.3f, 0.3f, 0.6f); // 빨간색 반투명 (설치 불가)
+        
+        draggedSpriteRenderer.color = previewColor;
+    }
+    
+    // 스프라이트 오브젝트 드래그 종료 및 배치
+    private void EndSpriteDrag()
+    {
+        if (!isDraggingSprite || draggedSpriteObject == null || draggedSpriteRenderer == null)
+            return;
+        
+        Vector3Int dropCell = GetMouseCell();
+        
+        // 설치 가능 여부 확인
+        if (CanPlaceAt(dropCell))
+        {
+            // 그리드 셀 위치로 정확히 배치
+            Vector3 worldPos = grid.CellToWorld(dropCell);
+            worldPos.z = originalSpritePosition.z; // 원래 Z 위치 유지
+            draggedSpriteObject.transform.position = worldPos;
+            
+            // 색상 복원
+            draggedSpriteRenderer.color = originalSpriteColor;
+            
+            Debug.Log($"스프라이트 오브젝트를 셀 ({dropCell.x}, {dropCell.y})에 배치했습니다!");
+        }
+        else
+        {
+            // 설치할 수 없으면 원래 위치로 되돌리기
+            draggedSpriteObject.transform.position = originalSpritePosition;
+            draggedSpriteRenderer.color = originalSpriteColor;
+            Debug.Log("설치할 수 없는 위치입니다. 원래 위치로 되돌렸습니다.");
+        }
+        
+        // 드래그 상태 초기화
+        isDraggingSprite = false;
+        draggedSpriteObject = null;
+        draggedSpriteRenderer = null;
+    }
+    
+    // 스프라이트 오브젝트 드래그 취소
+    private void CancelSpriteDrag()
+    {
+        if (!isDraggingSprite || draggedSpriteObject == null || draggedSpriteRenderer == null)
+            return;
+        
+        // 원래 위치로 되돌리기
+        draggedSpriteObject.transform.position = originalSpritePosition;
+        draggedSpriteRenderer.color = originalSpriteColor;
+        
+        // 드래그 상태 초기화
+        isDraggingSprite = false;
+        draggedSpriteObject = null;
+        draggedSpriteRenderer = null;
+        
+        Debug.Log("스프라이트 드래그를 취소했습니다.");
     }
 }
