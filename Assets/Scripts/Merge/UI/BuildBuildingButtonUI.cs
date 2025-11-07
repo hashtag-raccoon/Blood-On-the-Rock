@@ -11,8 +11,10 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
     [SerializeField] private Image BuildingiconImage;
     [SerializeField] private TextMeshProUGUI BuildingNameText;
     [SerializeField] private TextMeshProUGUI BuildingAmountText;
-    [SerializeField] private TextMeshProUGUI BuildingPriceText;
-    [SerializeField] private Image PriceIconImage;
+    [SerializeField] private TextMeshProUGUI BuildingPriceMoneyText;
+    [SerializeField] private Image PriceMoneyIconImage;
+    [SerializeField] private TextMeshProUGUI BuildingPriceWoodText;
+    [SerializeField] private Image PriceWoodIconImage;
     [SerializeField] private Button BuyButton;
 
     private object BuildingData;
@@ -24,8 +26,11 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
         BuildingiconImage.sprite = buildingData.icon;
         BuildingNameText.text = buildingData.BuildingName;
         BuildingAmountText.text = buildingData.amount.ToString();
-        BuildingPriceText.text = buildingData.price.ToString();
-        PriceIconImage.sprite = buildingData.priceType.icon;
+        
+        BuildingPriceMoneyText.text = buildingData.construction_cost_gold.ToString();
+        //PriceMoneyIconImage.sprite = GetGoodsData().icon;
+        BuildingPriceWoodText.text = buildingData.construction_cost_wood.ToString();
+        PriceWoodIconImage.sprite = buildingData.priceType.icon;
 
         BuyButton.onClick.RemoveAllListeners();
         BuyButton.onClick.AddListener(() => onClickCallback?.Invoke(this));
