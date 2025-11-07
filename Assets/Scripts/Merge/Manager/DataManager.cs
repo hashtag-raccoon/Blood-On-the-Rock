@@ -85,11 +85,18 @@ class Json
         File.WriteAllText(BuildingPass, JsonData);
     }
 
+    public List<ConstructedBuilding> loadBuildingData()
+    {
+        string JsonData = File.ReadAllText(BuildingPass);
+        List<ConstructedBuilding> buildinsFromData = JsonConvert.DeserializeObject<List<ConstructedBuilding>>(JsonData);
+        return buildinsFromData;
+    }
+    
+
     public void updateBuildingData(List<ConstructedBuilding> constructedBuildings)
     {
         // 1. JSON 파일에서 기존 건물 데이터를 읽어옴
-        string JsonData = File.ReadAllText(BuildingPass);
-        List<ConstructedBuilding> buildingsFromData = JsonConvert.DeserializeObject<List<ConstructedBuilding>>(JsonData);
+        List<ConstructedBuilding> buildingsFromData = loadBuildingData();
 
         // 2. 기존 데이터를 ID를 키로 하는 Dictionary로 변환
         var buildingsDict = buildingsFromData.ToDictionary(b => b.Id);

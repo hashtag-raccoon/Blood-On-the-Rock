@@ -56,6 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Blood-On-the-Rock.sln",
+    "dotnet.defaultSolution": "Blood-On-the-Rock.slnx",
     "CodeGPT.apiKey": "Gemini CLI"
 }
