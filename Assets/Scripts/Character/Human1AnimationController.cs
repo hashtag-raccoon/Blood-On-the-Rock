@@ -83,6 +83,25 @@ public class Human1AnimationController : MonoBehaviour
         Vector3 toTarget = targetPosition - current;
         float distance = toTarget.magnitude;
         
+        // 이동 방향에 따라 캐릭터 뒤집기
+        if (distance > stoppingDistance)
+        {
+            float directionX = targetPosition.x - current.x;
+            Vector3 scale = transform.localScale;
+            
+            if (directionX < 0) // 왼쪽으로 이동
+            {
+                scale.x = -1f;
+            }
+            else if (directionX > 0) // 오른쪽으로 이동
+            {
+                scale.x = 1f;
+            }
+            // directionX == 0일 때는 이전 스케일 유지
+            
+            transform.localScale = scale;
+        }
+        
         if (distance <= stoppingDistance)
         {
             transform.position = targetPosition;
