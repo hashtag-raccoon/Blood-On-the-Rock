@@ -21,6 +21,11 @@ public class DataManager : MonoBehaviour
     // BuildingRepository에서 가져온 통합된 건설 완료 건물 데이터
     public List<ConstructedBuilding> ConstructedBuildings { get; private set; }
 
+    public List<ArbeitData> arbeitDatas = new List<ArbeitData>();
+    public List<Personality> personalities = new List<Personality>();
+    
+    public List<npc> npcs = new List<npc>();
+
     private Json DataFile = new Json();
 
     [Space(2)]
@@ -52,7 +57,7 @@ public class DataManager : MonoBehaviour
 
     public void GetGoodsData()
     {
-
+        //npcs = ArbeitRepository.Instance.
     }
 
     /// <summary>
@@ -63,6 +68,12 @@ public class DataManager : MonoBehaviour
         // BuildingRepository 인스턴스에서 건설된 건물 목록을 가져옵니다.
         ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildingsOnMainIsland();
     }
+
+    public void LoadNPC()
+    {
+        
+    }
+
 }
 class Json
 // 아이템 및 플레이어 데이터를 JSON 파일로 저장하고 불러오는 기능을 담당
