@@ -42,7 +42,6 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         {
             BuildingUpgradeButton.onClick.AddListener(() =>
             {
-                Debug.Log("[BuildingBase] 업그레이드 버튼 클릭됨!");
                 OnUpgradeUI();
             });
         }
@@ -213,8 +212,22 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     
     protected void UpgradeUIUpdate()
     {
-        //Buildingdata
-        //activeUpgradeUI.GetComponent<BuildingUpgradeUI>().;
-
+        UpgradeUIScripts upgradeScript = activeUpgradeUI.GetComponent<UpgradeUIScripts>();
+        
+        if (upgradeScript != null)
+        {
+            upgradeScript.SetData(Buildingdata);
+            
+            // 다음 레벨의 업그레이드 데이터 찾기
+            BuildingUpgradeData upgradeData = DataManager.instance.GetBuildingUpgradeDataByLevel(
+                DataManager.instance.GetBuildingUpgradeDataByType(Buildingdata.BuildingName),
+                Buildingdata.level + 1
+            );
+            
+            if (upgradeData != null)
+            {
+                upgradeScript.SetUpgradeData(upgradeData);
+            }
+        }
     }
 }

@@ -620,6 +620,41 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &4985873769958826412
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5162910294314278382}
+  m_Layer: 5
+  m_Name: RequirementsContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5162910294314278382
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4985873769958826412}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5263512702597630286}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -177.38, y: -133.23}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5903270389812994797
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,6 +694,7 @@ RectTransform:
   - {fileID: 8252345810018931978}
   - {fileID: 6825241625953815969}
   - {fileID: 8816298879770899093}
+  - {fileID: 5162910294314278382}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -718,14 +754,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   upgradeUIBuildingImage: {fileID: 860518355918420207}
   upgradeButtonCostImage: {fileID: 2303786584710423917}
-  upgradeButtonCostText: {fileID: 8495440647627928860}
-  upgradeRequiredTimeText: {fileID: 8495440647627928860}
-  upgradeRequiredPanel: {fileID: 0}
-  BuildingName: {fileID: 6462471929647217479}
-  CurrentBuildingLevel: {fileID: 7946521788626220895}
-  NextBuildingLevel: {fileID: 5931083042410147932}
+  upgradeButtonCostText: {fileID: 5145478065016729651}
+  upgradeRequiredTimeText: {fileID: 142336704506510943}
+  upgradeRequiredTimePanel: {fileID: 4414518695930378194}
+  upgradeRequiredPanel: {fileID: 3055091665028132917}
+  BuildingName: {fileID: 6283499245334775801}
+  CurrentBuildingLevel: {fileID: 9140927362435715602}
+  NextBuildingLevel: {fileID: 4522103904544496541}
   UpgradeButton: {fileID: 6835953428716319705}
+  upgradeButtonCostIcon: {fileID: 7701520945675801244}
+  UpgradeConsumeText: {fileID: 5145478065016729651}
   upgradeUICloseButton: {fileID: 5412738666436930316}
+  requirementContainer: {fileID: 5162910294314278382}
+  panelSpacing: 10
+  gapBeforeTimePanel: 50
+  panelSize: {x: 200, y: 200}
+  iconSize: {x: 160, y: 160}
+  iconYOffset: 20
+  textYOffset: 10
+  textFontSize: 36
+  panelBackgroundSprite: {fileID: 21300000, guid: 28e6ce43dfa6e6a45a2899b502ae06f7, type: 3}
+  panelColor: {r: 1, g: 1, b: 1, a: 1}
+  textFont: {fileID: 11400000, guid: 22951b3e2a68fc849af9181338ac85cb, type: 2}
+  textColor: {r: 0, g: 0, b: 0, a: 1}
+  buildingData: {fileID: 0}
+  buildingUpgradeData: {fileID: 0}
 --- !u!1 &5931083042410147932
 GameObject:
   m_ObjectHideFlags: 0

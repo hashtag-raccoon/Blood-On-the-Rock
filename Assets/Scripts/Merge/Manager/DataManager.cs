@@ -9,7 +9,7 @@ public class DataManager : MonoBehaviour
     private const string BuildingPath = "Data/Building";
     private const string GoodsPath = "Data/Goods";
     private const string BuildingProductionPath = "Data/Building/BuildingProduction";
-    private const string BuildingUpgradePath = "Data/Building/BuildingUpgrade";
+    private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
 
     public List<goodsData> goodsDatas = new List<goodsData>();
     public List<BuildingData> BuildingDatas = new List<BuildingData>();
@@ -85,6 +85,16 @@ public class DataManager : MonoBehaviour
     public List<BuildingProductionData> GetBuildingProductionDataByType(string buildingType)
     {
         return BuildingProductionDatas.FindAll(data => data.building_type == buildingType);
+    }
+
+    public List<BuildingUpgradeData> GetBuildingUpgradeDataByType(string buildingType)
+    {
+        return BuildingUpgradeDatas.FindAll(data => data.building_type == buildingType);
+    }
+    
+    public BuildingUpgradeData GetBuildingUpgradeDataByLevel(List<BuildingUpgradeData> upgradeDataList,int level)
+    {
+        return upgradeDataList.Find(data => data.level == level);
     }
 
     private void OnDestroy()

@@ -7,6 +7,8 @@ public class BuildingUpgradeData : ScriptableObject
 {
     public string building_type;
     public int level;
+    public int upgrade_price;
+    public float base_upgrade_time_minutes;
     public List<upgrade_requirements> requirements = new List<upgrade_requirements>();
 }
 
