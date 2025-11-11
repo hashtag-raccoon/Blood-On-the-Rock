@@ -5,18 +5,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 //using UnityEngine.UIElements;
 
-public class IslandData : ScriptableObject
-{
-    int island_id;
-    public string island_name;
-    int island_level;
-    int construction_slots;
-    int current_building_count;
-    int max_bulding_count;
-    int required_gold;
-    int required_reputaion;
-}
-
 public class IslandManager : MonoBehaviour
 {
     [Header("데이터 매니저 할당")]
@@ -31,14 +19,10 @@ public class IslandManager : MonoBehaviour
 
     private Coroutine dayCoroutine;
 
-    [Header("가게 오픈 버튼")]
     [SerializeField] private Button StoreOpenButton;
-    [Header("인벤토리 버튼")]
     [SerializeField] private Button InventoryButton;
     [SerializeField] private InventoryUI inventoryUI;
 
-
-    [Header("좌우 UI들<Build Button 용>")]
     public List<GameObject> leftUI = new List<GameObject>();
     public List<GameObject> rightUI = new List<GameObject>();
 
