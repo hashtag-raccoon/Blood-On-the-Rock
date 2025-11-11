@@ -1,21 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
     public static DataManager instance;
+    public static DataManager Instance => instance;
+    
     private const string BuildingPath = "Data/Building";
     private const string GoodsPath = "Data/Goods";
+    private const string BuildingProductionPath = "Data/Building/BuildingProduction";
+    private const string BuildingUpgradePath = "Data/Building/BuildingUpgrade";
+
     public List<goodsData> goodsDatas = new List<goodsData>();
     public List<BuildingData> BuildingDatas = new List<BuildingData>();
+    public List<BuildingProductionData> BuildingProductionDatas = new List<BuildingProductionData>();
+    public List<BuildingUpgradeData> BuildingUpgradeDatas = new List<BuildingUpgradeData>();
 
-    [Space(2)]
-    [Header("¼¶/ÀÚ¿ø ÇöÈ²")]
-    public int wood = 0;
-    public int money = 0;
-    [Header("¹Ù ÇöÀç ¼±È£µµ/¹Ù ÇöÀç ·¹º§")]
+    [Header("ê°€ê²Œ ìƒíƒœ")]
     public float storeFavor = 100f;
     public int barLevel = 1;
 
@@ -29,17 +30,61 @@ public class DataManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
+        
         BuildingDatas.Clear();
         goodsDatas.Clear();
+        BuildingProductionDatas.Clear();
 
-        BuildingDatas.AddRange(Resources.LoadAll<BuildingData>(BuildingPath));
-        goodsDatas.AddRange(Resources.LoadAll<goodsData>(GoodsPath));
+        // BuildingData ë¡œë“œ
+        BuildingData[] loadedBuildings = Resources.LoadAll<BuildingData>(BuildingPath);
+        foreach (var building in loadedBuildings)
+        {
+            BuildingDatas.Add(building);
+        }
+        
+        // goodsData ë¡œë“œ
+        goodsData[] loadedGoods = Resources.LoadAll<goodsData>(GoodsPath);
+        foreach (var goods in loadedGoods)
+        {
+            goodsDatas.Add(goods);
+        }
+        
+        // BuildingProductionData ë¡œë“œ
+        BuildingProductionData[] loadedProductions = Resources.LoadAll<BuildingProductionData>(BuildingProductionPath);
+        foreach (var production in loadedProductions)
+        {
+            BuildingProductionDatas.Add(production);
+        }
+
+        // BuildingUpgradeData ë¡œë“œ
+        BuildingUpgradeData[] loadedUpgrades = Resources.LoadAll<BuildingUpgradeData>(BuildingUpgradePath);
+        foreach (var upgrade in loadedUpgrades)
+        {
+            BuildingUpgradeDatas.Add(upgrade);
+        }
     }
 
-    public void GetGoodsData()
+    public goodsData GetResourceById(int id)
     {
+        return goodsDatas.Find(r => r.id == id);
+    }
 
+    public List<BuildingProductionData> GetBuildingProductionDataList()
+    {
+        return BuildingProductionDatas;
+    }
+
+    public goodsData GetResourceByName(string name)
+    {
+        return goodsDatas.Find(r => r.goodsName == name);
+    }
+
+    // í•´ë‹¹ ê±´ë¬¼ ì´ë¦„ì˜ ê±´ë¬¼ ìƒì‚° ë°ì´í„° ê°€ì ¸ì˜´
+    public List<BuildingProductionData> GetBuildingProductionDataByType(string buildingType)
+    {
+        return BuildingProductionDatas.FindAll(data => data.building_type == buildingType);
     }
 
     private void OnDestroy()
@@ -48,9 +93,12 @@ public class DataManager : MonoBehaviour
         {
             BuildingDatas.Clear();
             goodsDatas.Clear();
+            BuildingProductionDatas.Clear();
             BuildingDatas = null;
             goodsDatas = null;
+            BuildingProductionDatas = null;
             instance = null;
         }
     }
 }
+

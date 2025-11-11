@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 
-#region µ¥ÀÌÅÍ ±¸Á¶
+#region ë°ì´í„° êµ¬ì¡°
 
 public enum ConditionType
 {
@@ -16,7 +17,7 @@ public enum ConditionType
 public class ConditionData
 {
     public ConditionType conditionType;
-    public string buildingName; // ScriptableObject ÀÌ¸§ ÀúÀå¿ë
+    public string buildingName; 
     public int value;
 }
 
@@ -35,10 +36,8 @@ public class IslandConditionDatabase
 
 #endregion
 
-/// <summary>
-/// ÀÎ½ºÆåÅÍ¿¡¼­ Á¶°Ç µ¥ÀÌÅÍ¸¦ ÀÔ·ÂÇÏ°í JSONÀ¸·Î ÀúÀåÇÏ´Â ScriptableObject
-/// </summary>
-[CreateAssetMenu(fileName = "IslandLevelUP", menuName = "Condition")]
+// ì¡°ê±´ ë°ì´í„° ì…ë ¥ -> JSON ì €ì¥ìš© ë°ì´í„° ì˜¤ë¸Œì íŠ¸
+[CreateAssetMenu(menuName = "IslandConditionData")]
 public class IslandConditionEditorData : ScriptableObject
 {
     public int islandLevel = 1;
@@ -55,53 +54,51 @@ public class IslandConditionEditorData : ScriptableObject
     }
 }
 
-/// <summary>
-/// Ä¿½ºÅÒ ¿¡µğÅÍ
-/// </summary>
+// ì»¤ìŠ¤í…€ ì—ë””í„°
 [CustomEditor(typeof(IslandConditionEditorData))]
 public class IslandConditionEditor : Editor
 {
-    private const string SAVE_PATH = "Assets/Resources/Data/island_conditions.json";
+    private const string SAVE_PATH = "Assets/Resources/Data/LevelupCondition/Json/island_conditions.json";
     private IslandConditionDatabase database = new IslandConditionDatabase();
 
     public override void OnInspectorGUI()
     {
         IslandConditionEditorData data = (IslandConditionEditorData)target;
 
-        EditorGUILayout.LabelField("¼¶ ·¹º§ Á¶°Ç ¼³Á¤", EditorStyles.boldLabel);
-        data.islandLevel = EditorGUILayout.IntField("¼¶ ·¹º§", data.islandLevel);
-        data.conditionCount = EditorGUILayout.IntField("Á¶°Ç °³¼ö", data.conditionCount);
+        EditorGUILayout.LabelField("ì„¬ ë ˆë²¨ ì¡°ê±´ ì„¤ì •", EditorStyles.boldLabel);
+        data.islandLevel = EditorGUILayout.IntField("ì„¬ ë ˆë²¨", data.islandLevel);
+        data.conditionCount = EditorGUILayout.IntField("ì¡°ê±´ ê°œìˆ˜", data.conditionCount);
 
         if (data.conditions.Count != data.conditionCount)
             data.ResetConditions();
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Á¶°Ç ¼³Á¤", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("ì¡°ê±´ ì„¤ì •", EditorStyles.boldLabel);
 
         for (int i = 0; i < data.conditionCount; i++)
         {
             var cond = data.conditions[i];
 
             EditorGUILayout.BeginVertical("box");
-            EditorGUILayout.LabelField($"Á¶°Ç {i + 1}", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField($"ì¡°ê±´ {i + 1}", EditorStyles.boldLabel);
 
-            cond.conditionType = (ConditionType)EditorGUILayout.EnumPopup("Á¶°Ç Å¸ÀÔ", cond.conditionType);
+            cond.conditionType = (ConditionType)EditorGUILayout.EnumPopup("ì¡°ê±´ íƒ€ì…", cond.conditionType);
 
             switch (cond.conditionType)
             {
                 case ConditionType.BuildingLevelGreaterThan:
-                    BuildingData building = (BuildingData)EditorGUILayout.ObjectField("°Ç¹°",
-                        AssetDatabase.LoadAssetAtPath<BuildingData>($"Assets/Resources/{cond.buildingName}.asset"),
+                    BuildingData building = (BuildingData)EditorGUILayout.ObjectField("ê±´ë¬¼", 
+                        AssetDatabase.LoadAssetAtPath<BuildingData>($"Assets/Resources/Data/Building/{cond.buildingName}.asset"), 
                         typeof(BuildingData), false);
-
+                    
                     if (building != null)
                         cond.buildingName = building.name;
-
-                    cond.value = EditorGUILayout.IntField("·¹º§ ÀÌ»ó", cond.value);
+                    
+                    cond.value = EditorGUILayout.IntField("ë ˆë²¨ ì´ìƒ", cond.value);
                     break;
 
                 case ConditionType.GuestCountGreaterThan:
-                    cond.value = EditorGUILayout.IntField("¼Õ´Ô ¼ö ÀÌ»ó", cond.value);
+                    cond.value = EditorGUILayout.IntField("ì†ë‹˜ ìˆ˜ ì´ìƒ", cond.value);
                     break;
             }
 
@@ -110,7 +107,7 @@ public class IslandConditionEditor : Editor
 
         EditorGUILayout.Space();
 
-        if (GUILayout.Button("JSON ÀúÀåÇÏ±â"))
+        if (GUILayout.Button("JSON ì €ì¥í•˜ê¸°"))
         {
             SaveToJson(data);
         }
@@ -118,16 +115,16 @@ public class IslandConditionEditor : Editor
 
     private void SaveToJson(IslandConditionEditorData data)
     {
-        // ±âÁ¸ µ¥ÀÌÅÍ ºÒ·¯¿À±â
+        // JSON -> ìŠ¤í¬ë¦½íŠ¸ë¡œ ë°ì´í„° ë³µì‚¬
         if (File.Exists(SAVE_PATH))
         {
             string json = File.ReadAllText(SAVE_PATH);
-            database = JsonUtility.FromJson<IslandConditionDatabase>(json);
+            database = JsonConvert.DeserializeObject<IslandConditionDatabase>(json);
             if (database == null || database.IslandLevels == null)
                 database = new IslandConditionDatabase();
         }
 
-        // »õ µ¥ÀÌÅÍ »ı¼º
+        // ìŠ¤í¬ë¦½íŠ¸ì—ì„œ ìƒˆ ë°ì´í„° ìƒì„±
         string key = data.islandLevel.ToString();
         IslandLevelData levelData = new IslandLevelData
         {
@@ -137,12 +134,12 @@ public class IslandConditionEditor : Editor
 
         database.IslandLevels[key] = levelData;
 
-        // JSON ÀúÀå
-        string outputJson = JsonUtility.ToJson(database, true);
+        // JSON íŒŒì¼ì— ì €ì¥
+        string outputJson = JsonConvert.SerializeObject(database, Formatting.Indented);
         Directory.CreateDirectory(Path.GetDirectoryName(SAVE_PATH));
         File.WriteAllText(SAVE_PATH, outputJson);
 
-        Debug.Log($"JSON ÀúÀå ¿Ï·á: {SAVE_PATH}");
+        Debug.Log($"JSON ì €ì¥ ì™„ë£Œ: {SAVE_PATH}");
         AssetDatabase.Refresh();
     }
 }

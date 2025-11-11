@@ -12,9 +12,9 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
     [SerializeField] private TextMeshProUGUI BuildingNameText;
     [SerializeField] private TextMeshProUGUI BuildingAmountText;
     [SerializeField] private TextMeshProUGUI BuildingPriceMoneyText;
-    [SerializeField] private Image PriceMoneyIconImage;
+    //[SerializeField] private Image PriceMoneyIconImage;
     [SerializeField] private TextMeshProUGUI BuildingPriceWoodText;
-    [SerializeField] private Image PriceWoodIconImage;
+    //[SerializeField] private Image PriceWoodIconImage;
     [SerializeField] private Button BuyButton;
 
     private object BuildingData;
@@ -22,20 +22,31 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
     public void SetData<T>(T data, Action<IScrollItemUI> onClickCallback) where T : IScrollItemData
     {
         BuildingData = data;
-        var buildingData = data as BuildingData;
-        BuildingiconImage.sprite = buildingData.icon;
-        BuildingNameText.text = buildingData.BuildingName;
-        BuildingAmountText.text = buildingData.amount.ToString();
-        
-        BuildingPriceMoneyText.text = buildingData.construction_cost_gold.ToString();
-        //PriceMoneyIconImage.sprite = GetGoodsData().icon;
-        BuildingPriceWoodText.text = buildingData.construction_cost_wood.ToString();
-        PriceWoodIconImage.sprite = buildingData.priceType.icon;
 
-        BuyButton.onClick.RemoveAllListeners();
-        BuyButton.onClick.AddListener(() => onClickCallback?.Invoke(this));
+        var building = data as BuildingData;
+
+        BuildingNameText.text = building.BuildingName;
+
+        BuildingAmountText.text = building.amount.ToString();
+
+        BuildingPriceMoneyText.text = building.construction_cost_gold.ToString();
+
+        BuildingPriceWoodText.text = building.construction_cost_wood.ToString();
+
+        BuildingiconImage.sprite = building.icon;
+
+        BuyButton.onClick.AddListener(() =>
+        {
+            try
+            {
+                onClickCallback(this);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error invoking onClickCallback: {ex}");
+            }
+        });
     }
-
 
     public T GetData<T>() where T : IScrollItemData
     {

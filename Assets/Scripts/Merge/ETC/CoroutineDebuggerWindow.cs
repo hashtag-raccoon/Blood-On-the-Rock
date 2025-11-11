@@ -26,7 +26,7 @@ public class CoroutineDebuggerWindow : EditorWindow
         public bool isWaiting;
     }
 
-    [MenuItem("Window/Coroutine Debugger")]
+    [MenuItem("Tools/Coroutine Debugger")]
     public static void ShowWindow()
     {
         GetWindow<CoroutineDebuggerWindow>("Coroutine Debugger");
