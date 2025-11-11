@@ -24,6 +24,7 @@ public class ArbeitData
     public bool need_rest;
 }
 
+[CreateAssetMenu(fileName = "Arbeit", menuName = "Arbeit/Personality")]
 [Serializable]
 public class Personality : ScriptableObject
 {

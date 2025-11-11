@@ -10,14 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: passionate
+  m_Name: 2
   m_EditorClassIdentifier: Assembly-CSharp::Personality
   personality_id: 2
-  personality_name: "\uC5F4\uC815\uC801\uC784"
-  description: "\uD56D\uC0C1 \uD65C\uAE30\uAC00 \uB118\uCE58\uBA70 \uC190\uB2D8\uB4E4\uC5D0\uAC8C
-    \uAE0D\uC815\uC801\uC778 \uC5D0\uB108\uC9C0\uB97C \uC804\uD30C\uD569\uB2C8\uB2E4."
-  specificity: "\uD65C\uAE30\uCC2C \uC751\uB300: \uC11C\uBE59 \uC18D\uB3C4\uAC00
-    1 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  personality_name: "\uC5F4\uC815"
+  description: "\u3147"
+  specificity: "\u3147"
   serving_ability: 3
   cooking_ability: 2
   cleaning_ability: 2

@@ -10,15 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: Meticulous
+  m_Name: 3
   m_EditorClassIdentifier: Assembly-CSharp::Personality
   personality_id: 3
-  personality_name: "\uAF3C\uAF3C\uD568"
-  description: "\uCE75\uD14C\uC77C\uC758 \uB9C8\uC9C0\uB9C9 \uD55C \uBC29\uC6B8,
-    \uC548\uC8FC\uC758 \uB9C8\uC9C0\uB9C9 \uD50C\uB808\uC774\uD305\uAE4C\uC9C0 \uC644\uBCBD\uC744
-    \uCD94\uAD6C\uD569\uB2C8\uB2E4."
-  specificity: "\uC7A5\uC778\uC758 \uC190\uAE38: \uC694\uB9AC \uC131\uACF5\uB960\uC774
-    1 \uC0C1\uC2B9\uD55C\uB2E4."
+  personality_name: "\uAF3C\uAF3C"
+  description: "\u3147"
+  specificity: "\u3147"
   serving_ability: 2
   cooking_ability: 3
   cleaning_ability: 2

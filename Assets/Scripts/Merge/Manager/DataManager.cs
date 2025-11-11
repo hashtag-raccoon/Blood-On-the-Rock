@@ -61,6 +61,34 @@ public class DataManager : MonoBehaviour
         DataFile.ExistsFile();
         LoadArbeitData();
         LoadPersonalityData();
+
+        // BuildingData 로드(수정)
+        BuildingData[] loadedBuildings = Resources.LoadAll<BuildingData>(BuildingPath);
+        foreach (var building in loadedBuildings)
+        {
+            BuildingDatas.Add(building);
+        }
+
+        // goodsData 로드
+        goodsData[] loadedGoods = Resources.LoadAll<goodsData>(GoodsPath);
+        foreach (var goods in loadedGoods)
+        {
+            goodsDatas.Add(goods);
+        }
+
+        // BuildingProductionData 로드(수정)
+        BuildingProductionData[] loadedProductions = Resources.LoadAll<BuildingProductionData>(BuildingProductionPath);
+        foreach (var production in loadedProductions)
+        {
+            BuildingProductionDatas.Add(production);
+        }
+
+        // BuildingUpgradeData 로드(수정)
+        BuildingUpgradeData[] loadedUpgrades = Resources.LoadAll<BuildingUpgradeData>(BuildingUpgradePath);
+        foreach (var upgrade in loadedUpgrades)
+        {
+            BuildingUpgradeDatas.Add(upgrade);
+        }
     }
     public void Start()
     {

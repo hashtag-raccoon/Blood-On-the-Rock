@@ -12,7 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5507b56c43473124d86ead4770d4b734, type: 3}
   m_Name: PersonalityData
   m_EditorClassIdentifier: 
-  personalities:
-  - {fileID: 11400000, guid: 50d83ccc6149ad744aa529e50bb14189, type: 2}
-  - {fileID: 11400000, guid: 7b664303babe09943aec2db3efec54fc, type: 2}
-  - {fileID: 11400000, guid: ea717bcff5382d541b9a9a6d72c7eb41, type: 2}
+  personalities: []
