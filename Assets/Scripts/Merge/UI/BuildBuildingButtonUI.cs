@@ -25,9 +25,9 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
 
         var building = data as BuildingData;
 
-        BuildingNameText.text = building.BuildingName;
+        BuildingNameText.text = building.Building_Name;
 
-        BuildingAmountText.text = building.amount.ToString();
+        //BuildingAmountText.text = building.amount.ToString();
 
         BuildingPriceMoneyText.text = building.construction_cost_gold.ToString();
 

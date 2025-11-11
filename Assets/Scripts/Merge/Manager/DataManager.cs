@@ -9,15 +9,23 @@ using Newtonsoft.Json;
 public class DataManager : MonoBehaviour
 {
     public static DataManager instance;
+    public static DataManager Instance => instance; // Added from ex.cs
 
     [Header("데이터 에셋")]
     public PersonalityDataSO personalityDataSO; // 인스펙터에서 할당
 
+    // Constants for loading from Resources (from ex.cs)
+    private const string BuildingPath = "Data/Building";
+    private const string GoodsPath = "Data/Goods";
+    private const string BuildingProductionPath = "Data/Building/BuildingProduction";
+    private const string BuildingUpgradePath = "Data/Building/BuildingUpgrade";
+
     public List<goodsData> goodsDatas = new List<goodsData>();
     // ScriptableObject로 관리되는 모든 건물 정의
     public List<BuildingData> BuildingDatas = new List<BuildingData>();
-    // 건물 타입별 생산 정보 (JSON 또는 다른 방식으로 로드)
     public List<BuildingProductionInfo> BuildingProductionInfos = new List<BuildingProductionInfo>();
+    public List<BuildingProductionData> BuildingProductionDatas = new List<BuildingProductionData>(); // Replaced BuildingProductionInfos
+    public List<BuildingUpgradeData> BuildingUpgradeDatas = new List<BuildingUpgradeData>(); // Added from ex.cs
     // 현재 건설된 건물의 생산 상태 (플레이어 세이브 파일에서 로드)
     public List<ConstructedBuildingProduction> ConstructedBuildingProductions = new List<ConstructedBuildingProduction>();
 
@@ -111,6 +119,58 @@ public class DataManager : MonoBehaviour
         }
     }
 
+    // Methods from ex.cs
+    public goodsData GetResourceById(int id)
+    {
+        return goodsDatas.Find(r => r.id == id);
+    }
+
+    public List<BuildingProductionData> GetBuildingProductionDataList()
+    {
+        return BuildingProductionDatas;
+    }
+
+    public goodsData GetResourceByName(string name)
+    {
+        return goodsDatas.Find(r => r.goodsName == name);
+    }
+
+    // 해당 건물 이름의 건물 생산 데이터 가져옴
+    public List<BuildingProductionData> GetBuildingProductionDataByType(string buildingType)
+    {
+        return BuildingProductionDatas.FindAll(data => data.building_type == buildingType);
+    }
+
+    private void OnDestroy() // From ex.cs
+    {
+        if (instance == this)
+        {
+            // Clear and nullify lists to free up memory
+            BuildingDatas.Clear();
+            goodsDatas.Clear();
+            BuildingProductionDatas.Clear();
+            BuildingUpgradeDatas.Clear(); // Clear new list
+
+            BuildingDatas = null;
+            goodsDatas = null;
+            BuildingProductionDatas = null;
+            BuildingUpgradeDatas = null; // Nullify new list
+
+            // Also clear other lists if they are not managed by other systems
+            ConstructedBuildingProductions.Clear();
+            ConstructedBuildings = null; // Assuming this is managed elsewhere or needs explicit nulling
+            arbeitDatas.Clear();
+            personalities.Clear();
+            npcs.Clear();
+
+            ConstructedBuildingProductions = null;
+            arbeitDatas = null;
+            personalities = null;
+            npcs = null;
+
+            instance = null;
+        }
+    }
 }
 class Json
 // 아이템 및 플레이어 데이터를 JSON 파일로 저장하고 불러오는 기능을 담당

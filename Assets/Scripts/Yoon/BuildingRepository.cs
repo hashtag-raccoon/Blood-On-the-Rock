@@ -11,8 +11,8 @@ public class BuildingRepository : MonoBehaviour
     public static BuildingRepository Instance { get; private set; }
 
     private DataManager _dataManager;
-    [SerializeField]private Dictionary<string, BuildingProductionInfo> _productionInfoDict;
-    [SerializeField]private Dictionary<int, ConstructedBuildingProduction> _productionStatusDict;
+    [SerializeField] private Dictionary<string, BuildingProductionInfo> _productionInfoDict;
+    [SerializeField] private Dictionary<int, ConstructedBuildingProduction> _productionStatusDict;
 
     private void Awake()
     {
