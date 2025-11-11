@@ -137,16 +137,16 @@ public class ResourceBuildingUIManager : MonoBehaviour
 
         if (currentBuildingData == null) return;
 
-        List<BuildingProductionData> productionDatas =
-            DataManager.Instance.GetBuildingProductionDataByType(currentBuildingData.Building_Name);
+        List<BuildingProductionInfo> productionInfos =
+            DataManager.Instance.GetBuildingProductionInfoByType(currentBuildingData.Building_Name);
 
-        foreach (var productionData in productionDatas)
+        foreach (var productionInfo in productionInfos)
         {
-            CreateProductionItem(productionData);
+            CreateProductionItem(productionInfo);
         }
     }
 
-    private void CreateProductionItem(BuildingProductionData productionData)
+    private void CreateProductionItem(BuildingProductionInfo productionData)
     {
         GameObject itemObj = Instantiate(productionItemPrefab, productionListContent);
         ProductionCreateButton createButton = itemObj.GetComponent<ProductionCreateButton>();
@@ -175,7 +175,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
         productionCreateButtons.Clear();
     }
 
-    public void OnProductionCreateButtonClicked(BuildingProductionData productionData, goodsData resourceData)
+    public void OnProductionCreateButtonClicked(BuildingProductionInfo productionData, goodsData resourceData)
     {
         currentBuilding.StartProduction(productionData, resourceData);
     }

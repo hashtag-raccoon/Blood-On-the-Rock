@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: c44a59ae010d841429ad17369b383616, type: 3}
   m_Name: 3
-  m_EditorClassIdentifier: Assembly-CSharp::Personality
+  m_EditorClassIdentifier: 
   personality_id: 3
-  personality_name: "\uAF3C\uAF3C"
-  description: "\u3147"
-  specificity: "\u3147"
+  personality_name: "\uCE68\uCC29"
+  description: 1
+  specificity: 1
   serving_ability: 2
   cooking_ability: 3
   cleaning_ability: 2

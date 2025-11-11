@@ -22,20 +22,6 @@ public class BuildingData : ScriptableObject, IScrollItemData
 }
 
 /// <summary>
-/// BUILDING_PRODUCTION_INFO 테이블: 건물 타입별 생산 정보를 정의하는 클래스
-/// </summary>
-[Serializable]
-public class BuildingProductionInfo
-{
-    public string building_type; // 건물 타입(PK)
-    public int resource_id; // 생산자원 id(FK)
-    public int output_amount; // 생산량
-    public float base_production_time_minutes; // 기본 생산시간(분)
-
-    //소비 재회 데이터
-}
-
-/// <summary>
 /// CONSTRUCTED_BUILDING_PRODUCTION 테이블: 건설된 건물의 생산 현황을 관리하는 클래스
 /// </summary>
 [Serializable]
@@ -48,7 +34,16 @@ public class ConstructedBuildingProduction
 }
 
 // building upgrade 조건 데이터
-
+[CreateAssetMenu(fileName = "Building_Production_Info", menuName = "Building/Building_Production_Info")]
+public class BuildingProductionInfo : ScriptableObject
+{
+    public string building_type;
+    public int resource_id;
+    public int output_amount;
+    public float base_production_time_minutes;
+    public int consume_amount;
+    public string consume_resource_type;
+}
 
 /// <summary>
 /// 게임 내에 실제로 건설된 건물의 모든 정보를 통합하여 관리하는 클래스입니다.

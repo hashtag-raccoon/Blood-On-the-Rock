@@ -16,11 +16,11 @@ public class ProductionCreateButton : MonoBehaviour
     //[SerializeField] private GameObject lockedOverlay;
     //[SerializeField] private TextMeshProUGUI lockedLevelText;
     
-    private BuildingProductionData productionData;
+    private BuildingProductionInfo productionData;
     private goodsData resourceData;
     private bool isUnlocked = true;
     
-    public void Initialize(BuildingProductionData production, goodsData resource, int currentBuildingLevel)
+    public void Initialize(BuildingProductionInfo production, goodsData resource, int currentBuildingLevel)
     {
         createButton = GetComponent<Button>();
         productionData = production;

@@ -2980,6 +2980,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 365667838}
   m_CullTransparentMesh: 1
+--- !u!1 &373021536
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 373021537}
+  m_Layer: 0
+  m_Name: BuildingRepository
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &373021537
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373021536}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 675181389}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &376449533
 GameObject:
   m_ObjectHideFlags: 0
@@ -4259,6 +4290,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 996104524}
+  - {fileID: 373021537}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &687171646 stripped
@@ -21147,6 +21179,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
+  buildingDataSO: {fileID: 11400000, guid: 9fc70487ce8bd804aa658d37f60b1192, type: 2}
+  buildingProductionInfoSO: {fileID: 11400000, guid: 506aba939074ddf41ac9b036998565c0, type: 2}
   goodsDatas:
   - {fileID: 11400000, guid: 73b72c595d6481644b264c0add64b084, type: 2}
   - {fileID: 11400000, guid: 9e1cf8a609e62ff469018fcc3ee0625c, type: 2}
@@ -21154,7 +21188,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ce99f9875829f0643a2441c8cf74e482, type: 2}
   - {fileID: 11400000, guid: ac43a83465c95914891343442699a5d0, type: 2}
   BuildingProductionInfos: []
-  BuildingProductionDatas: []
   BuildingUpgradeDatas: []
   ConstructedBuildingProductions: []
   arbeitDatas: []

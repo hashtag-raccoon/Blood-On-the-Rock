@@ -1,1 +1,40 @@
-[]
+[
+  {
+    "part_timer_id": 1,
+    "part_timer_name": "아리아",
+    "race": "인간",
+    "level": 1,
+    "exp": 0,
+    "employment_state": true,
+    "fatigue": 0,
+    "daily_wage": 100,
+    "need_rest": false,
+    "total_ability": 9,
+    "personality_id": 1,
+    "personality_name": "꼼꼼",
+    "description": "1",
+    "specificity": "1",
+    "serving_ability": 3,
+    "cooking_ability": 3,
+    "cleaning_ability": 3
+  },
+  {
+    "part_timer_id": 3,
+    "part_timer_name": "브록",
+    "race": "드워프",
+    "level": 1,
+    "exp": 10,
+    "employment_state": true,
+    "fatigue": 0,
+    "daily_wage": 110,
+    "need_rest": false,
+    "total_ability": 7,
+    "personality_id": 3,
+    "personality_name": "침착",
+    "description": "1",
+    "specificity": "1",
+    "serving_ability": 2,
+    "cooking_ability": 3,
+    "cleaning_ability": 2
+  }
+]

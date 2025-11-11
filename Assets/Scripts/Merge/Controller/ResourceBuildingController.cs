@@ -8,13 +8,13 @@ public class ResourceBuildingController : BuildingBase
     [System.Serializable]
     public class ProductionInfo
     {
-        public BuildingProductionData productionData;
+        public BuildingProductionInfo productionData;
         public goodsData resourceData;
         public float totalProductionTime;
         public float timeRemaining;
         public int slotIndex;
   
-        public ProductionInfo(BuildingProductionData prodData, goodsData resData, int index)
+        public ProductionInfo(BuildingProductionInfo prodData, goodsData resData, int index)
         {
             productionData = prodData;
             resourceData = resData;
@@ -118,7 +118,7 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
-    public bool StartProduction(BuildingProductionData productionData, goodsData resourceData)
+    public bool StartProduction(BuildingProductionInfo productionData, goodsData resourceData)
     {
         int emptySlotIndex = FindEmptySlotIndex();
         

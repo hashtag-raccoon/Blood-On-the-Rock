@@ -10,7 +10,7 @@ public class ProductionStatusButtonUI : MonoBehaviour
     public TextMeshProUGUI timeText;
     
     [Header("데이터")]
-    public BuildingProductionData productionData;
+    public BuildingProductionInfo productionData;
     public goodsData resourceData;
     public bool isActive;
 
@@ -20,7 +20,7 @@ public class ProductionStatusButtonUI : MonoBehaviour
     }
 
     // 데이터 설정
-    public virtual void SetData(BuildingProductionData data, goodsData resource)
+    public virtual void SetData(BuildingProductionInfo data, goodsData resource)
     {
         productionData = data;
         resourceData = resource;
