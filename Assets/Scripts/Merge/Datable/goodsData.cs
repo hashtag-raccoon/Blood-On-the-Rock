@@ -1,14 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum goodsType
 {
-    vegetable,    // ä��
-    blood,       // ��
-    meet,       // ����
-    wood,      // ����
-    money     // ��
+    vegetable,
+    blood,
+    meet,
+    wood,
+    money
 }
 
 [CreateAssetMenu(fileName = "goods", menuName = "goods")]
