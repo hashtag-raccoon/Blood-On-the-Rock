@@ -3,6 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Building", menuName = "Building/Building")]
 public class BuildingData : ScriptableObject, IScrollItemData
 {
+    // 테스트 주석
     public int id;
     public int level;
     public string BuildingName;
