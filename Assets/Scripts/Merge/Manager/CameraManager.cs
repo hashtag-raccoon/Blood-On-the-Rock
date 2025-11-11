@@ -3,11 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class CameraManager : MonoBehaviour
 {
+    public static CameraManager instance;
+
     [Header("카메라 할당(가상카메라)")]
     public CinemachineVirtualCamera virtualCamera;
+    public float OriginSize;
     [Header("Confiner 할당(가상카메라)")]
     [SerializeField] private CinemachineConfiner2D confiner;
 
@@ -17,6 +21,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private bool isIsland = false;
     [Header("마우스 시점 오브젝트")]
     [SerializeField] private GameObject MouseFollowingObj;
+    public GameObject mouseFollowingObj => MouseFollowingObj; // public 접근자 추가
     [Header("플레이어 시점 오브젝트")]
     [SerializeField] private GameObject PlayerObj;
     [Header("작업 시점 오브젝트")]
@@ -41,6 +46,23 @@ public class CameraManager : MonoBehaviour
     private Vector3 _tmpCameraPos;
 
     private bool _isDragging = false;
+    
+    [HideInInspector] public bool isBuildingUIActive = false; // 건물 UI 활성화 상태
+    
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        virtualCamera.m_Lens.OrthographicSize = OriginSize;
+    }
+    
     private void Start()
     {
         confiner.m_Damping = 0.2f; // 카메라 댐핑
@@ -49,14 +71,14 @@ public class CameraManager : MonoBehaviour
             IslandInit();
         }
     }
-    // Update is called once per frame
-    void Update()
-    {
-        // 마우스 위치를 월드 좌표로 변환
-        Vector3 mouseScreenPos = Input.mousePosition;
-        mouseScreenPos.z = Mathf.Abs(Camera.main.transform.position.z); // 카메라와의 거리 지정
 
-        if (!isIsland) // BarScene 일때
+    void Update()
+    {        
+
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = Mathf.Abs(Camera.main.transform.position.z); 
+
+        if (!isIsland)
         {
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
             mouseWorldPos.z = 0; // 2D 환경일 경우 z값 고정
@@ -126,10 +148,23 @@ public class CameraManager : MonoBehaviour
     // 드래그로 카메라 이동
     private void DragToCameramMove()
     {
+        if (MouseFollowingObj == null)
+        {
+            Debug.LogWarning("CameraManager: MouseFollowingObj가 할당되지 않았습니다. Inspector에서 할당하세요.");
+            return;
+        }
+        
+        // 건물 UI가 활성화되어 있으면 드래그 불가
+        if (isBuildingUIActive)
+        {
+            _isDragging = false;
+            return;
+        }
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (!IsPointerOverUI())
+            bool isOverUI = IsPointerOverUI();
+            if (!isOverUI)
             {
                 _isDragging = true;
                 _tmpClickPos = Input.mousePosition;
@@ -147,23 +182,40 @@ public class CameraManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            if (_isDragging)
+            {
+
+            }
             _isDragging = false;
         }
     }
     // 휠로 줌 인 / 줌 아웃
     private void WheelToZoom()
     {
-        float scrollWheelInput = Input.GetAxis("Mouse ScrollWheel");
-        if (scrollWheelInput != 0)
-        { virtualCamera.m_Lens.OrthographicSize += (1 * -Mathf.Sign(scrollWheelInput)) * ZoomSpeed; }
-
-        if (virtualCamera.m_Lens.OrthographicSize < MinZoomOut)
+        Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        bool isInCamera = (Input.mousePosition.x >= 0 && Input.mousePosition.x <= Screen.width)
+                && (Input.mousePosition.y >= 0 && Input.mousePosition.y <= Screen.height);
+        // 건물 UI가 활성화되어 있으면 줌 불가
+        if (isBuildingUIActive)
         {
-            virtualCamera.m_Lens.OrthographicSize = MinZoomOut;
+            return;
         }
-        if (virtualCamera.m_Lens.OrthographicSize > MaxZoomIn)
+
+        if (isInCamera)
         {
-            virtualCamera.m_Lens.OrthographicSize = MaxZoomIn;
+            float scrollWheelInput = Input.GetAxis("Mouse ScrollWheel");
+
+            if (scrollWheelInput != 0)
+            { virtualCamera.m_Lens.OrthographicSize += (1 * -Mathf.Sign(scrollWheelInput)) * ZoomSpeed; }
+
+            if (virtualCamera.m_Lens.OrthographicSize < MinZoomOut)
+            {
+                virtualCamera.m_Lens.OrthographicSize = MinZoomOut;
+            }
+            if (virtualCamera.m_Lens.OrthographicSize > MaxZoomIn)
+            {
+                virtualCamera.m_Lens.OrthographicSize = MaxZoomIn;
+            }
         }
     }
 
@@ -188,13 +240,32 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    // UI 위에 마우스가 있는지 확인
+    // UI 위에 마우스가 있는지 확인 (상호작용 가능한 UI만 감지)
     private bool IsPointerOverUI()
     {
         PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
         eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-        return results.Count > 0;
+        
+        // 실제 상호작용 가능한 UI 요소만 필터링
+        foreach (RaycastResult result in results)
+        {
+            // Graphic 컴포넌트가 있고 raycastTarget이 true인 경우만 체크
+            Graphic graphic = result.gameObject.GetComponent<Graphic>();
+            if (graphic != null && graphic.raycastTarget)
+            {
+                // Button, ScrollRect 등 실제 상호작용 컴포넌트가 있는지 확인
+                if (result.gameObject.GetComponent<Button>() != null ||
+                    result.gameObject.GetComponent<ScrollRect>() != null ||
+                    result.gameObject.GetComponentInParent<Button>() != null ||
+                    result.gameObject.GetComponentInParent<ScrollRect>() != null)
+                {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 }
