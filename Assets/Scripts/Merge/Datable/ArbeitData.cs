@@ -14,18 +14,18 @@ public class ArbeitData
     public int level;
     public int exp;
     public DateTime hire_date;
-    public DateTime employeement_stae;
+    public bool employment_state;
     public int serving_ability;
     public int cooking_ability;
     public int cleaning_ability;
     public int total_ability;
-    public int faigue;
+    public int fatigue;
     public int daily_wage;
     public bool need_rest;
 }
 
 [Serializable]
-public class Personality
+public class Personality : ScriptableObject
 {
     public int personality_id;
     public string personality_name;
@@ -44,7 +44,8 @@ public class npc
     public string race { get; private set; }
     public int level { get; set; }
     public int exp { get; set; }
-    public int faigue { get; set; }
+    public bool employment_state { get; set; }
+    public int fatigue { get; set; }
     public int daily_wage { get; private set; }
     public bool need_rest { get; set; }
     public int total_ability { get; private set; }
@@ -64,7 +65,7 @@ public class npc
         race = arbeitData.race;
         level = arbeitData.level;
         exp = arbeitData.exp;
-        faigue = arbeitData.faigue;
+        employment_state = arbeitData.employment_state; // 추가
         daily_wage = arbeitData.daily_wage;
         need_rest = false;
 

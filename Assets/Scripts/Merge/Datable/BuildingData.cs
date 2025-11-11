@@ -31,6 +31,8 @@ public class BuildingProductionInfo
     public int resource_id; // 생산자원 id(FK)
     public int output_amount; // 생산량
     public float base_production_time_minutes; // 기본 생산시간(분)
+
+    //소비 재회 데이터
 }
 
 /// <summary>
@@ -44,6 +46,9 @@ public class ConstructedBuildingProduction
     public DateTime next_production_time; // 다음 생산 완료 시간
     public bool is_producing; // 생산 중 여부
 }
+
+// building upgrade 조건 데이터
+
 
 /// <summary>
 /// 게임 내에 실제로 건설된 건물의 모든 정보를 통합하여 관리하는 클래스입니다.

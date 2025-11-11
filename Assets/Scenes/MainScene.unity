@@ -3573,6 +3573,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2080cb266c84bb34aabd2e4f44b1e947, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
   goodsDatas:
   - {fileID: 11400000, guid: 73b72c595d6481644b264c0add64b084, type: 2}
   - {fileID: 11400000, guid: 9e1cf8a609e62ff469018fcc3ee0625c, type: 2}
@@ -3581,6 +3582,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ac43a83465c95914891343442699a5d0, type: 2}
   BuildingProductionInfos: []
   ConstructedBuildingProductions: []
+  arbeitDatas: []
+  personalities: []
+  npcs: []
   wood: 0
   money: 0
   storeFavor: 100
@@ -18190,6 +18194,7 @@ Transform:
   m_Children:
   - {fileID: 1791549050}
   - {fileID: 1805406247}
+  - {fileID: 1747009334}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &1511566539 stripped
@@ -19409,6 +19414,50 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ae9b3438b449bc9499c4c89c57b7d9b8, type: 3}
+--- !u!1 &1747009333
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1747009334}
+  - component: {fileID: 1747009335}
+  m_Layer: 0
+  m_Name: ArbeitRepository
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1747009334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747009333}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1488297228}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1747009335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747009333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a496111eaec6a0f46a78542bda07da2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1791549049
 GameObject:
   m_ObjectHideFlags: 0

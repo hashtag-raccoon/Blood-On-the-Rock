@@ -1,0 +1,40 @@
+[
+  {
+    "part_timer_id": 1,
+    "part_timer_name": "아리아",
+    "race": "인간",
+    "level": 1,
+    "exp": 0,
+    "employment_state": true,
+    "fatigue": 0,
+    "daily_wage": 100,
+    "need_rest": false,
+    "total_ability": 9,
+    "personality_id": 1,
+    "personality_name": "성실함",
+    "description": "어떤 일이든 묵묵하고 완벽하게 해내는 믿음직한 일꾼입니다.",
+    "specificity": "에이스: 모든 능력치가 1씩 높은 상태로 시작한다.",
+    "serving_ability": 3,
+    "cooking_ability": 3,
+    "cleaning_ability": 3
+  },
+  {
+    "part_timer_id": 3,
+    "part_timer_name": "브록",
+    "race": "드워프",
+    "level": 1,
+    "exp": 10,
+    "employment_state": true,
+    "fatigue": 0,
+    "daily_wage": 110,
+    "need_rest": false,
+    "total_ability": 7,
+    "personality_id": 3,
+    "personality_name": "꼼꼼함",
+    "description": "칵테일의 마지막 한 방울, 안주의 마지막 플레이팅까지 완벽을 추구합니다.",
+    "specificity": "장인의 손길: 요리 성공률이 1 상승한다.",
+    "serving_ability": 2,
+    "cooking_ability": 3,
+    "cleaning_ability": 2
+  }
+]

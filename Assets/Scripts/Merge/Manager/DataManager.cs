@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Newtonsoft.Json;
 using System.Linq;
+using Newtonsoft.Json;
 
 
 public class DataManager : MonoBehaviour
 {
     public static DataManager instance;
+
+    [Header("데이터 에셋")]
+    public PersonalityDataSO personalityDataSO; // 인스펙터에서 할당
 
     public List<goodsData> goodsDatas = new List<goodsData>();
     // ScriptableObject로 관리되는 모든 건물 정의
@@ -23,7 +26,7 @@ public class DataManager : MonoBehaviour
 
     public List<ArbeitData> arbeitDatas = new List<ArbeitData>();
     public List<Personality> personalities = new List<Personality>();
-    
+
     public List<npc> npcs = new List<npc>();
 
     private Json DataFile = new Json();
@@ -48,6 +51,8 @@ public class DataManager : MonoBehaviour
             Destroy(gameObject);
         }
         DataFile.ExistsFile();
+        LoadArbeitData();
+        LoadPersonalityData();
     }
     public void Start()
     {
@@ -55,30 +60,64 @@ public class DataManager : MonoBehaviour
         LoadConstructedBuildings();
     }
 
+    private void LoadArbeitData()
+    {
+        arbeitDatas = DataFile.loadArbeitData();
+    }
+
+    private void LoadPersonalityData()
+    {
+        if (personalityDataSO != null)
+        {
+            personalities = personalityDataSO.personalities;
+        }
+        else
+        {
+            Debug.LogError("PersonalityDataSO가 DataManager에 할당되지 않았습니다.");
+        }
+    }
+
+    /// <summary>
+    /// 현재 NPC 리스트를 JSON 파일에 저장합니다.
+    /// </summary>
+    public void SaveNpcData()
+    {
+        DataFile.saveNpcData(npcs);
+    }
+
     public void GetGoodsData()
     {
         //npcs = ArbeitRepository.Instance.
     }
 
+    private void OnApplicationQuit()
+    {
+        SaveNpcData();
+    }
     /// <summary>
     /// BuildingRepository를 통해 현재 건설된 모든 건물 데이터를 가져와 리스트를 초기화
     /// </summary>
     public void LoadConstructedBuildings()
     {
         // BuildingRepository 인스턴스에서 건설된 건물 목록을 가져옵니다.
-        ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildingsOnMainIsland();
+        //ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildingsOnMainIsland();
     }
 
     public void LoadNPC()
     {
-        
+        foreach (var npc in npcs)
+        {
+            Debug.Log($"id: {npc.part_timer_id} name: {npc.part_timer_name} race: {npc.race} level: {npc.level} exp: {npc.exp} employment_state: {npc.employment_state}, fatigue: {npc.fatigue} daily_wage: {npc.daily_wage} need_rest: {npc.need_rest} total_ability: {npc.total_ability} personality_id: {npc.personality_id} personality_name: {npc.personality_name} description: {npc.description} specificity: {npc.specificity} serving_ability: {npc.serving_ability} cooking_ability: {npc.cooking_ability} cleaning_ability: {npc.cleaning_ability}");
+        }
     }
 
 }
 class Json
 // 아이템 및 플레이어 데이터를 JSON 파일로 저장하고 불러오는 기능을 담당
 {
-    private string BuildingPass = "../Merge/Json/Building.json";
+    private string ArbeitDataPass = "Assets/Scripts/Merge/Datable/Json/ArbeitData.json";
+    private string NpcDataPass = "Assets/Scripts/Merge/Datable/Json/NpcData.json";
+    private string BuildingPass = "Assets/Scripts/Merge/Datable/Json/BuildingData.json";
 
     public void ExistsFile()
     {
@@ -86,6 +125,16 @@ class Json
         if (!File.Exists(BuildingPass))
         {
             File.WriteAllText(BuildingPass, "[]");
+        }
+
+        if (!File.Exists(ArbeitDataPass))
+        {
+            File.WriteAllText(ArbeitDataPass, "[]");
+        }
+
+        if (!File.Exists(NpcDataPass))
+        {
+            File.WriteAllText(NpcDataPass, "[]");
         }
 
     }
@@ -102,7 +151,20 @@ class Json
         List<ConstructedBuilding> buildinsFromData = JsonConvert.DeserializeObject<List<ConstructedBuilding>>(JsonData);
         return buildinsFromData;
     }
-    
+
+    public List<ArbeitData> loadArbeitData()
+    {
+        string jsonData = File.ReadAllText(ArbeitDataPass);
+        List<ArbeitData> arbeitDataList = JsonConvert.DeserializeObject<List<ArbeitData>>(jsonData);
+        return arbeitDataList ?? new List<ArbeitData>();
+    }
+
+    public void saveNpcData(List<npc> npcs)
+    {
+        string jsonData = JsonConvert.SerializeObject(npcs, Formatting.Indented);
+        File.WriteAllText(NpcDataPass, jsonData);
+    }
+
 
     public void updateBuildingData(List<ConstructedBuilding> constructedBuildings)
     {
