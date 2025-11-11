@@ -133,8 +133,11 @@ public class MultiCharacterRigSetup : EditorWindow
             bodyFileName,
             $"{characterName}_head",
             $"{characterName}_hair",
+            // 팔/다리 앞뒤 모두 로드 (좌우에 다른 스프라이트를 사용하기 위함)
             $"{characterName}_armfront",
-            $"{characterName}_legfront"
+            $"{characterName}_armback",
+            $"{characterName}_legfront",
+            $"{characterName}_legback"
         };
         
         foreach (string spriteName in spriteNames)
@@ -184,17 +187,37 @@ public class MultiCharacterRigSetup : EditorWindow
             CreateSpritePart("Hair", sprites["hair"], headParent.transform, Vector3.zero, 7);
         
         // Arm 계층 구조
-        if (sprites.ContainsKey("armfront"))
+        // 요구사항: 왼팔은 armback, 오른팔은 armfront 사용
         {
-            CreateSpritePart("ArmFront_L", sprites["armfront"], characterRoot.transform, new Vector3(-armXOffset, armYOffset, 0), 8);
-            CreateSpritePart("ArmFront_R", sprites["armfront"], characterRoot.transform, new Vector3(armXOffset, armYOffset, 0), 8);
+            Sprite leftArmSprite = null;
+            Sprite rightArmSprite = null;
+            sprites.TryGetValue("armback", out leftArmSprite);
+            sprites.TryGetValue("armfront", out rightArmSprite);
+            // 폴백 처리: 없을 경우 서로 대체
+            if (leftArmSprite == null && rightArmSprite != null) leftArmSprite = rightArmSprite;
+            if (rightArmSprite == null && leftArmSprite != null) rightArmSprite = leftArmSprite;
+            
+            if (leftArmSprite != null)
+                CreateSpritePart("ArmFront_L", leftArmSprite, characterRoot.transform, new Vector3(-armXOffset, armYOffset, 0), 8);
+            if (rightArmSprite != null)
+                CreateSpritePart("ArmFront_R", rightArmSprite, characterRoot.transform, new Vector3(armXOffset, armYOffset, 0), 8);
         }
         
         // Leg 계층 구조
-        if (sprites.ContainsKey("legfront"))
+        // 요구사항: 왼다리는 legback, 오른다리는 legfront 사용
         {
-            CreateSpritePart("LegFront_L", sprites["legfront"], characterRoot.transform, new Vector3(-legXOffset, -legYOffset, 0), 9);
-            CreateSpritePart("LegFront_R", sprites["legfront"], characterRoot.transform, new Vector3(legXOffset, -legYOffset, 0), 9);
+            Sprite leftLegSprite = null;
+            Sprite rightLegSprite = null;
+            sprites.TryGetValue("legback", out leftLegSprite);
+            sprites.TryGetValue("legfront", out rightLegSprite);
+            // 폴백 처리
+            if (leftLegSprite == null && rightLegSprite != null) leftLegSprite = rightLegSprite;
+            if (rightLegSprite == null && leftLegSprite != null) rightLegSprite = leftLegSprite;
+            
+            if (leftLegSprite != null)
+                CreateSpritePart("LegFront_L", leftLegSprite, characterRoot.transform, new Vector3(-legXOffset, -legYOffset, 0), 9);
+            if (rightLegSprite != null)
+                CreateSpritePart("LegFront_R", rightLegSprite, characterRoot.transform, new Vector3(legXOffset, -legYOffset, 0), 9);
         }
     }
     
