@@ -493,7 +493,7 @@ Transform:
   m_GameObject: {fileID: 145509548}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.73970085, w: 0.67293584}
-  m_LocalPosition: {x: 0.25410873, y: -0.2573288, z: 0}
+  m_LocalPosition: {x: 0.1846965, y: -0.33826572, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2311,13 +2311,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 582811492}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.7092592, w: 0.70494777}
-  m_LocalPosition: {x: 0.007106781, y: -0.43535614, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: 0.7252214, w: 0.6885158}
+  m_LocalPosition: {x: 0.016019437, y: -0.43179125, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 302606982}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 92.975}
 --- !u!1 &587695373
 GameObject:
   m_ObjectHideFlags: 0
@@ -3500,7 +3500,6 @@ MonoBehaviour:
   - {fileID: 1823091995}
   mainCamera: {fileID: 620770636}
   previewTilemap: {fileID: 2113479113}
-  clearSelectionAfterPlace: 1
 --- !u!4 &758221431
 Transform:
   m_ObjectHideFlags: 0
@@ -3806,13 +3805,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815793314}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.6618026, w: 0.74967813}
-  m_LocalPosition: {x: 0.35685903, y: -0.2559412, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0.43317652, w: 0.9013091}
+  m_LocalPosition: {x: 0.4191621, y: -0.31040293, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 803348626}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -51.339}
 --- !u!1 &817665708
 GameObject:
   m_ObjectHideFlags: 0
@@ -4819,7 +4818,7 @@ Transform:
   m_GameObject: {fileID: 957507190}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.7197266, w: 0.6942576}
-  m_LocalPosition: {x: 0.18152323, y: 0.43013287, z: 0}
+  m_LocalPosition: {x: 0.24880853, y: 0.19576311, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18340,7 +18339,7 @@ Transform:
   m_GameObject: {fileID: 1161937133}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.014, y: -0.296, z: 0}
+  m_LocalPosition: {x: -0.03, y: -0.082, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18423,7 +18422,7 @@ Transform:
   m_GameObject: {fileID: 1200931956}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.72402215, w: 0.6897767}
-  m_LocalPosition: {x: 0.13325539, y: 0.4183855, z: 0}
+  m_LocalPosition: {x: 0.1231114, y: 0.16789925, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19348,7 +19347,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.09, y: -1.53, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 576608611}
@@ -19464,7 +19463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 1545567886}
-  moveSpeed: 0.5
+  moveSpeed: 1
   stoppingDistance: 0.05
   speedParameter: Speed
   isWalkingParameter: IsWalking
@@ -20567,13 +20566,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1742523682}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.6972205, w: 0.7168567}
-  m_LocalPosition: {x: 0.00036426543, y: -0.06079588, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: 0.7067746, w: 0.7074388}
+  m_LocalPosition: {x: 0.020356178, y: -0.2977842, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 576608611}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 89.946}
 --- !u!1 &1823091992
 GameObject:
   m_ObjectHideFlags: 0

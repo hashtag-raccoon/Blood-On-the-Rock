@@ -129,12 +129,12 @@ public class Human1AnimationController : MonoBehaviour
         }
         
         // 애니메이션 파라미터 설정
-        animator.SetFloat(speedParameter, speed);
-        animator.SetBool(isWalkingParameter, hasTarget && speed > 0.1f);
+        // animator.SetFloat(speedParameter, speed);
+        // animator.SetBool(isWalkingParameter, hasTarget && speed > 0.1f);
         
-        // 달리기 여부 (속도가 일정 이상일 때)
-        bool isRunning = speed > moveSpeed * 0.7f;
-        animator.SetBool(isRunningParameter, isRunning);
+        // // 달리기 여부 (속도가 일정 이상일 때)
+        // bool isRunning = speed > moveSpeed * 0.7f;
+        // animator.SetBool(isRunningParameter, isRunning);
     }
     
     /// <summary>
