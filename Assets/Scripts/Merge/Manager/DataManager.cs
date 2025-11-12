@@ -8,43 +8,51 @@ using Newtonsoft.Json;
 public class DataManager : MonoBehaviour
 {
     #region Singleton
-    public static DataManager instance;
-    public static DataManager Instance => instance;
+    // 다른 클래스에서 DataManager의 데이터에 쉽게 접근할 수 있도록 싱글톤 인스턴스를 제공합니다.
+    // 외부에서는 값을 수정할 수 없도록 private set으로 설정합니다.
+    public static DataManager Instance { get; private set; }
     #endregion
 
     #region Constants
     private const string GoodsPath = "Data/Goods";
-    private const string BuildingUpgradePath = "Data/Building/BuildingUpgrade";
+    private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
     #endregion
 
-    #region Scriptable Object References
+    #region Data Sources (ScriptableObject)
     [Header("데이터 에셋")]
-    public PersonalityDataSO personalityDataSO;
-    public BuildingDataSO buildingDataSO;
-    public BuildingProductionInfoSO buildingProductionInfoSO;
+    [Tooltip("NPC의 고정 특성(성격, 기본 능력치 등)을 담고 있는 ScriptableObject")]
+    [SerializeField] private PersonalityDataSO personalityDataSO;
+    [Tooltip("건물의 고정 정보(ID, 이름, 레벨, 아이콘 등)를 담고 있는 ScriptableObject")]
+    [SerializeField] private BuildingDataSO buildingDataSO;
+    [Tooltip("건물의 생산 관련 고정 정보(생산품, 시간 등)를 담고 있는 ScriptableObject")]
+    [SerializeField] private BuildingProductionInfoSO buildingProductionInfoSO;
     #endregion
 
-    #region Goods Data
-    public List<goodsData> goodsDatas = new List<goodsData>();
-    #endregion
-
-    #region Building Data
-    // ScriptableObject로 관리되는 모든 건물 정의
+    #region Raw Data Lists (원본 데이터)
+    // --- 건물 관련 원본 데이터 ---
+    [Header("건물 데이터")]
     public List<BuildingData> BuildingDatas = new List<BuildingData>();
     public List<BuildingProductionInfo> BuildingProductionInfos = new List<BuildingProductionInfo>();
     public List<BuildingUpgradeData> BuildingUpgradeDatas = new List<BuildingUpgradeData>();
-    
+
     // 현재 건설된 건물의 생산 상태 (플레이어 세이브 파일에서 로드)
     public List<ConstructedBuildingProduction> ConstructedBuildingProductions = new List<ConstructedBuildingProduction>();
-    
-    // BuildingRepository에서 가져온 통합된 건설 완료 건물 데이터
-    public List<ConstructedBuilding> ConstructedBuildings { get; private set; }
-    #endregion
 
-    #region NPC/Arbeit Data
+    // --- NPC 관련 원본 데이터 ---
+    [Header("NPC 데이터")]
     public List<ArbeitData> arbeitDatas = new List<ArbeitData>();
     public List<Personality> personalities = new List<Personality>();
+
+    // --- 기타 데이터 ---
+    [Header("기타 데이터")]
+    public List<goodsData> goodsDatas = new List<goodsData>();
+    #endregion
+
+    #region Runtime Data Lists (가공된 런타임 데이터)
+    [Header("조합 데이터")]
+    // Repositories에서 원본 데이터를 조합하여 생성한, 실제 게임 로직에서 사용될 데이터 리스트입니다.
     public List<npc> npcs = new List<npc>();
+    public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     #endregion
 
     #region Game Resources
@@ -52,7 +60,7 @@ public class DataManager : MonoBehaviour
     [Header("섬/자원 현황")]
     public int wood = 0;
     public int money = 0;
-    
+
     [Header("바 현재 선호도/바 현재 레벨")]
     public float storeFavor = 100f;
     public int barLevel = 1;
@@ -68,32 +76,29 @@ public class DataManager : MonoBehaviour
         InitializeSingleton();
         InitializeDataFiles();
         LoadAllData();
-    }
-
-    public void Start()
-    {
-        // 게임 시작 시 건설된 건물 데이터 로드
-        LoadConstructedBuildings();
+        Debug.Log("DataManager 초기화 및 모든 데이터 로딩 완료.");
     }
 
     private void OnApplicationQuit()
     {
-        SaveNpcData();
+        // 게임 종료 직전, 변경된 런타임 데이터의 '상태'를 원본 '상태' 데이터에 반영 후 저장합니다.
+        UpdateConstructedBuildingProductionsFromConstructedBuildings();
+        UpdateAndSaveArbeitData();
         SaveConstructedBuildingProductions();
     }
 
     private void OnDestroy()
     {
-        CleanupResources();
+        //CleanupResources();
     }
     #endregion
 
     #region Initialization
     private void InitializeSingleton()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -109,6 +114,7 @@ public class DataManager : MonoBehaviour
 
     private void LoadAllData()
     {
+        // 게임 시작에 필요한 모든 데이터를 로드합니다.
         LoadArbeitData();
         LoadPersonalityData();
         LoadBuildingData();
@@ -121,6 +127,7 @@ public class DataManager : MonoBehaviour
 
     #region Data Loading Methods
     private void LoadArbeitData()
+    // NPC의 상태 데이터(레벨, 경험치 등)를 JSON 파일에서 로드합니다.
     {
         arbeitDatas = DataFile.loadArbeitData();
     }
@@ -128,6 +135,7 @@ public class DataManager : MonoBehaviour
     private void LoadPersonalityData()
     {
         if (personalityDataSO != null)
+        // NPC의 정의 데이터(성격, 고유 능력치 등)를 ScriptableObject에서 로드합니다.
         {
             personalities = personalityDataSO.personalities;
         }
@@ -140,6 +148,7 @@ public class DataManager : MonoBehaviour
 
     private void LoadBuildingData()
     {
+        // 건물의 기본 정의 데이터(이름, 타입, 레벨 등)를 ScriptableObject에서 로드합니다.
         if (buildingDataSO != null && buildingDataSO.buildings != null)
         {
             BuildingDatas = buildingDataSO.buildings;
@@ -154,6 +163,7 @@ public class DataManager : MonoBehaviour
 
     private void LoadBuildingProductionData()
     {
+        // 건물의 생산 정의 데이터(생산품, 생산 시간 등)를 ScriptableObject에서 로드합니다.
         if (buildingProductionInfoSO != null && buildingProductionInfoSO.productionInfos != null)
         {
             BuildingProductionInfos = buildingProductionInfoSO.productionInfos;
@@ -168,6 +178,7 @@ public class DataManager : MonoBehaviour
 
     private void LoadGoodsData()
     {
+        // 재화(Goods) 데이터를 Resources 폴더에서 로드합니다.
         goodsData[] loadedGoods = Resources.LoadAll<goodsData>(GoodsPath);
         goodsDatas.Clear();
         foreach (var goods in loadedGoods)
@@ -178,6 +189,7 @@ public class DataManager : MonoBehaviour
 
     private void LoadBuildingUpgradeData()
     {
+        // 건물 업그레이드 데이터를 Resources 폴더에서 로드합니다.
         BuildingUpgradeData[] loadedUpgrades = Resources.LoadAll<BuildingUpgradeData>(BuildingUpgradePath);
         BuildingUpgradeDatas.Clear();
         foreach (var upgrade in loadedUpgrades)
@@ -188,52 +200,68 @@ public class DataManager : MonoBehaviour
 
     private void LoadConstructedBuildingProductions()
     {
+        // 건설된 건물의 상태 데이터(생산 상태, 시간 등)를 JSON 파일에서 로드합니다.
         ConstructedBuildingProductions = DataFile.loadConstructedBuildingProductions();
         Debug.Log($"ConstructedBuildingProduction {ConstructedBuildingProductions.Count}개를 JSON에서 로드했습니다.");
     }
     #endregion
 
-    #region NPC Management
-    /// <summary>
-    /// 현재 NPC 리스트를 JSON 파일에 저장합니다.
-    /// </summary>
-    public void SaveNpcData()
-    {
-        DataFile.saveNpcData(npcs);
-    }
-
-    public void LoadNPC()
-    {
-        foreach (var npc in npcs)
-        {
-            Debug.Log($"id: {npc.part_timer_id} name: {npc.part_timer_name} race: {npc.race} " +
-                     $"level: {npc.level} exp: {npc.exp} employment_state: {npc.employment_state}, " +
-                     $"fatigue: {npc.fatigue} daily_wage: {npc.daily_wage} need_rest: {npc.need_rest} " +
-                     $"total_ability: {npc.total_ability} personality_id: {npc.personality_id} " +
-                     $"personality_name: {npc.personality_name} description: {npc.description} " +
-                     $"specificity: {npc.specificity} serving_ability: {npc.serving_ability} " +
-                     $"cooking_ability: {npc.cooking_ability} cleaning_ability: {npc.cleaning_ability}");
-        }
-    }
-    #endregion
-
-    #region Building Management
-    /// <summary>
-    /// BuildingRepository를 통해 현재 건설된 모든 건물 데이터를 가져와 리스트를 초기화
-    /// </summary>
-    public void LoadConstructedBuildings()
-    {
-        // BuildingRepository 인스턴스에서 건설된 건물 목록을 가져옵니다.
-        // TODO: BuildingRepository 구현 후 주석 해제
-        // ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildingsOnMainIsland();
-    }
-
+    #region Data Saving Methods
     /// <summary>
     /// 현재 건설된 건물 생산 상태를 JSON 파일에 저장합니다.
     /// </summary>
     public void SaveConstructedBuildingProductions()
     {
         DataFile.saveConstructedBuildingProductions(ConstructedBuildingProductions);
+    }
+
+    /// <summary>
+    /// 게임 플레이 중 변경된 'ConstructedBuilding' 런타임 객체의 상태를
+    /// 저장을 위한 원본 상태 데이터인 'ConstructedBuildingProductions' 리스트에 다시 반영합니다.
+    /// </summary>
+    private void UpdateConstructedBuildingProductionsFromConstructedBuildings()
+    {
+        if (ConstructedBuildings == null || ConstructedBuildingProductions == null) return;
+
+        var productionDict = ConstructedBuildingProductions.ToDictionary(p => p.building_id);
+
+        foreach (var building in ConstructedBuildings)
+        {
+            if (productionDict.TryGetValue(building.Id, out var production))
+            // 딕셔너리에서 ID로 해당 건물의 상태 데이터를 찾습니다.
+            {
+                production.is_producing = building.IsProducing;
+                production.last_production_time = building.LastProductionTime;
+                production.next_production_time = building.NextProductionTime;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 게임 플레이 중 변경된 'npc' 런타임 객체의 상태를
+    /// 저장을 위한 원본 상태 데이터인 'arbeitDatas' 리스트에 다시 반영하고, 그 결과를 JSON 파일에 저장합니다.
+    /// </summary>
+    private void UpdateAndSaveArbeitData()
+    {
+        if (npcs == null || arbeitDatas == null) return;
+
+        var arbeitDict = arbeitDatas.ToDictionary(a => a.part_timer_id);
+
+        foreach (var npc in npcs)
+        {
+            if (arbeitDict.TryGetValue(npc.part_timer_id, out var arbeitData))
+            {
+                // npc 객체의 변경 가능한 상태(레벨, 경험치 등)를 arbeitData에 덮어씁니다.
+                arbeitData.level = npc.level;
+                arbeitData.exp = npc.exp;
+                arbeitData.employment_state = npc.employment_state;
+                arbeitData.fatigue = npc.fatigue;
+                arbeitData.need_rest = npc.need_rest;
+            }
+        }
+
+        // 최신 상태가 반영된 arbeitDatas 리스트를 파일에 저장합니다.
+        DataFile.saveArbeitData(arbeitDatas);
     }
     #endregion
 
@@ -267,7 +295,7 @@ public class DataManager : MonoBehaviour
     #region Cleanup
     private void CleanupResources()
     {
-        if (instance == this)
+        if (Instance == this)
         {
             // Clear and nullify lists to free up memory
             BuildingDatas?.Clear();
@@ -289,7 +317,7 @@ public class DataManager : MonoBehaviour
             personalities = null;
             npcs = null;
 
-            instance = null;
+            Instance = null;
         }
     }
     #endregion
@@ -302,26 +330,13 @@ public class DataManager : MonoBehaviour
 class Json
 {
     private string ArbeitDataPass = "Assets/Scripts/Merge/Datable/Json/ArbeitData.json";
-    private string NpcDataPass = "Assets/Scripts/Merge/Datable/Json/NpcData.json";
-    private string BuildingPass = "Assets/Scripts/Merge/Datable/Json/BuildingData.json";
     private string ConstructedBuildingProductionPass = "Assets/Scripts/Merge/Datable/Json/ConstructedBuildingProduction.json";
 
     public void ExistsFile()
     {
-        // 파일이 없으면 빈 배열로 초기화
-        if (!File.Exists(BuildingPass))
-        {
-            File.WriteAllText(BuildingPass, "[]");
-        }
-
         if (!File.Exists(ArbeitDataPass))
         {
             File.WriteAllText(ArbeitDataPass, "[]");
-        }
-
-        if (!File.Exists(NpcDataPass))
-        {
-            File.WriteAllText(NpcDataPass, "[]");
         }
 
         if (!File.Exists(ConstructedBuildingProductionPass))
@@ -329,62 +344,6 @@ class Json
             File.WriteAllText(ConstructedBuildingProductionPass, "[]");
         }
     }
-
-    #region Building Data Methods
-    public void saveBuildingData(List<ConstructedBuilding> constructedBuildings)
-    {
-        string JsonData = JsonConvert.SerializeObject(constructedBuildings, Formatting.Indented);
-        File.WriteAllText(BuildingPass, JsonData);
-    }
-
-    public List<ConstructedBuilding> loadBuildingData()
-    {
-        if (!File.Exists(BuildingPass))
-        {
-            Debug.LogWarning("BuildingData 파일이 존재하지 않습니다. 빈 리스트를 반환합니다.");
-            return new List<ConstructedBuilding>();
-        }
-
-        string JsonData = File.ReadAllText(BuildingPass);
-        List<ConstructedBuilding> buildingsFromData = JsonConvert.DeserializeObject<List<ConstructedBuilding>>(JsonData);
-        return buildingsFromData ?? new List<ConstructedBuilding>();
-    }
-
-    public void updateBuildingData(List<ConstructedBuilding> constructedBuildings)
-    {
-        // 1. JSON 파일에서 기존 건물 데이터를 읽어옴
-        List<ConstructedBuilding> buildingsFromData = loadBuildingData();
-
-        // 2. 기존 데이터를 ID를 키로 하는 Dictionary로 변환
-        var buildingsDict = buildingsFromData.ToDictionary(b => b.Id);
-
-        // 3. 현재 게임 내 건물 데이터를 순회하며 업데이트/추가
-        foreach (var currentBuilding in constructedBuildings)
-        {
-            if (buildingsDict.ContainsKey(currentBuilding.Id))
-            {
-                // 3-1. ID가 존재하면 기존 건물 정보를 현재 정보로 업데이트
-                buildingsDict[currentBuilding.Id] = currentBuilding;
-            }
-            else
-            {
-                // 3-2. ID가 없으면 새로 건설된 건물이므로 Dictionary에 추가
-                buildingsDict.Add(currentBuilding.Id, currentBuilding);
-            }
-        }
-
-        // 4. 현재 게임 데이터에 없는 건물(삭제된 건물)을 찾아 제거
-        var currentBuildingIds = new HashSet<int>(constructedBuildings.Select(b => b.Id));
-        var buildingsToRemove = buildingsDict.Keys.Where(id => !currentBuildingIds.Contains(id)).ToList();
-        foreach (var id in buildingsToRemove)
-        {
-            buildingsDict.Remove(id);
-        }
-
-        // 5. 업데이트된 데이터를 다시 JSON 형식으로 변환하여 파일에 저장
-        saveBuildingData(buildingsDict.Values.ToList());
-    }
-    #endregion
 
     #region Constructed Building Production Methods
     public void saveConstructedBuildingProductions(List<ConstructedBuildingProduction> productions)
@@ -421,14 +380,19 @@ class Json
         List<ArbeitData> arbeitDataList = JsonConvert.DeserializeObject<List<ArbeitData>>(jsonData);
         return arbeitDataList ?? new List<ArbeitData>();
     }
-    #endregion
 
-    #region NPC Data Methods
-    public void saveNpcData(List<npc> npcs)
+    /// <summary>
+    /// ArbeitData 리스트를 JSON 파일로 저장합니다.
+    /// 이 메서드는 NPC의 레벨, 경험치 등 게임 플레이 중에 변경된 '상태' 데이터를 저장하는 데 사용됩니다.
+    /// </summary>
+    /// <param name="arbeitData">저장할 ArbeitData 리스트</param>
+    public void saveArbeitData(List<ArbeitData> arbeitData)
     {
-        string jsonData = JsonConvert.SerializeObject(npcs, Formatting.Indented);
-        File.WriteAllText(NpcDataPass, jsonData);
+        string jsonData = JsonConvert.SerializeObject(arbeitData, Formatting.Indented);
+        File.WriteAllText(ArbeitDataPass, jsonData);
+        Debug.Log($"ArbeitData {arbeitData.Count}개를 저장했습니다.");
     }
     #endregion
+
 }
 #endregion

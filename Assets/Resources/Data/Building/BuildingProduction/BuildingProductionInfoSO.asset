@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e32edc63b423a64597f9e49ba19bd4d, type: 3}
   m_Name: BuildingProductionInfoSO
   m_EditorClassIdentifier: 
-  productionInfos: []
+  productionInfos:
+  - {fileID: 11400000, guid: 2ca840e6f87e7054093fc0937c48dc35, type: 2}
+  - {fileID: 11400000, guid: 71ea4bfb663e13c4da40439cd5565edf, type: 2}
+  - {fileID: 11400000, guid: 0adc430cdf3a77842b4358f075af3e31, type: 2}

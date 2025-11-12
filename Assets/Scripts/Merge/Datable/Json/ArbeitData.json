@@ -46,7 +46,7 @@
     "cooking_ability": 8,
     "cleaning_ability": 5,
     "total_ability": 15,
-    "fatigue": 5,
+    "fatigue": 0,
     "daily_wage": 110,
     "need_rest": false
   }

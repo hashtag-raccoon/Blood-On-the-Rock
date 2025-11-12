@@ -17,7 +17,7 @@ public class EditScrollUI : BaseScrollUI<BuildingData, EditBuildingButtonUI>
 
     private void Start()
     {
-        dataManager = DataManager.instance;
+        dataManager = DataManager.Instance;
 
         GenerateItems(dataManager.BuildingDatas);
     }

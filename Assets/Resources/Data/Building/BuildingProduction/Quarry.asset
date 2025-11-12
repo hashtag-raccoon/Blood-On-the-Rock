@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce6a0db8b658c0445b51c86982505de6, type: 3}
+  m_Script: {fileID: 11500000, guid: cace8201559105c499e8f0f76b39e1ba, type: 3}
   m_Name: Quarry
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingProductionData
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingProductionInfo
   building_type: Quarry
-  resource_id: 0
-  output_amount: 50
-  base_production_time_minutes: 1.5
-  consume_amount: 50
+  resource_id: 2
+  output_amount: 150
+  base_production_time_minutes: 1.85
+  consume_amount: 0
   consume_resource_type: Money
