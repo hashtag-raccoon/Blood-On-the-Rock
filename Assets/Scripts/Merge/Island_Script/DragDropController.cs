@@ -32,16 +32,6 @@ public class DragDropController : MonoBehaviour
     private SpriteRenderer draggedSpriteRenderer = null; // 드래그 중인 스프라이트 렌더러
     private Color originalSpriteColor; // 원래 스프라이트 색상 (프리뷰용)
 
-    // 다중 선택/그룹 이동 관련 상태
-    private HashSet<Vector3Int> selectedCells = new HashSet<Vector3Int>();
-    private Dictionary<Vector3Int, TileBase> selectedTiles = new Dictionary<Vector3Int, TileBase>();
-    private bool isGroupDragging = false;
-    private Vector3Int anchorOriginalCell; // 기준 셀 (첫 선택 또는 마우스 시작 시점)
-    private List<Vector3Int> lastGroupPreviewCells = new List<Vector3Int>();
-    [Header("선택 동작 설정")]
-    [SerializeField] private bool clearSelectionAfterPlace = true; // 그룹 배치 후 자동 선택 해제
-    // 선택 하이라이트 이전 원본 색상 복원용
-    private Dictionary<Vector3Int, Color> originalTileColors = new Dictionary<Vector3Int, Color>();
 
     void OnValidate()
     {
@@ -54,7 +44,7 @@ public class DragDropController : MonoBehaviour
             // 기존 값 보존
             Tilemap[] oldTilemaps = buildingTilemaps;
             buildingTilemaps = new Tilemap[buildingTilemapCount];
-
+            
             // 기존 값 복사
             if (oldTilemaps != null)
             {
@@ -74,7 +64,7 @@ public class DragDropController : MonoBehaviour
             // 기존 값 보존
             Tilemap[] oldTilemaps = buildingTilemaps;
             buildingTilemaps = new Tilemap[buildingTilemapCount];
-
+            
             // 기존 값 복사
             if (oldTilemaps != null)
             {
@@ -177,11 +167,7 @@ public class DragDropController : MonoBehaviour
     void Update()
     {
         HandleMouseInput();
-        if (isGroupDragging)
-        {
-            UpdateGroupPreview();
-        }
-        else if (isDraggingSprite)
+        if (isDraggingSprite)
         {
             UpdateSpritePreview();
         }
@@ -193,37 +179,23 @@ public class DragDropController : MonoBehaviour
 
     private void HandleMouseInput()
     {
-        // Alt+우클릭: 선택 토글
-        if (Input.GetMouseButtonDown(1) && (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)))
-        {
-            ToggleSelectionAtMouse();
-            return;
-        }
-
-        // 우클릭으로 드래그 시작 (선택이 있으면 그룹 드래그, 없으면 단일 드래그)
+        // 우클릭으로 드래그 시작
         if (Input.GetMouseButtonDown(1))
         {
-            if (selectedCells.Count > 0)
+            // 스프라이트 오브젝트를 먼저 확인
+            if (TryStartSpriteDrag())
             {
-                StartGroupDrag();
+                // 스프라이트 드래그 시작됨
             }
             else
             {
-                // 스프라이트 오브젝트를 먼저 확인
-                if (TryStartSpriteDrag())
-                {
-                    // 스프라이트 드래그 시작됨
-                }
-                else
-                {
-                    // 타일맵 드래그 시도
-                    StartDrag();
-                }
+                // 타일맵 드래그 시도
+                StartDrag();
             }
         }
 
         // 드래그 중일 때 마우스 따라가기
-        if (isDragging && !isGroupDragging && !isDraggingSprite)
+        if (isDragging && !isDraggingSprite)
         {
             UpdateDragPosition();
         }
@@ -231,11 +203,7 @@ public class DragDropController : MonoBehaviour
         // 마우스 좌클릭 해제로 드래그 종료
         if (Input.GetMouseButtonUp(1))
         {
-            if (isGroupDragging)
-            {
-                EndGroupDrag();
-            }
-            else if (isDraggingSprite)
+            if (isDraggingSprite)
             {
                 EndSpriteDrag();
             }
@@ -248,18 +216,10 @@ public class DragDropController : MonoBehaviour
         // 우클릭으로 드래그 취소
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isGroupDragging)
-                CancelGroupDrag();
-            else if (isDraggingSprite)
+            if (isDraggingSprite)
                 CancelSpriteDrag();
             else if (isDragging)
                 CancelDrag();
-        }
-
-        // Alt+C: 전체 선택 해제
-        if ((Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) && Input.GetKeyDown(KeyCode.C))
-        {
-            ClearSelectionState();
         }
     }
 
@@ -281,7 +241,7 @@ public class DragDropController : MonoBehaviour
                 // 클릭한 타일에서 연결된 모든 타일 찾기 (연결된 컴포넌트)
                 buildingCells.Clear();
                 buildingTiles.Clear();
-
+                
                 FindConnectedTiles(foundCell, foundTile, tilemapIndex);
 
                 if (buildingCells.Count > 0)
@@ -455,322 +415,16 @@ public class DragDropController : MonoBehaviour
         }
     }
 
-    // ====== 다중 선택/그룹 이동 ======
-    private void ToggleSelectionAtMouse()
-    {
-        Vector3Int cell = GetMouseCell();
-
-        // 모든 타일맵을 확인하여 클릭한 위치의 건물 찾기
-        for (int tilemapIndex = 0; tilemapIndex < buildingTilemaps.Length; tilemapIndex++)
-        {
-            if (TryFindBuildingAtXY(cell.x, cell.y, tilemapIndex, out Vector3Int foundCell, out TileBase foundTile))
-            {
-                if (selectedCells.Contains(foundCell))
-                {
-                    // 해제
-                    DeselectCell(foundCell);
-                }
-                else
-                {
-                    // 선택
-                    SelectCell(foundCell);
-                }
-                return;
-            }
-        }
-
-        // 빈 공간 Alt+우클릭 시 전체 해제
-        if (selectedCells.Count > 0)
-            ClearSelectionState();
-    }
-
-    private void SelectCell(Vector3Int cell)
-    {
-        selectedCells.Add(cell);
-
-        Tilemap targetTilemap = GetTilemapForCell(cell);
-        if (targetTilemap != null)
-        {
-            if (!selectedTiles.ContainsKey(cell))
-            {
-                TileBase t = targetTilemap.GetTile(cell);
-                if (t != null)
-                {
-                    selectedTiles[cell] = t;
-                }
-            }
-            // 하이라이트 (기존 색 저장 후 적용)
-            targetTilemap.SetTileFlags(cell, TileFlags.None);
-            if (!originalTileColors.ContainsKey(cell))
-            {
-                originalTileColors[cell] = targetTilemap.GetColor(cell);
-            }
-            targetTilemap.SetColor(cell, new Color(0.3f, 0.9f, 1f, 1f));
-        }
-    }
-
-    private void DeselectCell(Vector3Int cell)
-    {
-        Tilemap targetTilemap = GetTilemapForCell(cell);
-        if (targetTilemap != null)
-        {
-            // 색상 복구 (원본 저장값이 있으면 그걸로, 없으면 흰색)
-            targetTilemap.SetTileFlags(cell, TileFlags.None);
-            if (originalTileColors.TryGetValue(cell, out var orig))
-                targetTilemap.SetColor(cell, orig);
-            else
-                targetTilemap.SetColor(cell, Color.white);
-        }
-        selectedCells.Remove(cell);
-        selectedTiles.Remove(cell);
-        originalTileColors.Remove(cell);
-    }
-
-    private void ClearAllSelectionHighlights()
-    {
-        foreach (var cell in selectedCells)
-        {
-            Tilemap targetTilemap = GetTilemapForCell(cell);
-            if (targetTilemap != null)
-            {
-                targetTilemap.SetTileFlags(cell, TileFlags.None);
-                if (originalTileColors.TryGetValue(cell, out var orig))
-                    targetTilemap.SetColor(cell, orig);
-                else
-                    targetTilemap.SetColor(cell, Color.white);
-            }
-        }
-    }
-
-    private void ClearSelectionState()
-    {
-        ClearAllSelectionHighlights();
-        selectedCells.Clear();
-        selectedTiles.Clear();
-        originalTileColors.Clear();
-    }
-
-    private void StartGroupDrag()
-    {
-        if (selectedCells.Count == 0)
-            return;
-
-        // 기준 셀 결정: 마우스 아래 셀 우선
-        Vector3Int mouseCell = GetMouseCell();
-        if (selectedCells.Contains(mouseCell))
-            anchorOriginalCell = mouseCell;
-        else
-            foreach (var c in selectedCells) { anchorOriginalCell = c; break; }
-
-        // 하이라이트 제거 후 타일 들어올리기
-        ClearAllSelectionHighlights();
-
-        // 선택된 모든 타일 캐싱 (누락된 경우 보강) 및 제거
-        List<Vector3Int> toRemove = new List<Vector3Int>();
-        foreach (var c in selectedCells)
-        {
-            Tilemap targetTilemap = GetTilemapForCell(c);
-            if (targetTilemap != null)
-            {
-                TileBase t = targetTilemap.GetTile(c);
-                if (t != null)
-                {
-                    selectedTiles[c] = t;
-                    toRemove.Add(c);
-                }
-            }
-        }
-        foreach (var c in toRemove)
-        {
-            Tilemap targetTilemap = GetTilemapForCell(c);
-            if (targetTilemap != null)
-            {
-                targetTilemap.SetTile(c, null);
-            }
-        }
-
-        isGroupDragging = true;
-        // 프리뷰 초기화
-        ClearGroupPreview();
-    }
-
-    private void UpdateGroupPreview()
-    {
-        if (!isGroupDragging || previewTilemap == null)
-            return;
-
-        // 기존 프리뷰 제거
-        ClearGroupPreview();
-
-        Vector3Int currentCell = GetMouseCell();
-        Vector3Int delta = new Vector3Int(currentCell.x - anchorOriginalCell.x, currentCell.y - anchorOriginalCell.y, 0);
-
-        foreach (var kv in selectedTiles)
-        {
-            Vector3Int origin = kv.Key;
-            TileBase tile = kv.Value;
-            Vector3Int target = new Vector3Int(origin.x + delta.x, origin.y + delta.y, 2);
-
-            bool canPlace = CanPlaceAt(target);
-            previewTilemap.SetTile(target, tile);
-            previewTilemap.SetTileFlags(target, TileFlags.None);
-            previewTilemap.SetColor(target, canPlace ? new Color(1f, 1f, 1f, 0.6f) : new Color(1f, 0.3f, 0.3f, 0.6f));
-            lastGroupPreviewCells.Add(target);
-        }
-    }
-
-    private void EndGroupDrag()
-    {
-        if (!isGroupDragging)
-            return;
-
-        Vector3Int dropCell = GetMouseCell();
-        Vector3Int delta = new Vector3Int(dropCell.x - anchorOriginalCell.x, dropCell.y - anchorOriginalCell.y, 0);
-
-        // 설치 가능성 체크
-        List<(Vector3Int origin, Vector3Int target, TileBase tile)> placements = new List<(Vector3Int, Vector3Int, TileBase)>();
-        foreach (var kv in selectedTiles)
-        {
-            Vector3Int origin = kv.Key;
-            TileBase tile = kv.Value;
-            Vector3Int target = new Vector3Int(origin.x + delta.x, origin.y + delta.y, 2);
-            placements.Add((origin, target, tile));
-        }
-
-        bool allPlaceable = true;
-        foreach (var p in placements)
-        {
-            if (!CanPlaceAt(p.target))
-            {
-                allPlaceable = false;
-                break;
-            }
-        }
-
-        // 프리뷰 제거
-        ClearGroupPreview();
-
-        if (allPlaceable)
-        {
-            // 신규 위치에 설치
-            foreach (var p in placements)
-            {
-                Tilemap targetTilemap = GetTilemapForCell(p.origin);
-                if (targetTilemap != null)
-                {
-                    targetTilemap.SetTile(p.target, p.tile);
-                }
-            }
-
-            // 옵션: 배치 후 자동 선택 해제
-            if (clearSelectionAfterPlace)
-            {
-                ClearSelectionState();
-            }
-            else
-            {
-                // 선택을 새 위치로 유지
-                HashSet<Vector3Int> newSelected = new HashSet<Vector3Int>();
-                Dictionary<Vector3Int, TileBase> newSelectedTiles = new Dictionary<Vector3Int, TileBase>();
-                foreach (var p in placements)
-                {
-                    newSelected.Add(p.target);
-                    newSelectedTiles[p.target] = p.tile;
-                }
-                selectedCells = newSelected;
-                selectedTiles = newSelectedTiles;
-                foreach (var c in selectedCells)
-                {
-                    Tilemap targetTilemap = GetTilemapForCell(c);
-                    if (targetTilemap != null)
-                    {
-                        targetTilemap.SetTileFlags(c, TileFlags.None);
-                        targetTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
-                    }
-                }
-            }
-        }
-        else
-        {
-            // 원위치로 복원
-            foreach (var kv in selectedTiles)
-            {
-                Tilemap targetTilemap = GetTilemapForCell(kv.Key);
-                if (targetTilemap != null)
-                {
-                    targetTilemap.SetTile(kv.Key, kv.Value);
-                }
-            }
-            // 하이라이트 복구
-            foreach (var c in selectedCells)
-            {
-                Tilemap targetTilemap = GetTilemapForCell(c);
-                if (targetTilemap != null)
-                {
-                    targetTilemap.SetTileFlags(c, TileFlags.None);
-                    targetTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
-                }
-            }
-            Debug.Log("설치할 수 없는 위치가 있어 원위치로 되돌렸습니다.");
-        }
-
-        isGroupDragging = false;
-    }
-
-    private void CancelGroupDrag()
-    {
-        if (!isGroupDragging)
-            return;
-
-        // 프리뷰 제거
-        ClearGroupPreview();
-
-        // 원래 위치로 되돌리기
-        foreach (var kv in selectedTiles)
-        {
-            Tilemap targetTilemap = GetTilemapForCell(kv.Key);
-            if (targetTilemap != null)
-            {
-                targetTilemap.SetTile(kv.Key, kv.Value);
-            }
-        }
-        // 하이라이트 복구
-        foreach (var c in selectedCells)
-        {
-            Tilemap targetTilemap = GetTilemapForCell(c);
-            if (targetTilemap != null)
-            {
-                targetTilemap.SetTileFlags(c, TileFlags.None);
-                targetTilemap.SetColor(c, new Color(0.3f, 0.9f, 1f, 1f));
-            }
-        }
-
-        isGroupDragging = false;
-        Debug.Log("그룹 드래그를 취소했습니다.");
-    }
-
-    private void ClearGroupPreview()
-    {
-        if (previewTilemap == null)
-            return;
-        foreach (var c in lastGroupPreviewCells)
-        {
-            previewTilemap.SetTile(c, null);
-            previewTilemap.SetTileFlags(c, TileFlags.None);
-            previewTilemap.SetColor(c, Color.white);
-        }
-        lastGroupPreviewCells.Clear();
-    }
 
     // 클릭된 x,y에서 모든 Z를 탐색하여 실제로 존재하는 건물 타일을 찾는다 (가장 높은 Z 우선)
     private bool TryFindBuildingAtXY(int x, int y, int tilemapIndex, out Vector3Int foundCell, out TileBase foundTile)
     {
         foundCell = new Vector3Int(x, y, 0);
         foundTile = null;
-
+        
         if (tilemapIndex < 0 || tilemapIndex >= buildingTilemaps.Length)
             return false;
-
+            
         Tilemap tilemap = buildingTilemaps[tilemapIndex];
         if (tilemap == null)
             return false;
@@ -905,7 +559,7 @@ public class DragDropController : MonoBehaviour
 
         HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
         Queue<Vector3Int> queue = new Queue<Vector3Int>();
-
+        
         queue.Enqueue(startCell);
         visited.Add(startCell);
 
@@ -962,22 +616,22 @@ public class DragDropController : MonoBehaviour
     }
 
     // ====== 스프라이트 오브젝트 드래그 관련 ======
-
+    
     // 마우스 클릭 위치에서 스프라이트 오브젝트 찾기 및 드래그 시작
     private bool TryStartSpriteDrag()
     {
         // 마우스 위치에서 레이캐스트로 스프라이트 오브젝트 찾기
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0;
-
+        
         // 2D 레이캐스트 사용
         RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
-
+        
         if (hit.collider != null)
         {
             GameObject hitObject = hit.collider.gameObject;
             SpriteRenderer spriteRenderer = hitObject.GetComponent<SpriteRenderer>();
-
+            
             // SpriteRenderer가 있고 TilemapRenderer가 없는 오브젝트만 처리
             if (spriteRenderer != null && hitObject.GetComponent<TilemapRenderer>() == null)
             {
@@ -986,49 +640,49 @@ public class DragDropController : MonoBehaviour
                 originalSpritePosition = hitObject.transform.position;
                 originalSpriteCell = grid.WorldToCell(originalSpritePosition);
                 originalSpriteColor = spriteRenderer.color;
-
+                
                 isDraggingSprite = true;
-
+                
                 Debug.Log($"스프라이트 오브젝트 드래그 시작: {hitObject.name}, 원래 위치: {originalSpriteCell}");
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     // 스프라이트 오브젝트 프리뷰 업데이트
     private void UpdateSpritePreview()
     {
         if (!isDraggingSprite || draggedSpriteObject == null || draggedSpriteRenderer == null)
             return;
-
+        
         Vector3Int currentCell = GetMouseCell();
         Vector3 worldPos = grid.CellToWorld(currentCell);
         worldPos.z = originalSpritePosition.z; // 원래 Z 위치 유지
-
+        
         // 오브젝트 위치 업데이트
         draggedSpriteObject.transform.position = worldPos;
-
+        
         // 설치 가능 여부 체크
         bool canPlace = CanPlaceAt(currentCell);
-
+        
         // 프리뷰 색상 적용 (설치 가능하면 반투명, 불가능하면 빨간색 반투명)
         Color previewColor = canPlace ?
             new Color(1f, 1f, 1f, 0.6f) :  // 흰색 반투명 (설치 가능)
             new Color(1f, 0.3f, 0.3f, 0.6f); // 빨간색 반투명 (설치 불가)
-
+        
         draggedSpriteRenderer.color = previewColor;
     }
-
+    
     // 스프라이트 오브젝트 드래그 종료 및 배치
     private void EndSpriteDrag()
     {
         if (!isDraggingSprite || draggedSpriteObject == null || draggedSpriteRenderer == null)
             return;
-
+        
         Vector3Int dropCell = GetMouseCell();
-
+        
         // 설치 가능 여부 확인
         if (CanPlaceAt(dropCell))
         {
@@ -1036,10 +690,10 @@ public class DragDropController : MonoBehaviour
             Vector3 worldPos = grid.CellToWorld(dropCell);
             worldPos.z = originalSpritePosition.z; // 원래 Z 위치 유지
             draggedSpriteObject.transform.position = worldPos;
-
+            
             // 색상 복원
             draggedSpriteRenderer.color = originalSpriteColor;
-
+            
             Debug.Log($"스프라이트 오브젝트를 셀 ({dropCell.x}, {dropCell.y})에 배치했습니다!");
         }
         else
@@ -1049,28 +703,28 @@ public class DragDropController : MonoBehaviour
             draggedSpriteRenderer.color = originalSpriteColor;
             Debug.Log("설치할 수 없는 위치입니다. 원래 위치로 되돌렸습니다.");
         }
-
+        
         // 드래그 상태 초기화
         isDraggingSprite = false;
         draggedSpriteObject = null;
         draggedSpriteRenderer = null;
     }
-
+    
     // 스프라이트 오브젝트 드래그 취소
     private void CancelSpriteDrag()
     {
         if (!isDraggingSprite || draggedSpriteObject == null || draggedSpriteRenderer == null)
             return;
-
+        
         // 원래 위치로 되돌리기
         draggedSpriteObject.transform.position = originalSpritePosition;
         draggedSpriteRenderer.color = originalSpriteColor;
-
+        
         // 드래그 상태 초기화
         isDraggingSprite = false;
         draggedSpriteObject = null;
         draggedSpriteRenderer = null;
-
+        
         Debug.Log("스프라이트 드래그를 취소했습니다.");
     }
 }

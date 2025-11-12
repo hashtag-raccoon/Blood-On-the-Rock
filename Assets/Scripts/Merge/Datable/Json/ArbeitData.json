@@ -1,0 +1,53 @@
+[
+  {
+    "part_timer_id": 1,
+    "part_timer_name": "아리아",
+    "race": "인간",
+    "personality_id": 1,
+    "level": 1,
+    "exp": 0,
+    "hire_date": "2024-01-15T09:00:00",
+    "employment_state": true,
+    "serving_ability": 5,
+    "cooking_ability": 3,
+    "cleaning_ability": 4,
+    "total_ability": 12,
+    "fatigue": 0,
+    "daily_wage": 100,
+    "need_rest": false
+  },
+  {
+    "part_timer_id": 2,
+    "part_timer_name": "엘라라",
+    "race": "엘프",
+    "personality_id": 2,
+    "level": 2,
+    "exp": 50,
+    "hire_date": "2024-02-10T10:00:00",
+    "employment_state": false,
+    "serving_ability": 7,
+    "cooking_ability": 4,
+    "cleaning_ability": 2,
+    "total_ability": 13,
+    "fatigue": 10,
+    "daily_wage": 120,
+    "need_rest": false
+  },
+  {
+    "part_timer_id": 3,
+    "part_timer_name": "브록",
+    "race": "드워프",
+    "personality_id": 3,
+    "level": 1,
+    "exp": 10,
+    "hire_date": "2024-03-01T08:30:00",
+    "employment_state": true,
+    "serving_ability": 2,
+    "cooking_ability": 8,
+    "cleaning_ability": 5,
+    "total_ability": 15,
+    "fatigue": 0,
+    "daily_wage": 110,
+    "need_rest": false
+  }
+]
