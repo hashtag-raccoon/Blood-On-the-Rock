@@ -227,8 +227,8 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             upgradeScript.SetData(Buildingdata);
             
             // 다음 레벨의 업그레이드 데이터 찾기
-            BuildingUpgradeData upgradeData = DataManager.instance.GetBuildingUpgradeDataByLevel(
-                DataManager.instance.GetBuildingUpgradeDataByType(Buildingdata.BuildingName),
+            BuildingUpgradeData upgradeData = DataManager.Instance.GetBuildingUpgradeDataByLevel(
+                DataManager.Instance.GetBuildingUpgradeDataByType(Buildingdata.Building_Name),
                 Buildingdata.level + 1
             );
             

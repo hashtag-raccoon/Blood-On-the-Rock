@@ -98,7 +98,7 @@ public class UpgradeUIScripts : MonoBehaviour
         
         if (BuildingName != null)
         {
-            BuildingName.text = buildingData.BuildingName;
+            BuildingName.text = buildingData.Building_Name;
         }
         
         if (CurrentBuildingLevel != null)

@@ -277,6 +277,8 @@ public class DataManager : MonoBehaviour
     }
     #endregion
 
+
+
     #region Building Production Query Methods
     public List<BuildingProductionInfo> GetBuildingProductionInfoList()
     {
@@ -286,10 +288,25 @@ public class DataManager : MonoBehaviour
     /// <summary>
     /// 해당 건물 이름의 건물 생산 데이터 가져옴
     /// </summary>
+
     public List<BuildingProductionInfo> GetBuildingProductionInfoByType(string buildingType)
     {
         return BuildingProductionInfos.FindAll(data => data.building_type == buildingType);
     }
+    #endregion
+    
+    #region Building Upgrade Methods
+
+    public List<BuildingUpgradeData> GetBuildingUpgradeDataByType(string buildingType)
+    {
+        return BuildingUpgradeDatas.FindAll(data => data.building_type == buildingType);
+    }
+    
+    public BuildingUpgradeData GetBuildingUpgradeDataByLevel(List<BuildingUpgradeData> upgradeDataList,int level)
+    {
+        return upgradeDataList.Find(data => data.level == level);
+    }
+
     #endregion
 
     #region Cleanup
