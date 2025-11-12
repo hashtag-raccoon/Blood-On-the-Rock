@@ -15,6 +15,6 @@ MonoBehaviour:
   building_type: LoggingFarm
   resource_id: 1
   output_amount: 50
-  base_production_time_minutes: 0.1
+  base_production_time_minutes: 1.2
   consume_amount: 50
   consume_resource_type: Money
