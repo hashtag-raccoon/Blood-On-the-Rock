@@ -14151,12 +14151,15 @@ MonoBehaviour:
   BuildingUI: {fileID: 766802634}
   BuildingUpgradeButton: {fileID: 1008107330}
   UpgradeUIPrefab: {fileID: 5903270389812994797, guid: 313e7544005d8e041b517d6de69825c5, type: 3}
+  UpgradeBlurUI: {fileID: 2120083158}
   CameraPositionOffset: 1
   AnimationSpeed: 5
   TargetOrthographicSize: 2
   HorizontalOffset: 5
   maxProductionSlots: 4
   completeResourceUIPrefab: {fileID: 578911195489028713, guid: d5dbb6a9644295e4e907b1875714a728, type: 3}
+  LimitUpgradeUIObject: {fileID: 5903270389812994797, guid: 284049f988447604c8d66945c9fdfcb0, type: 3}
+  limitBuildingImageSize: {x: 250, y: 250}
 --- !u!1 &213656970
 GameObject:
   m_ObjectHideFlags: 0
@@ -21814,11 +21817,11 @@ RectTransform:
   - {fileID: 2052468415}
   - {fileID: 1113522076}
   - {fileID: 1471190818}
-  - {fileID: 2120083159}
   - {fileID: 1513898392}
   - {fileID: 1769523747}
   - {fileID: 1241332971}
   - {fileID: 766802635}
+  - {fileID: 2120083159}
   m_Father: {fileID: 1755924260}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

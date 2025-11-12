@@ -7,6 +7,7 @@ public class BuildingData : ScriptableObject, IScrollItemData
     public int id;
     public int level;
     public string BuildingName;
+    public string Building_type;
     public Sprite icon;
     public int amount;
     public int price;

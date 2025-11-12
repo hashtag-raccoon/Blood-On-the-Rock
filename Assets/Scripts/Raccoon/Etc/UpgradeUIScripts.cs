@@ -41,10 +41,14 @@ public class UpgradeUIScripts : MonoBehaviour
     [Header("텍스트 폰트 설정")]
     public TMP_FontAsset textFont;
     public Color textColor = Color.black;
-    private const int MAX_REQUIREMENTS = 3; // 최대 요구조건 개수
-    
+    //private const int MAX_REQUIREMENTS = 3; // 최대 요구조건 개수
+
+    [HideInInspector]
     public BuildingData buildingData;
+    [HideInInspector]
     public BuildingUpgradeData buildingUpgradeData;
+    [HideInInspector]
+    public BuildingBase MyBuilding;
     private List<GameObject> createdRequirementPanels = new List<GameObject>();
     private List<Image> createdPanelImages = new List<Image>(); 
     private List<Image> createdIconImages = new List<Image>(); 
@@ -53,7 +57,7 @@ public class UpgradeUIScripts : MonoBehaviour
     {
         upgradeUICloseButton.onClick.AddListener(() =>
         {
-            upgradeClick();
+            Destroy(this.gameObject);
         });
 
         // 초기 데이터 설정 시 requirements UI 생성
@@ -265,15 +269,16 @@ public class UpgradeUIScripts : MonoBehaviour
 
     private void OnDestroy()
     {
+        MyBuilding.BlurOnOff();
         ClearRequirementPanels();
     }
-    
+
     private void upgradeClick()
     {
         goodsData consumeResource = DataManager.Instance.GetResourceByName("Money");
         if (buildingUpgradeData.upgrade_price <= consumeResource.amount)
         {
-            for(int i = 0; i < buildingUpgradeData.requirements.Count; i++)
+            for (int i = 0; i < buildingUpgradeData.requirements.Count; i++)
             {
                 upgrade_requirements req = buildingUpgradeData.requirements[i];
                 goodsData reqResource = DataManager.Instance.GetResourceByName(req.requirement_type);
@@ -282,6 +287,7 @@ public class UpgradeUIScripts : MonoBehaviour
                     reqResource.amount -= req.requirement_value;
                 }
             }
+
             consumeResource.amount -= buildingUpgradeData.upgrade_price;
             buildingData.level += 1;
             Destroy(this.gameObject);
@@ -291,4 +297,5 @@ public class UpgradeUIScripts : MonoBehaviour
             Debug.Log("돈이 부족합니다.");
         }
     }
+
 }

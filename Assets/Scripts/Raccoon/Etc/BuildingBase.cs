@@ -18,9 +18,10 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     [SerializeField] protected Sprite BuildingSprite;
     [SerializeField] protected GameObject BuildingUI;
     [SerializeField] protected Button BuildingUpgradeButton;
-    [SerializeField] protected GameObject UpgradeUIPrefab; 
+    [SerializeField] protected GameObject UpgradeUIPrefab;
+    [SerializeField] protected GameObject UpgradeBlurUI;
     
-    private GameObject activeUpgradeUI; 
+    protected GameObject activeUpgradeUI; 
     
     [Header("카메라 세팅")]
     [SerializeField] protected PositionData CameraPositionOffset;
@@ -37,7 +38,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     protected virtual void Start()
     {
         InitializeCamera();
-        
+
         if (BuildingUpgradeButton != null)
         {
             BuildingUpgradeButton.onClick.AddListener(() =>
@@ -46,7 +47,12 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             });
         }
     }
-    
+
+    protected virtual void Update()
+    {
+        
+    }
+
     private void InitializeCamera()
     {
         if (cameraInitialized) return;
@@ -207,13 +213,15 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         {
             activeUpgradeUI.transform.SetParent(canvas.transform, false);
         }
+        BlurOnOff();
         UpgradeUIUpdate();
     }
     
     protected void UpgradeUIUpdate()
     {
         UpgradeUIScripts upgradeScript = activeUpgradeUI.GetComponent<UpgradeUIScripts>();
-        
+        upgradeScript.MyBuilding = this;
+
         if (upgradeScript != null)
         {
             upgradeScript.SetData(Buildingdata);
@@ -229,5 +237,10 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
                 upgradeScript.SetUpgradeData(upgradeData);
             }
         }
+    }
+
+    public void BlurOnOff()
+    {
+        UpgradeBlurUI.SetActive(!UpgradeBlurUI.activeSelf);
     }
 }

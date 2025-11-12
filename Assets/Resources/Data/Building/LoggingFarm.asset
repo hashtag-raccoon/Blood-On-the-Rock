@@ -15,6 +15,7 @@ MonoBehaviour:
   id: 1
   level: 0
   BuildingName: LoggingFarm
+  Building_type: Production
   icon: {fileID: 21300000, guid: cd54c5b7b1a52224facef4f66b607d76, type: 3}
   amount: 2
   price: 5000
