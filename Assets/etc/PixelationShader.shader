@@ -9,8 +9,7 @@ Shader"Custom/PixelationSbader"
     SubShader
     {
         Tags { "RenderType"="Transparent" "Queue"="Transparent" }
-        Blend
-        SrcAlpha OneMinusSrcAlpha
+        Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
@@ -19,6 +18,8 @@ Shader"Custom/PixelationSbader"
             #pragma fragment frag
 
 sampler2D _MainTex;
+SamplerState point_clamp_sampler; // Point í•„í„°ë§ ê°•ì œ
+float4 _MainTex_TexelSize;
 float _PixelWidth;
 float _PixelHeight;
 
@@ -44,16 +45,16 @@ v2f vert(appdata v)
 
 fixed4 frag(v2f i) : SV_Target
 {
-                // ÅØ½ºÃ³ÀÇ Å©±â ºñÀ²¿¡ µû¸¥ ÇÈ¼¿ Å©±â ¼³Á¤
+                // ï¿½Ø½ï¿½Ã³ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½È¼ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     float2 pixelSize = float2(1.0 / _PixelWidth, 1.0 / _PixelHeight);
 
-                // ÇÈ¼¿È­µÈ UV ÁÂÇ¥ °è»ê (Áß¾Ó º¸Á¤)
+                // ï¿½È¼ï¿½È­ï¿½ï¿½ UV ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ (ï¿½ß¾ï¿½ ï¿½ï¿½ï¿½ï¿½)
     float2 uv = floor(i.uv / pixelSize) * pixelSize + (pixelSize * 0.5);
 
-                // ÇÈ¼¿È­µÈ UV ÁÂÇ¥·Î ÅØ½ºÃ³ »ö»ó °¡Á®¿À±â
+                // ï¿½È¼ï¿½È­ï¿½ï¿½ UV ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½Ø½ï¿½Ã³ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     fixed4 color = tex2D(_MainTex, uv);
                 
-                // ¾ËÆÄ°ªÀ» À¯ÁöÇÏ¿© Åõ¸íµµ Ã³¸®
+                // ï¿½ï¿½ï¿½Ä°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     return color;
 }
             ENDCG

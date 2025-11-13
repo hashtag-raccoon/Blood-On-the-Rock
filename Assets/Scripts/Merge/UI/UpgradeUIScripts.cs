@@ -289,7 +289,8 @@ public class UpgradeUIScripts : MonoBehaviour
             }
 
             consumeResource.amount -= buildingUpgradeData.upgrade_price;
-            buildingData.level += 1;
+            DataManager.Instance.UpgradeBuildingLevel(buildingData);
+            
             Destroy(this.gameObject);
         }
         else
