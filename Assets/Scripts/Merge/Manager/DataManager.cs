@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using Newtonsoft.Json;
 
+
 public class DataManager : MonoBehaviour
 {
     #region Singleton
@@ -396,3 +397,4 @@ class Json
 
 }
 #endregion
+
