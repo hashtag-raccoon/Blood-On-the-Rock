@@ -16,7 +16,7 @@ MonoBehaviour:
   Building_Name: "\uCC44\uC11D\uC7A5"
   building_Type: Production
   island_id: 1
-  level: 1
+  level: 2
   construction_cost_gold: 200
   construction_cost_wood: 80
   construction_time_minutes: 0
