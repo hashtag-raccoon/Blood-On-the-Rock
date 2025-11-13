@@ -14,7 +14,8 @@ public enum PositionData
 public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 {
     [Header("건물 데이터/UI")]
-    [SerializeField] protected BuildingData Buildingdata;
+    [SerializeField] protected int constructedBuildingId; // ConstructedBuilding ID
+    protected ConstructedBuilding constructedBuilding; // 런타임 건물 데이터
     [SerializeField] protected Sprite BuildingSprite;
     [SerializeField] protected GameObject BuildingUI;
     [SerializeField] protected Button BuildingUpgradeButton;
@@ -47,11 +48,16 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         // DataManager가 데이터를 로드할 때까지 대기
         yield return new WaitUntil(() =>
             DataManager.Instance != null &&
-            DataManager.Instance.BuildingProductionInfos != null &&
-            DataManager.Instance.BuildingProductionInfos.Count > 0 &&
-            DataManager.Instance.BuildingDatas != null &&
-            DataManager.Instance.BuildingDatas.Count > 0
+            DataManager.Instance.ConstructedBuildings != null &&
+            DataManager.Instance.ConstructedBuildings.Count > 0
         );
+
+        // ConstructedBuilding 로드
+        constructedBuilding = DataManager.Instance.GetConstructedBuildingById(constructedBuildingId);
+        if (constructedBuilding == null)
+        {
+            Debug.LogError($"ID {constructedBuildingId}에 해당하는 ConstructedBuilding을 찾을 수 없습니다.");
+        }
 
         InitializeCamera();
 
@@ -249,19 +255,21 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         UpgradeUIUpdate();
     }
     
-    protected void UpgradeUIUpdate()
+    public void UpgradeUIUpdate()
     {
+        if (constructedBuilding == null) return;
+
         UpgradeUIScripts upgradeScript = activeUpgradeUI.GetComponent<UpgradeUIScripts>();
         upgradeScript.MyBuilding = this;
-        //Debug.Log("Buildingdata: " + upgradeScript.MyBuilding.Buildingdata.Building_Name);
+        
         if (upgradeScript != null)
         {
-            upgradeScript.SetData(Buildingdata);
+            upgradeScript.SetData(constructedBuilding);
             
             // 다음 레벨의 업그레이드 데이터 찾기
             BuildingUpgradeData upgradeData = DataManager.Instance.GetBuildingUpgradeDataByLevel(
-                DataManager.Instance.GetBuildingUpgradeDataByType(Buildingdata.Building_Name),
-                Buildingdata.level + 1
+                DataManager.Instance.GetBuildingUpgradeDataByType(constructedBuilding.Name),
+                constructedBuilding.Level + 1
             );
             
             if (upgradeData != null)
@@ -278,6 +286,9 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public void UpgradeBuildingLevel()
     {
-        DataManager.Instance.UpgradeBuildingLevel(Buildingdata);
+        if (constructedBuilding != null)
+        {
+            DataManager.Instance.UpgradeBuildingLevel(constructedBuilding.Id);
+        }
     }
 }

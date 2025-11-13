@@ -1768,7 +1768,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f3086858f98c117408cc371d543f5b30, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2040,7 +2040,7 @@ PolygonCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
+    border: {x: 2.56, y: 4.25, z: 6.22, w: 6.16}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 12.8, y: 12.8}
     newSize: {x: 0.8828125, y: 1}
@@ -22018,11 +22018,11 @@ RectTransform:
   - {fileID: 1044143820}
   - {fileID: 1959686739}
   - {fileID: 2107611689}
-  - {fileID: 704879621}
   - {fileID: 149445131}
   - {fileID: 2062296814}
   - {fileID: 18589593}
   - {fileID: 213227472}
+  - {fileID: 704879621}
   m_Father: {fileID: 983493035}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
