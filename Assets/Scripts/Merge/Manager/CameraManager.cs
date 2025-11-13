@@ -130,6 +130,15 @@ public class CameraManager : MonoBehaviour
             DragToCameramMove();
 
             WheelToZoom();
+
+            if(isBuildingUIActive == true)
+            {
+                confiner.m_BoundingShape2D = null;
+            }
+            else
+            {
+                confiner.m_BoundingShape2D = defaultCollider; 
+            }
         }
     }
 

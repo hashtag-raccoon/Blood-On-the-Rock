@@ -86,11 +86,13 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             
             if (isOpening)
             {
+                CameraManager.instance.isBuildingUIActive = true;
                 OpenBuildingUI();
                 AnimateCamera(true); // 열기 애니메이션
             }
             else
             {
+                CameraManager.instance.isBuildingUIActive = false;
                 CloseBuildingUI();
                 AnimateCamera(false); // 닫기 애니메이션
             }
