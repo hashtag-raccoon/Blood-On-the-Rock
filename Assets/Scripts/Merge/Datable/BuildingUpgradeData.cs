@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
+
 [CreateAssetMenu(fileName = "Building_Upgrade", menuName = "Building/Building_UpgradeData")]
 public class BuildingUpgradeData : ScriptableObject
 {

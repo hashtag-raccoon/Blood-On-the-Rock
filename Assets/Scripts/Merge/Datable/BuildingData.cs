@@ -44,13 +44,15 @@ public class ConstructedBuilding
     public int Id { get; private set; }
     public string Name { get; private set; }
     public string Type { get; private set; }
-    public int Level { get; private set; }
+    public int Level { get; set; }
     public Sprite Icon { get; private set; }
 
     // BuildingProductionInfo에서 가져온 정보
     public int ProductionResourceId { get; private set; }
     public int ProductionOutputAmount { get; private set; }
     public float BaseProductionTimeMinutes { get; private set; }
+    public int ConsumeAmount { get; private set; } // save & load 해야함
+    public string ConsumeResourceType { get; private set; } // save & load 해야함
 
     // ConstructedBuildingProduction에서 가져온 정보
     public DateTime LastProductionTime { get; set; }

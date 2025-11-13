@@ -31,7 +31,7 @@ public class ResourceBuildingController : BuildingBase
     [Header("업그레이드 불가 UI 프리팹")]
     public GameObject LimitUpgradeUIObject;
     public Vector2 limitBuildingImageSize = new Vector2(100, 100);
-    private GameObject ActiveLimitUpgradeUI;
+    private static GameObject ActiveLimitUpgradeUI;
 
     private GameObject activeCompleteUI; // 생산완료 UI (Canvas 포함)
     
@@ -59,28 +59,32 @@ public class ResourceBuildingController : BuildingBase
 
     protected override void OnUpgradeUI()
     {
-        base.OnUpgradeUI();
-
-        
+        // 생산 중이면 제한 UI 표시
         if (this.gameObject.GetComponent<ResourceBuildingController>().GetActiveProductionCount() > 0)
         {
-            if (activeUpgradeUI != null)
-            {
-                Destroy(activeUpgradeUI);
-                activeUpgradeUI = null;
-            }
-
             BlurOnOff();
             ShowLimitUpgradeUI();
             return;
         }
+        
+        // 생산 중이 아니면 일반 업그레이드 UI 표시
+        base.OnUpgradeUI();
     }
     
     private void ShowLimitUpgradeUI()
     {
+        // 기존 UI가 있으면 먼저 제거하고, 후에 새로 생성함
+        // 만약 제거를 하지 않을 경우 기존 UI가 남아있게 되어 UI가 중복 생성되는 문제가 발생함
         if (ActiveLimitUpgradeUI != null)
         {
-            return;
+            Destroy(ActiveLimitUpgradeUI);
+            ActiveLimitUpgradeUI = null;
+        }
+
+        if (activeUpgradeUI != null)
+        {
+            Destroy(activeUpgradeUI);
+            activeUpgradeUI = null;
         }
         
         ActiveLimitUpgradeUI = Instantiate(LimitUpgradeUIObject);
@@ -91,7 +95,6 @@ public class ResourceBuildingController : BuildingBase
             ActiveLimitUpgradeUI.transform.SetParent(canvas.transform, false);
         }
         
-        // BuildingImage 찾기 및 설정
         Transform buildingImageTransform = ActiveLimitUpgradeUI.transform.Find("BuildingImage");
         if (buildingImageTransform != null && Buildingdata != null && Buildingdata.icon != null)
         {
@@ -108,7 +111,6 @@ public class ResourceBuildingController : BuildingBase
             }
         }
         
-        // BuildingName 찾기 및 설정
         Transform buildingNameTransform = ActiveLimitUpgradeUI.transform.Find("BuildingName");
         if (buildingNameTransform != null && Buildingdata != null)
         {
@@ -119,7 +121,6 @@ public class ResourceBuildingController : BuildingBase
             }
         }
         
-        // ExitButton 찾기 및 이벤트 설정
         Transform exitButtonTransform = ActiveLimitUpgradeUI.transform.Find("ExitButton");
         if (exitButtonTransform != null)
         {

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Quarry
   m_EditorClassIdentifier: 
   building_id: 1
-  Building_Name: Quarry
-  building_Type: Quarry
+  Building_Name: "\uCC44\uC11D\uC7A5"
+  building_Type: Production
   island_id: 1
   level: 1
   construction_cost_gold: 200
   construction_cost_wood: 80
   construction_time_minutes: 0
-  icon: {fileID: 21300000, guid: 11883d5983edc9b49b5bcfc30397cf35, type: 3}
+  icon: {fileID: 21300000, guid: 0b5ef4441869cf54f86c2e96214d0f28, type: 3}

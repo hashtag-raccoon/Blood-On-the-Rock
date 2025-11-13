@@ -307,6 +307,20 @@ public class DataManager : MonoBehaviour
         return upgradeDataList.Find(data => data.level == level);
     }
 
+    public void UpgradeBuildingLevel(BuildingData buildingData)
+    {
+        GetConstructedBuildingName(buildingData.Building_Name).Level += 1;
+    }
+
+    #endregion
+
+    #region  ConstructedBuilding Methods
+
+    public  ConstructedBuilding GetConstructedBuildingName(string buildingType)
+    {
+        return  ConstructedBuildings.Find(data => data.Name == buildingType);
+    }
+
     #endregion
 
     #region Cleanup

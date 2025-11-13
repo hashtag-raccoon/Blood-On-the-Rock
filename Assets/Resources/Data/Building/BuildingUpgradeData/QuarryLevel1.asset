@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea27f43327d9189478731e6bb7263a6b, type: 3}
   m_Name: QuarryLevel1
   m_EditorClassIdentifier: 
-  building_type: Quarry
+  building_type: "\uCC44\uC11D\uC7A5"
   level: 1
   upgrade_price: 100
   base_upgrade_time_minutes: 1
