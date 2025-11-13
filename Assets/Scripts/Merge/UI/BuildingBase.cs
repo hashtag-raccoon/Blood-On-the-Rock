@@ -18,9 +18,12 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     [SerializeField] protected Sprite BuildingSprite;
     [SerializeField] protected GameObject BuildingUI;
     [SerializeField] protected Button BuildingUpgradeButton;
-    [SerializeField] protected GameObject UpgradeUIPrefab; 
+    [SerializeField] protected GameObject UpgradeUIPrefab;
+    [SerializeField] protected GameObject UpgradeBlurUI;
     
-    private GameObject activeUpgradeUI; 
+    protected static GameObject activeUpgradeUI;
+    protected static BuildingBase currentActiveBuilding; // 현재 활성화된 건물
+    private static bool upgradeButtonInitialized = false; // 버튼 리스너 초기화 여부
     
     [Header("카메라 세팅")]
     [SerializeField] protected PositionData CameraPositionOffset;
@@ -37,17 +40,26 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     protected virtual void Start()
     {
         InitializeCamera();
-        
-        if (BuildingUpgradeButton != null)
+
+        if (BuildingUpgradeButton != null && !upgradeButtonInitialized)
         {
             BuildingUpgradeButton.onClick.AddListener(() =>
             {
-                Debug.Log("[BuildingBase] 업그레이드 버튼 클릭됨!");
-                OnUpgradeUI();
+                // 현재 활성화된 건물의 OnUpgradeUI만 호출
+                if (currentActiveBuilding != null)
+                {
+                    currentActiveBuilding.OnUpgradeUI();
+                }
             });
+            upgradeButtonInitialized = true;
         }
     }
-    
+
+    protected virtual void Update()
+    {
+        
+    }
+
     private void InitializeCamera()
     {
         if (cameraInitialized) return;
@@ -62,23 +74,28 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        if (virtualCamera == null)
+        if(Input.GetMouseButtonDown(0))
         {
-            InitializeCamera();
-        }
+            if (virtualCamera == null)
+            {
+                InitializeCamera();
+            }
 
-        // 건물 UI 열기, 닫기 토글 방식 => 건물 UI가 열려 있지 않다면 열기, 아니라면 닫기
-        bool isOpening = !BuildingUI.activeSelf;
-        
-        if (isOpening)
-        {
-            OpenBuildingUI();
-            AnimateCamera(true); // 열기 애니메이션
-        }
-        else
-        {
-            CloseBuildingUI();
-            AnimateCamera(false); // 닫기 애니메이션
+            // 건물 UI 열기, 닫기 토글 방식 => 건물 UI가 열려 있지 않다면 열기, 아니라면 닫기
+            bool isOpening = !BuildingUI.activeSelf;
+            
+            if (isOpening)
+            {
+                CameraManager.instance.isBuildingUIActive = true;
+                OpenBuildingUI();
+                AnimateCamera(true); // 열기 애니메이션
+            }
+            else
+            {
+                CameraManager.instance.isBuildingUIActive = false;
+                CloseBuildingUI();
+                AnimateCamera(false); // 닫기 애니메이션
+            }
         }
     }
     
@@ -95,12 +112,17 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     {
         BuildingUI?.SetActive(true);
         CameraManager.instance.isBuildingUIActive = true;
+        currentActiveBuilding = this; // 현재 건물을 활성 건물로 설정
     }
 
     public virtual void CloseBuildingUI()
     {
         BuildingUI?.SetActive(false);
         CameraManager.instance.isBuildingUIActive = false;
+        if (currentActiveBuilding == this)
+        {
+            currentActiveBuilding = null; // 활성 건물 해제
+        }
     }
 
     protected virtual IEnumerator AnimateCameraCoroutine(bool isOpening)
@@ -198,7 +220,8 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     {
         if (activeUpgradeUI != null)
         {
-            return;
+            Destroy(activeUpgradeUI);
+            activeUpgradeUI = null;
         }
 
         activeUpgradeUI = Instantiate(UpgradeUIPrefab);
@@ -208,13 +231,39 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         {
             activeUpgradeUI.transform.SetParent(canvas.transform, false);
         }
+        BlurOnOff();
         UpgradeUIUpdate();
     }
     
     protected void UpgradeUIUpdate()
     {
-        //Buildingdata
-        //activeUpgradeUI.GetComponent<BuildingUpgradeUI>().;
+        UpgradeUIScripts upgradeScript = activeUpgradeUI.GetComponent<UpgradeUIScripts>();
+        upgradeScript.MyBuilding = this;
+        //Debug.Log("Buildingdata: " + upgradeScript.MyBuilding.Buildingdata.Building_Name);
+        if (upgradeScript != null)
+        {
+            upgradeScript.SetData(Buildingdata);
+            
+            // 다음 레벨의 업그레이드 데이터 찾기
+            BuildingUpgradeData upgradeData = DataManager.Instance.GetBuildingUpgradeDataByLevel(
+                DataManager.Instance.GetBuildingUpgradeDataByType(Buildingdata.Building_Name),
+                Buildingdata.level + 1
+            );
+            
+            if (upgradeData != null)
+            {
+                upgradeScript.SetUpgradeData(upgradeData);
+            }
+        }
+    }
 
+    public void BlurOnOff()
+    {
+        UpgradeBlurUI.SetActive(!UpgradeBlurUI.activeSelf);
+    }
+
+    public void UpgradeBuildingLevel()
+    {
+        DataManager.Instance.UpgradeBuildingLevel(Buildingdata);
     }
 }

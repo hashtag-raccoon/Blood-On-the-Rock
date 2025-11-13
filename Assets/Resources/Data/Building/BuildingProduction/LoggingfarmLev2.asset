@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cace8201559105c499e8f0f76b39e1ba, type: 3}
   m_Name: LoggingfarmLev2
   m_EditorClassIdentifier: Assembly-CSharp::BuildingProductionInfo
-  building_type: Logging
+  building_type: "\uBC8C\uBAA9\uC7A5"
   resource_id: 1
   output_amount: 48
   base_production_time_minutes: 2.7
