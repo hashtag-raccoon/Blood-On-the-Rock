@@ -39,6 +39,20 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     protected virtual void Start()
     {
+        StartCoroutine(WaitForDataAndInitialize());
+    }
+
+    protected virtual IEnumerator WaitForDataAndInitialize()
+    {
+        // DataManager가 데이터를 로드할 때까지 대기
+        yield return new WaitUntil(() =>
+            DataManager.Instance != null &&
+            DataManager.Instance.BuildingProductionInfos != null &&
+            DataManager.Instance.BuildingProductionInfos.Count > 0 &&
+            DataManager.Instance.BuildingDatas != null &&
+            DataManager.Instance.BuildingDatas.Count > 0
+        );
+
         InitializeCamera();
 
         if (BuildingUpgradeButton != null && !upgradeButtonInitialized)

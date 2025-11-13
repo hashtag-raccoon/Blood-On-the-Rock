@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using Newtonsoft.Json;
 
+
 public class DataManager : MonoBehaviour
 {
     #region Singleton
@@ -294,15 +295,15 @@ public class DataManager : MonoBehaviour
         return BuildingProductionInfos.FindAll(data => data.building_type == buildingType);
     }
     #endregion
-    
+
     #region Building Upgrade Methods
 
     public List<BuildingUpgradeData> GetBuildingUpgradeDataByType(string buildingType)
     {
         return BuildingUpgradeDatas.FindAll(data => data.building_type == buildingType);
     }
-    
-    public BuildingUpgradeData GetBuildingUpgradeDataByLevel(List<BuildingUpgradeData> upgradeDataList,int level)
+
+    public BuildingUpgradeData GetBuildingUpgradeDataByLevel(List<BuildingUpgradeData> upgradeDataList, int level)
     {
         return upgradeDataList.Find(data => data.level == level);
     }
@@ -316,9 +317,9 @@ public class DataManager : MonoBehaviour
 
     #region  ConstructedBuilding Methods
 
-    public  ConstructedBuilding GetConstructedBuildingName(string buildingType)
+    public ConstructedBuilding GetConstructedBuildingName(string buildingType)
     {
-        return  ConstructedBuildings.Find(data => data.Name == buildingType);
+        return ConstructedBuildings.Find(data => data.Name == buildingType);
     }
 
     #endregion
@@ -427,3 +428,4 @@ class Json
 
 }
 #endregion
+
