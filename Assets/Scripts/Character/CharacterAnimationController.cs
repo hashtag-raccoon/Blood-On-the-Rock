@@ -16,7 +16,6 @@ public class CharacterAnimationController : MonoBehaviour
 	[SerializeField] private bool updateAnimatorParameters = false;
 	[SerializeField] private string speedParameter = "Speed";
 	[SerializeField] private string isWalkingParameter = "IsWalking";
-	[SerializeField] private string isRunningParameter = "IsRunning";
 	[SerializeField] private string moveYParameter = "MoveY";
 
 	[Header("Movement")]
@@ -146,9 +145,6 @@ public class CharacterAnimationController : MonoBehaviour
 		animator.SetFloat(speedParameter, speed);
 		bool isWalking = hasTarget && speed > 0.1f;
 		animator.SetBool(isWalkingParameter, isWalking);
-
-		bool isRunning = isWalking && speed > moveSpeed * 0.7f;
-		animator.SetBool(isRunningParameter, isRunning);
 
 		animator.SetFloat(moveYParameter, directionY);
 	}
