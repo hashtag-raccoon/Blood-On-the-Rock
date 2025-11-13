@@ -239,7 +239,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     {
         UpgradeUIScripts upgradeScript = activeUpgradeUI.GetComponent<UpgradeUIScripts>();
         upgradeScript.MyBuilding = this;
-        Debug.Log("Buildingdata: " + upgradeScript.MyBuilding.Buildingdata.Building_Name);
+        //Debug.Log("Buildingdata: " + upgradeScript.MyBuilding.Buildingdata.Building_Name);
         if (upgradeScript != null)
         {
             upgradeScript.SetData(Buildingdata);

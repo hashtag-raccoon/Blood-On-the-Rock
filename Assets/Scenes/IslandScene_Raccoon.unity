@@ -1680,7 +1680,7 @@ Transform:
   m_GameObject: {fileID: 184237136}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.0039149974, w: 0.9999924}
-  m_LocalPosition: {x: 6.42, y: 2.62, z: -0.04430267}
+  m_LocalPosition: {x: 8.74, y: 6.88, z: -0.04430267}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1747,7 +1747,7 @@ MonoBehaviour:
   maxProductionSlots: 4
   completeResourceUIPrefab: {fileID: 578911195489028713, guid: d5dbb6a9644295e4e907b1875714a728, type: 3}
   LimitUpgradeUIObject: {fileID: 5903270389812994797, guid: 284049f988447604c8d66945c9fdfcb0, type: 3}
-  limitBuildingImageSize: {x: 100, y: 100}
+  limitBuildingImageSize: {x: 200, y: 200}
 --- !u!212 &184237141
 SpriteRenderer:
   m_ObjectHideFlags: 0

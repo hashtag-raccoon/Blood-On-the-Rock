@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: QuarryLevel2
   m_EditorClassIdentifier: 
   building_type: "\uCC44\uC11D\uC7A5"
-  level: 1
-  upgrade_price: 100
+  level: 2
+  upgrade_price: 300
   base_upgrade_time_minutes: 1
   requirements:
   - requirement_type: Wood
-    requirement_value: 50
+    requirement_value: 80
