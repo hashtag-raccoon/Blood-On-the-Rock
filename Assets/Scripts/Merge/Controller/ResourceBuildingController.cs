@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -34,12 +35,20 @@ public class ResourceBuildingController : BuildingBase
     private static GameObject ActiveLimitUpgradeUI;
 
     private GameObject activeCompleteUI; // 생산완료 UI (Canvas 포함)
-    
+
     private List<ProductionInfo> activeProductions = new List<ProductionInfo>();
 
     protected override void Start()
     {
-        base.Start();     
+        base.Start();
+    }
+
+    protected override IEnumerator WaitForDataAndInitialize()
+    {
+        // 부모 클래스의 초기화 대기
+        yield return StartCoroutine(base.WaitForDataAndInitialize());
+
+        // ResourceBuildingController 고유 초기화
         InitializeProductionSlots();
     }
 
@@ -66,11 +75,11 @@ public class ResourceBuildingController : BuildingBase
             ShowLimitUpgradeUI();
             return;
         }
-        
+
         // 생산 중이 아니면 일반 업그레이드 UI 표시
         base.OnUpgradeUI();
     }
-    
+
     private void ShowLimitUpgradeUI()
     {
         // 기존 UI가 있으면 먼저 제거하고, 후에 새로 생성함
@@ -86,15 +95,15 @@ public class ResourceBuildingController : BuildingBase
             Destroy(activeUpgradeUI);
             activeUpgradeUI = null;
         }
-        
+
         ActiveLimitUpgradeUI = Instantiate(LimitUpgradeUIObject);
-        
+
         Canvas canvas = FindObjectOfType<Canvas>();
         if (canvas != null)
         {
             ActiveLimitUpgradeUI.transform.SetParent(canvas.transform, false);
         }
-        
+
         Transform buildingImageTransform = ActiveLimitUpgradeUI.transform.Find("BuildingImage");
         if (buildingImageTransform != null && Buildingdata != null && Buildingdata.icon != null)
         {
@@ -102,7 +111,7 @@ public class ResourceBuildingController : BuildingBase
             if (img != null)
             {
                 img.sprite = Buildingdata.icon;
-                
+
                 RectTransform imgRect = buildingImageTransform.GetComponent<RectTransform>();
                 if (imgRect != null)
                 {
@@ -110,7 +119,7 @@ public class ResourceBuildingController : BuildingBase
                 }
             }
         }
-        
+
         Transform buildingNameTransform = ActiveLimitUpgradeUI.transform.Find("BuildingName");
         if (buildingNameTransform != null && Buildingdata != null)
         {
@@ -120,7 +129,7 @@ public class ResourceBuildingController : BuildingBase
                 nameText.text = Buildingdata.Building_Name;
             }
         }
-        
+
         Transform exitButtonTransform = ActiveLimitUpgradeUI.transform.Find("ExitButton");
         if (exitButtonTransform != null)
         {
@@ -140,7 +149,7 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
-    
+
     private void InitializeProductionSlots()
     {
         for (int i = 0; i < maxProductionSlots; i++)
@@ -152,7 +161,7 @@ public class ResourceBuildingController : BuildingBase
     private void UpdateAllProductions()
     {
         bool hasCompletedProduction = false;
-        
+
         for (int i = 0; i < activeProductions.Count; i++)
         {
             if (activeProductions[i] != null)
@@ -179,31 +188,31 @@ public class ResourceBuildingController : BuildingBase
         {
             return;
         }
-        
+
         activeCompleteUI = Instantiate(completeResourceUIPrefab);
-        
+
         Canvas canvas = activeCompleteUI.GetComponent<Canvas>();
         if (canvas != null)
         {
             canvas.renderMode = RenderMode.WorldSpace;
-            
+
             Vector3 worldPos = transform.position;
             activeCompleteUI.transform.position = worldPos + new Vector3(0, 0.5f, 0);
-            
+
             RectTransform canvasRect = activeCompleteUI.GetComponent<RectTransform>();
             if (canvasRect != null)
             {
                 canvasRect.sizeDelta = new Vector2(200, 100);
             }
         }
-        
+
         Button completeButton = activeCompleteUI.GetComponentInChildren<Button>();
         if (completeButton != null)
         {
             completeButton.onClick.AddListener(() =>
             {
                 ALLCompleteProduction();
-                
+
                 if (activeCompleteUI != null)
                 {
                     Destroy(activeCompleteUI);
@@ -216,31 +225,31 @@ public class ResourceBuildingController : BuildingBase
     public bool StartProduction(BuildingProductionInfo productionData, goodsData resourceData)
     {
         int emptySlotIndex = FindEmptySlotIndex();
-        
+
         if (emptySlotIndex == -1)
         {
             return false;
         }
-        
+
         // 재화 소비
         goodsData consumeResource = DataManager.Instance.GetResourceByName(productionData.consume_resource_type);
         if (consumeResource.amount < productionData.consume_amount)
         {
             return false;
         }
-        
+
         consumeResource.amount -= productionData.consume_amount;
-        
+
         // 생산 시작
         ProductionInfo newProduction = new ProductionInfo(productionData, resourceData, emptySlotIndex);
         activeProductions[emptySlotIndex] = newProduction;
-        
+
         // UI 업데이트
         if (ResourceBuildingUIManager.Instance != null)
         {
             ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
         }
-        
+
         return true;
     }
 
@@ -268,7 +277,7 @@ public class ResourceBuildingController : BuildingBase
             ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
         }
     }
-    
+
     /*
     public void AllCancleProduction()
     {
@@ -310,18 +319,18 @@ public class ResourceBuildingController : BuildingBase
             ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
         }
     }
-    
+
     private void ALLCompleteProduction()
     {
         int completedCount = 0;
-        
+
         for (int i = 0; i < activeProductions.Count; i++)
         {
             // null이 아니고, 시간이 0 이하인 경우만 처리
             if (activeProductions[i] != null && activeProductions[i].timeRemaining <= 0)
             {
                 ProductionInfo production = activeProductions[i];
-                
+
                 // 생산물 지급
                 production.resourceData.amount += production.productionData.output_amount;
 
@@ -362,7 +371,7 @@ public class ResourceBuildingController : BuildingBase
 
         activeProductions = compactedList;
     }
-    
+
     // 생산 중인지 확인
     public int GetActiveProductionCount()
     {
@@ -374,7 +383,7 @@ public class ResourceBuildingController : BuildingBase
         }
         return count;
     }
-    
+
     private int FindEmptySlotIndex()
     {
         for (int i = 0; i < activeProductions.Count; i++)
@@ -384,25 +393,25 @@ public class ResourceBuildingController : BuildingBase
         }
         return -1;
     }
-    
+
     public List<ProductionInfo> GetActiveProductions()
     {
         return activeProductions;
     }
-    
+
     public ProductionInfo GetProductionInfo(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= activeProductions.Count)
             return null;
-        
+
         return activeProductions[slotIndex];
     }
-    
+
     public int GetMaxProductionSlots()
     {
         return maxProductionSlots;
     }
-    
+
     public override void OpenBuildingUI()
     {
         base.OpenBuildingUI();
@@ -412,14 +421,14 @@ public class ResourceBuildingController : BuildingBase
             ResourceBuildingUIManager.Instance.OpenBuildingUI(this, Buildingdata, Buildingdata.level);
         }
     }
-    
+
     public override void CloseBuildingUI()
     {
         if (ResourceBuildingUIManager.Instance != null)
         {
             ResourceBuildingUIManager.Instance.CloseBuildingUI();
         }
-        
+
         base.CloseBuildingUI();
     }
 }
