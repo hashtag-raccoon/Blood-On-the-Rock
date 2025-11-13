@@ -22018,11 +22018,11 @@ RectTransform:
   - {fileID: 1044143820}
   - {fileID: 1959686739}
   - {fileID: 2107611689}
-  - {fileID: 704879621}
   - {fileID: 149445131}
   - {fileID: 2062296814}
   - {fileID: 18589593}
   - {fileID: 213227472}
+  - {fileID: 704879621}
   m_Father: {fileID: 983493035}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

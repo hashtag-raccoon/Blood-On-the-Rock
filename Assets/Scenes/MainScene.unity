@@ -4911,7 +4911,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7df031088a08c3b41bd072350b681bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Buildingdata: {fileID: 11400000, guid: ac43a83465c95914891343442699a5d0, type: 2}
+  constructedBuildingId: 0
   BuildingSprite: {fileID: 21300000, guid: ab2ce09fab7161648b9c92a48d6ba4ec, type: 3}
   BuildingUI: {fileID: 2099104964}
   BuildingUpgradeButton: {fileID: 1273758227}
@@ -22211,7 +22211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7df031088a08c3b41bd072350b681bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Buildingdata: {fileID: 11400000, guid: ce99f9875829f0643a2441c8cf74e482, type: 2}
+  constructedBuildingId: 1
   BuildingSprite: {fileID: 21300000, guid: 0b5ef4441869cf54f86c2e96214d0f28, type: 3}
   BuildingUI: {fileID: 2099104964}
   BuildingUpgradeButton: {fileID: 1273758227}
@@ -22245,7 +22245,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f3086858f98c117408cc371d543f5b30, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

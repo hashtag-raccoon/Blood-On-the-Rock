@@ -9,8 +9,7 @@ using Newtonsoft.Json;
 public class DataManager : MonoBehaviour
 {
     #region Singleton
-    // 다른 클래스에서 DataManager의 데이터에 쉽게 접근할 수 있도록 싱글톤 인스턴스를 제공합니다.
-    // 외부에서는 값을 수정할 수 없도록 private set으로 설정합니다.
+    
     public static DataManager Instance { get; private set; }
     #endregion
 
@@ -308,9 +307,18 @@ public class DataManager : MonoBehaviour
         return upgradeDataList.Find(data => data.level == level);
     }
 
-    public void UpgradeBuildingLevel(BuildingData buildingData)
+    public void UpgradeBuildingLevel(int buildingId)
     {
-        GetConstructedBuildingName(buildingData.Building_Name).Level += 1;
+        ConstructedBuilding building = GetConstructedBuildingById(buildingId);
+        if (building != null)
+        {
+            building.Level += 1;
+            Debug.Log($"건물 ID:{buildingId} '{building.Name}' 레벨 업그레이드: {building.Level}");
+        }
+        else
+        {
+            Debug.LogError($"건물 ID:{buildingId}를 찾을 수 없습니다.");
+        }
     }
 
     #endregion
@@ -320,6 +328,11 @@ public class DataManager : MonoBehaviour
     public ConstructedBuilding GetConstructedBuildingName(string buildingType)
     {
         return ConstructedBuildings.Find(data => data.Name == buildingType);
+    }
+
+    public ConstructedBuilding GetConstructedBuildingById(int buildingId)
+    {
+        return ConstructedBuildings.Find(data => data.Id == buildingId);
     }
 
     #endregion

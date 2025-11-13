@@ -35,7 +35,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
     [SerializeField] private int listPaddingBottom = 10;
 
     private ResourceBuildingController currentBuilding;
-    private BuildingData currentBuildingData;
+    private ConstructedBuilding currentConstructedBuilding;
     private int currentBuildingLevel;
 
     private List<ProductionSlot> productionSlots = new List<ProductionSlot>();
@@ -89,10 +89,10 @@ public class ResourceBuildingUIManager : MonoBehaviour
         }
     }
 
-    public void OpenBuildingUI(ResourceBuildingController building, BuildingData buildingData, int level)
+    public void OpenBuildingUI(ResourceBuildingController building, ConstructedBuilding constructedBuilding, int level)
     {
         currentBuilding = building;
-        currentBuildingData = buildingData;
+        currentConstructedBuilding = constructedBuilding;
         currentBuildingLevel = level;
 
         UpdateBuildingInfo();
@@ -114,31 +114,34 @@ public class ResourceBuildingUIManager : MonoBehaviour
         ClearProductionList();
 
         currentBuilding = null;
-        currentBuildingData = null;
+        currentConstructedBuilding = null;
         currentBuildingLevel = 0;
 
         resourceBuildingUIPanel?.SetActive(false);
     }
 
-    private void UpdateBuildingInfo()
+    public void UpdateBuildingInfo()
     {
-        if (currentBuildingData == null) return;
+        if (currentConstructedBuilding == null) return;
 
         if (buildingNameText != null)
-            buildingNameText.text = currentBuildingData.Building_Name;
+            buildingNameText.text = currentConstructedBuilding.Name;
 
         if (buildingLevelText != null)
+        {
+            currentBuildingLevel = currentConstructedBuilding.Level;
             buildingLevelText.text = $"Lv.{currentBuildingLevel}";
+        }
     }
 
     private void GenerateProductionList()
     {
         ClearProductionList();
 
-        if (currentBuildingData == null) return;
+        if (currentConstructedBuilding == null) return;
 
         List<BuildingProductionInfo> productionInfos =
-            DataManager.Instance.GetBuildingProductionInfoByType(currentBuildingData.Building_Name);
+            DataManager.Instance.GetBuildingProductionInfoByType(currentConstructedBuilding.Name);
 
         foreach (var productionInfo in productionInfos)
         {

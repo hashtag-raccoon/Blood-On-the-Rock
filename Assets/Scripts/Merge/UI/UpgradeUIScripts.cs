@@ -44,7 +44,7 @@ public class UpgradeUIScripts : MonoBehaviour
     //private const int MAX_REQUIREMENTS = 3; // 최대 요구조건 개수
 
     [HideInInspector]
-    public BuildingData buildingData;
+    public ConstructedBuilding constructedBuilding;
     [HideInInspector]
     public BuildingUpgradeData buildingUpgradeData;
     [HideInInspector]
@@ -61,7 +61,7 @@ public class UpgradeUIScripts : MonoBehaviour
         });
 
         // 초기 데이터 설정 시 requirements UI 생성
-        if (buildingData != null && buildingUpgradeData != null)
+        if (constructedBuilding != null && buildingUpgradeData != null)
         {
             CreateRequirementPanels();
         }
@@ -72,9 +72,9 @@ public class UpgradeUIScripts : MonoBehaviour
         
     }
     
-    public void SetData(BuildingData buildingData)
+    public void SetData(ConstructedBuilding building)
     {
-        this.buildingData = buildingData;
+        this.constructedBuilding = building;
         
         // UI 업데이트
         UpdateBuildingUI();
@@ -82,7 +82,7 @@ public class UpgradeUIScripts : MonoBehaviour
     
     private void UpdateBuildingUI()
     {
-        if (buildingData == null)
+        if (constructedBuilding == null)
         {
             return;
         }
@@ -90,25 +90,25 @@ public class UpgradeUIScripts : MonoBehaviour
         if (upgradeUIBuildingImage != null)
         {
             Image img = upgradeUIBuildingImage.GetComponent<Image>();
-            if (img != null && buildingData.icon != null)
+            if (img != null && constructedBuilding.Icon != null)
             {
-                img.sprite = buildingData.icon;
+                img.sprite = constructedBuilding.Icon;
             }
         }
         
         if (BuildingName != null)
         {
-            BuildingName.text = buildingData.Building_Name;
+            BuildingName.text = constructedBuilding.Name;
         }
         
         if (CurrentBuildingLevel != null)
         {
-            CurrentBuildingLevel.text = "레벨" + buildingData.level.ToString();
+            CurrentBuildingLevel.text = "레벨" + constructedBuilding.Level.ToString();
         }
         
         if (NextBuildingLevel != null)
         {
-            NextBuildingLevel.text = "레벨" + (buildingData.level + 1).ToString();
+            NextBuildingLevel.text = "레벨" + (constructedBuilding.Level + 1).ToString();
         }
 
         if (UpgradeButton != null)
@@ -289,14 +289,15 @@ public class UpgradeUIScripts : MonoBehaviour
             }
 
             consumeResource.amount -= buildingUpgradeData.upgrade_price;
-            DataManager.Instance.UpgradeBuildingLevel(buildingData);
-            
+            MyBuilding.UpgradeBuildingLevel();
             Destroy(this.gameObject);
         }
         else
         {
             Debug.Log("돈이 부족합니다.");
         }
+        UpdateBuildingUI();
+        ResourceBuildingUIManager.Instance.UpdateBuildingInfo();
     }
 
 }

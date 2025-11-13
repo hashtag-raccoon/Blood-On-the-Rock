@@ -16,5 +16,5 @@ MonoBehaviour:
   goodsName: Wood
   type: 3
   icon: {fileID: 21300000, guid: 0e1ccb64303778e4081913a6d9cca677, type: 3}
-  amount: 500
+  amount: 8480
   price: 0

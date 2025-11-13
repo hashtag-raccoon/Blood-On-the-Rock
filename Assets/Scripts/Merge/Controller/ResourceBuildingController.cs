@@ -105,12 +105,12 @@ public class ResourceBuildingController : BuildingBase
         }
 
         Transform buildingImageTransform = ActiveLimitUpgradeUI.transform.Find("BuildingImage");
-        if (buildingImageTransform != null && Buildingdata != null && Buildingdata.icon != null)
+        if (buildingImageTransform != null && constructedBuilding != null && constructedBuilding.Icon != null)
         {
             UnityEngine.UI.Image img = buildingImageTransform.GetComponent<UnityEngine.UI.Image>();
             if (img != null)
             {
-                img.sprite = Buildingdata.icon;
+                img.sprite = constructedBuilding.Icon;
 
                 RectTransform imgRect = buildingImageTransform.GetComponent<RectTransform>();
                 if (imgRect != null)
@@ -121,12 +121,12 @@ public class ResourceBuildingController : BuildingBase
         }
 
         Transform buildingNameTransform = ActiveLimitUpgradeUI.transform.Find("BuildingName");
-        if (buildingNameTransform != null && Buildingdata != null)
+        if (buildingNameTransform != null && constructedBuilding != null)
         {
             TMPro.TextMeshProUGUI nameText = buildingNameTransform.GetComponent<TMPro.TextMeshProUGUI>();
             if (nameText != null)
             {
-                nameText.text = Buildingdata.Building_Name;
+                nameText.text = constructedBuilding.Name;
             }
         }
 
@@ -416,9 +416,9 @@ public class ResourceBuildingController : BuildingBase
     {
         base.OpenBuildingUI();
 
-        if (ResourceBuildingUIManager.Instance != null && Buildingdata != null)
+        if (ResourceBuildingUIManager.Instance != null && constructedBuilding != null)
         {
-            ResourceBuildingUIManager.Instance.OpenBuildingUI(this, Buildingdata, Buildingdata.level);
+            ResourceBuildingUIManager.Instance.OpenBuildingUI(this, constructedBuilding, constructedBuilding.Level);
         }
     }
 
