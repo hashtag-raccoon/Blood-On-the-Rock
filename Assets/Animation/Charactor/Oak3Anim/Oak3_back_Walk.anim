@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Human2_back_Walk
+  m_Name: Oak3_back_Walk
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -19,7 +19,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0, y: 0, z: -60.907}
+        value: {x: 0, y: 0, z: -69.382}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -28,7 +28,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 0.5
-        value: {x: 0, y: 0, z: -99.745}
+        value: {x: 0, y: 0, z: -113.202}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -37,7 +37,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 1
-        value: {x: 0, y: 0, z: -60.907}
+        value: {x: 0, y: 0, z: -69.382}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -47,13 +47,13 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Human2_back/ArmFront_L/bone_1
+    path: Oak3_back/ArmFront_R/bone_1
   - curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0, y: 0, z: -106.293}
+        value: {x: 0, y: 0, z: -67.425}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -62,7 +62,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 0.5
-        value: {x: 0, y: 0, z: -56.89}
+        value: {x: 0, y: 0, z: -103.342}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -71,7 +71,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 1
-        value: {x: 0, y: 0, z: -106.293}
+        value: {x: 0, y: 0, z: -67.425}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -81,13 +81,13 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Human2_back/ArmFront_R/bone_1
+    path: Oak3_back/ArmFront_L/bone_1
   - curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0, y: 0, z: -113.665}
+        value: {x: 0, y: 0, z: -106.218}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -96,7 +96,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 0.5
-        value: {x: 0, y: 0, z: -89.8}
+        value: {x: 0, y: 0, z: -76.017}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -105,7 +105,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 1
-        value: {x: 0, y: 0, z: -113.665}
+        value: {x: 0, y: 0, z: -106.218}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -115,13 +115,13 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Human2_back/LegFront_R/bone_1
+    path: Oak3_back/LegFront_R/bone_1
   - curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0, y: 0, z: -60.624}
+        value: {x: 0, y: 0, z: -59.978}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -130,7 +130,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 0.5
-        value: {x: 0, y: 0, z: -101.228}
+        value: {x: 0, y: 0, z: -105.506}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -139,7 +139,7 @@ AnimationClip:
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 1
-        value: {x: 0, y: 0, z: -60.624}
+        value: {x: 0, y: 0, z: -59.978}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -149,7 +149,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Human2_back/LegFront_L/bone_1
+    path: Oak3_back/LegFront_L/bone_1
   m_PositionCurves: []
   m_ScaleCurves: []
   m_FloatCurves:
@@ -179,7 +179,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Human2_front
+    path: Oak3_front
     classID: 1
     script: {fileID: 0}
     flags: 16
@@ -209,7 +209,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Human2_back
+    path: Oak3_back
     classID: 1
     script: {fileID: 0}
     flags: 16
@@ -222,7 +222,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 1120583666
+      path: 463934376
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -231,7 +231,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 737909995
+      path: 1922445489
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -240,7 +240,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1167361028
+      path: 1976044359
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -249,7 +249,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 749053725
+      path: 486090846
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -258,7 +258,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 2454899404
+      path: 371756375
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -267,7 +267,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 3270710883
+      path: 116740976
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -323,7 +323,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Human2_front
+    path: Oak3_front
     classID: 1
     script: {fileID: 0}
     flags: 16
@@ -353,7 +353,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Human2_back
+    path: Oak3_back
     classID: 1
     script: {fileID: 0}
     flags: 16
@@ -392,7 +392,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Human2_back/ArmFront_L/bone_1
+    path: Oak3_back/ArmFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -431,7 +431,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Human2_back/ArmFront_L/bone_1
+    path: Oak3_back/ArmFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -441,7 +441,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -60.907
+        value: -69.382
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -450,7 +450,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.5
-        value: -99.745
+        value: -113.202
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -459,7 +459,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: -60.907
+        value: -69.382
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -470,7 +470,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Human2_back/ArmFront_L/bone_1
+    path: Oak3_back/ArmFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -509,7 +509,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Human2_back/ArmFront_R/bone_1
+    path: Oak3_back/ArmFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -548,7 +548,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Human2_back/ArmFront_R/bone_1
+    path: Oak3_back/ArmFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -558,7 +558,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -106.293
+        value: -67.425
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -567,7 +567,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.5
-        value: -56.89
+        value: -103.342
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -576,7 +576,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: -106.293
+        value: -67.425
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -587,7 +587,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Human2_back/ArmFront_R/bone_1
+    path: Oak3_back/ArmFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -626,7 +626,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Human2_back/LegFront_R/bone_1
+    path: Oak3_back/LegFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -665,7 +665,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Human2_back/LegFront_R/bone_1
+    path: Oak3_back/LegFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -675,7 +675,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -113.665
+        value: -106.218
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -684,7 +684,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.5
-        value: -89.8
+        value: -76.017
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -693,7 +693,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: -113.665
+        value: -106.218
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -704,7 +704,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Human2_back/LegFront_R/bone_1
+    path: Oak3_back/LegFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -743,7 +743,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Human2_back/LegFront_L/bone_1
+    path: Oak3_back/LegFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -782,7 +782,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Human2_back/LegFront_L/bone_1
+    path: Oak3_back/LegFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -792,7 +792,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -60.624
+        value: -59.978
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -801,7 +801,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 0.5
-        value: -101.228
+        value: -105.506
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -810,7 +810,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: -60.624
+        value: -59.978
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -821,7 +821,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Human2_back/LegFront_L/bone_1
+    path: Oak3_back/LegFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -834,7 +834,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Human2_back/ArmFront_L/bone_1
+    path: Oak3_back/LegFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -846,7 +846,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Human2_back/ArmFront_L/bone_1
+    path: Oak3_back/LegFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -858,7 +858,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Human2_back/ArmFront_L/bone_1
+    path: Oak3_back/LegFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -870,7 +870,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Human2_back/ArmFront_R/bone_1
+    path: Oak3_back/ArmFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -882,7 +882,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Human2_back/ArmFront_R/bone_1
+    path: Oak3_back/ArmFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -894,7 +894,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Human2_back/ArmFront_R/bone_1
+    path: Oak3_back/ArmFront_L/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -906,7 +906,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Human2_back/LegFront_L/bone_1
+    path: Oak3_back/ArmFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -918,7 +918,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Human2_back/LegFront_L/bone_1
+    path: Oak3_back/ArmFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -930,7 +930,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Human2_back/LegFront_L/bone_1
+    path: Oak3_back/ArmFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -942,7 +942,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Human2_back/LegFront_R/bone_1
+    path: Oak3_back/LegFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -954,7 +954,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Human2_back/LegFront_R/bone_1
+    path: Oak3_back/LegFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -966,7 +966,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Human2_back/LegFront_R/bone_1
+    path: Oak3_back/LegFront_R/bone_1
     classID: 4
     script: {fileID: 0}
     flags: 0
