@@ -2,9 +2,10 @@
     {
         "recipeid" : 1,
         "cocktailid" : 1,
+        "technique" : 0,
         "cocktailname" : "VampireCocktail",
         "description" : "가장 심플한 뱀파이어를 위한 칵테일",
-        "recipe" : {"Pitchtree": 35, "Baileys" : 15, "Blood" : 4, "Grenadine" : 4},
+        "recipedict" : {"Pitchtree": 35, "Baileys" : 15, "Blood" : 4, "Grenadine" : 4},
         "recipeorer" : "재료: 복숭아 리큐르, 베일리스, 뱀파이어 피, 그레나딘 시럼(석류시럽) \n1. 잔에 피치트리를 ½ 따른다 (35ml or 1 ⅙oz) \n2. 그 위에 베일리스를 띄워준다 (15ml or ½oz) \n3. 피를 바스푼이나 스포이드로 한 방울씩 떨어뜨려준다 (4 drops) \n4. 그레나딘 시럽 바스푼이나 스포이드로 한 방울씩 떨어뜨려준다 (4 drops)"
     }
 

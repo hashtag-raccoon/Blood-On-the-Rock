@@ -10,7 +10,7 @@ using System;
 public class DataManager : MonoBehaviour
 {
     #region Singleton
-    
+
     public static DataManager Instance { get; private set; }
     #endregion
 
@@ -52,9 +52,9 @@ public class DataManager : MonoBehaviour
     #region Runtime Data Lists (가공된 런타임 데이터)
     [Header("조합 데이터")]
     // Repositories에서 원본 데이터를 조합하여 생성한, 실제 게임 로직에서 사용될 데이터 리스트입니다.
-    
-    [SerializeField]public List<npc> npcs = new List<npc>();
-    [SerializeField]public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
+
+    [SerializeField] public List<npc> npcs = new List<npc>();
+    [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     #endregion
 
     #region Game Resources
