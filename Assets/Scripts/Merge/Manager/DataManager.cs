@@ -44,6 +44,9 @@ public class DataManager : MonoBehaviour
     public List<ArbeitData> arbeitDatas = new List<ArbeitData>();
     public List<Personality> personalities = new List<Personality>();
 
+    // -- Cocktail 관련 원본 데이터 --
+    public List<CocktailRecipeJson> recipes = new List<CocktailRecipeJson>();
+
     // --- 기타 데이터 ---
     [Header("기타 데이터")]
     public List<goodsData> goodsDatas = new List<goodsData>();
@@ -55,6 +58,7 @@ public class DataManager : MonoBehaviour
 
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
+    [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
     #endregion
 
     #region Game Resources
@@ -69,13 +73,14 @@ public class DataManager : MonoBehaviour
     #endregion
 
     #region JSON Handler
-    private Json DataFile = new Json();
+    private JsonDataHandler jsonDataHandler;
     #endregion
 
     #region Unity Lifecycle
     private void Awake()
     {
         InitializeSingleton();
+        jsonDataHandler = new JsonDataHandler();
         InitializeDataFiles();
         LoadAllData();
         Debug.Log("DataManager 초기화 및 모든 데이터 로딩 완료.");
@@ -111,7 +116,7 @@ public class DataManager : MonoBehaviour
 
     private void InitializeDataFiles()
     {
-        DataFile.ExistsFile();
+        jsonDataHandler.InitializeFiles();
     }
 
     private void LoadAllData()
@@ -131,7 +136,7 @@ public class DataManager : MonoBehaviour
     private void LoadArbeitData()
     // NPC의 상태 데이터(레벨, 경험치 등)를 JSON 파일에서 로드합니다.
     {
-        arbeitDatas = DataFile.loadArbeitData();
+        arbeitDatas = jsonDataHandler.LoadArbeitData();
     }
 
     private void LoadPersonalityData()
@@ -203,7 +208,7 @@ public class DataManager : MonoBehaviour
     private void LoadConstructedBuildingProductions()
     {
         // 건설된 건물의 상태 데이터(생산 상태, 시간 등)를 JSON 파일에서 로드합니다.
-        ConstructedBuildingProductions = DataFile.loadConstructedBuildingProductions();
+        ConstructedBuildingProductions = jsonDataHandler.LoadConstructedBuildingProductions();
         Debug.Log($"ConstructedBuildingProduction {ConstructedBuildingProductions.Count}개를 JSON에서 로드했습니다.");
     }
     #endregion
@@ -214,7 +219,7 @@ public class DataManager : MonoBehaviour
     /// </summary>
     public void SaveConstructedBuildingProductions()
     {
-        DataFile.saveConstructedBuildingProductions(ConstructedBuildingProductions);
+        jsonDataHandler.SaveConstructedBuildingProductions(ConstructedBuildingProductions);
     }
 
     /// <summary>
@@ -263,7 +268,7 @@ public class DataManager : MonoBehaviour
         }
 
         // 최신 상태가 반영된 arbeitDatas 리스트를 파일에 저장합니다.
-        DataFile.saveArbeitData(arbeitDatas);
+        jsonDataHandler.SaveArbeitData(arbeitDatas);
     }
     #endregion
 
@@ -369,78 +374,3 @@ public class DataManager : MonoBehaviour
     }
     #endregion
 }
-
-#region JSON Handler Class
-/// <summary>
-/// 아이템 및 플레이어 데이터를 JSON 파일로 저장하고 불러오는 기능을 담당
-/// </summary>
-class Json
-{
-    private string ArbeitDataPass = "Assets/Scripts/Merge/Datable/Json/ArbeitData.json";
-    private string ConstructedBuildingProductionPass = "Assets/Scripts/Merge/Datable/Json/ConstructedBuildingProduction.json";
-
-    public void ExistsFile()
-    {
-        if (!File.Exists(ArbeitDataPass))
-        {
-            File.WriteAllText(ArbeitDataPass, "[]");
-        }
-
-        if (!File.Exists(ConstructedBuildingProductionPass))
-        {
-            File.WriteAllText(ConstructedBuildingProductionPass, "[]");
-        }
-    }
-
-    #region Constructed Building Production Methods
-    public void saveConstructedBuildingProductions(List<ConstructedBuildingProduction> productions)
-    {
-        string jsonData = JsonConvert.SerializeObject(productions, Formatting.Indented);
-        File.WriteAllText(ConstructedBuildingProductionPass, jsonData);
-        Debug.Log($"ConstructedBuildingProduction {productions.Count}개를 저장했습니다.");
-    }
-
-    public List<ConstructedBuildingProduction> loadConstructedBuildingProductions()
-    {
-        if (!File.Exists(ConstructedBuildingProductionPass))
-        {
-            Debug.LogWarning("ConstructedBuildingProduction 파일이 존재하지 않습니다. 빈 리스트를 반환합니다.");
-            return new List<ConstructedBuildingProduction>();
-        }
-
-        string jsonData = File.ReadAllText(ConstructedBuildingProductionPass);
-        List<ConstructedBuildingProduction> productions = JsonConvert.DeserializeObject<List<ConstructedBuildingProduction>>(jsonData);
-        return productions ?? new List<ConstructedBuildingProduction>();
-    }
-    #endregion
-
-    #region Arbeit Data Methods
-    public List<ArbeitData> loadArbeitData()
-    {
-        if (!File.Exists(ArbeitDataPass))
-        {
-            Debug.LogWarning("ArbeitData 파일이 존재하지 않습니다. 빈 리스트를 반환합니다.");
-            return new List<ArbeitData>();
-        }
-
-        string jsonData = File.ReadAllText(ArbeitDataPass);
-        List<ArbeitData> arbeitDataList = JsonConvert.DeserializeObject<List<ArbeitData>>(jsonData);
-        return arbeitDataList ?? new List<ArbeitData>();
-    }
-
-    /// <summary>
-    /// ArbeitData 리스트를 JSON 파일로 저장합니다.
-    /// 이 메서드는 NPC의 레벨, 경험치 등 게임 플레이 중에 변경된 '상태' 데이터를 저장하는 데 사용됩니다.
-    /// </summary>
-    /// <param name="arbeitData">저장할 ArbeitData 리스트</param>
-    public void saveArbeitData(List<ArbeitData> arbeitData)
-    {
-        string jsonData = JsonConvert.SerializeObject(arbeitData, Formatting.Indented);
-        File.WriteAllText(ArbeitDataPass, jsonData);
-        Debug.Log($"ArbeitData {arbeitData.Count}개를 저장했습니다.");
-    }
-    #endregion
-
-}
-#endregion
-
