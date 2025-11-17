@@ -22,7 +22,7 @@ public class BuildScrollUI : BaseScrollUI<BuildingData, BuildBuildingButtonUI>
 
     private void Start()
     {
-        dataManager = DataManager.instance;
+        dataManager = DataManager.Instance;
 
         GenerateItems(dataManager.BuildingDatas);
     }

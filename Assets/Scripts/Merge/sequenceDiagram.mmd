@@ -1,0 +1,127 @@
+flowchart TB
+    Start([게임 시작]) --> DM_Awake[DataManager.Awake]
+
+    subgraph DataLoading["데이터 로딩 레이어"]
+        DM_Awake --> LoadSO[ScriptableObject 로드<br/>BuildingData, Personality, ProductionInfo]
+        DM_Awake --> LoadJSON[JSON 파일 로드<br/>ArbeitData, ConstructedBuildingProduction]
+        DM_Awake --> LoadRes[Resources 로드<br/>GoodsData, BuildingUpgrade]
+
+        LoadSO --> RawData[(DataManager<br/>Raw Data)]
+        LoadJSON --> RawData
+        LoadRes --> RawData
+    end
+
+    subgraph RepositoryInit["Repository 초기화"]
+        RawData --> Repo_Awake[Repository.Awake<br/>싱글톤 생성]
+        Repo_Awake --> Repo_Start[Repository.Start<br/>DataManager 참조]
+        Repo_Start --> WaitData{데이터 로딩<br/>완료 대기}
+
+        WaitData -->|대기 중| WaitData
+        WaitData -->|완료| InitDict[InitializeDictionaries<br/>List → Dictionary 변환]
+
+        InitDict --> BR_Init[BuildingRepository<br/>BuildingData + ProductionInfo + Production]
+        InitDict --> AR_Init[ArbeitRepository<br/>ArbeitData + Personality]
+        InitDict --> CR_Init[CocktailRepository<br/>CocktailData]
+
+        BR_Init --> Combine[데이터 조합 & 가공]
+        AR_Init --> Combine
+        CR_Init --> Combine
+
+        Combine --> RuntimeData[(DataManager<br/>Runtime Data<br/>npcs, ConstructedBuildings)]
+    end
+
+    subgraph GameLoop["게임 런타임"]
+        RuntimeData --> GameScene{현재 씬}
+
+        GameScene -->|Island Scene| IslandFlow[Island 씬 플로우]
+        GameScene -->|Bar Scene| BarFlow[Bar 씬 플로우]
+
+        subgraph IslandScene["Island Scene"]
+            IslandFlow --> IM_Start[IslandManager<br/>Day/Night Cycle 시작]
+            IM_Start --> DayLoop{Day Coroutine}
+
+            DayLoop --> UpdateUI[UI 업데이트<br/>Inventory, Store Button]
+            UpdateUI --> CheckTime{시간 경과?}
+            CheckTime -->|진행 중| DayLoop
+            CheckTime -->|종료| ToBar[Bar Scene 전환]
+
+            IslandFlow --> BuildingClick[건물 클릭]
+            BuildingClick --> OpenUI[ResourceBuildingUIManager<br/>건물 UI 열기]
+
+            OpenUI --> ShowSlots[왼쪽: Production Slots<br/>현재 생산 중인 항목 표시]
+            OpenUI --> ShowRecipes[오른쪽: Recipe List<br/>생산 가능한 레시피 표시]
+
+            ShowRecipes --> SelectRecipe{레시피 선택}
+            SelectRecipe --> CheckRes{자원 충분?}
+            CheckRes -->|부족| ShowSlots
+            CheckRes -->|충분| StartProd[StartProduction<br/>자원 소비 & 생산 시작]
+
+            StartProd --> ProdLoop{생산 진행}
+            ProdLoop -->|Update| UpdateTime[남은 시간 업데이트]
+            UpdateTime --> CheckComplete{생산 완료?}
+            CheckComplete -->|진행 중| ProdLoop
+            CheckComplete -->|완료| ShowComplete[완료 버튼 표시]
+
+            ShowComplete --> ClickComplete{완료 클릭}
+            ClickComplete --> GetResource[자원 획득 & 슬롯 정리]
+            GetResource --> ShowSlots
+
+            IslandFlow --> DragDrop[DragDropController<br/>건물 배치/이동]
+            DragDrop --> ValidatePos{타일 유효성 검사}
+            ValidatePos -->|유효| PlaceBuilding[건물 배치]
+            ValidatePos -->|무효| CancelDrag[배치 취소]
+        end
+
+        subgraph BarScene["Bar Scene"]
+            BarFlow --> CM_Init[CameraManager<br/>카메라 모드 설정]
+            CM_Init --> CamMode{카메라 모드}
+
+            CamMode -->|Mouse Follow| MouseCam[마우스 따라가기]
+            CamMode -->|Player Follow| PlayerCam[플레이어 따라가기]
+            CamMode -->|T키| ToggleCam[모드 전환]
+
+            ToggleCam --> CamMode
+        end
+
+        ToBar --> BarFlow
+    end
+
+    subgraph SaveSystem["저장 시스템"]
+        GameLoop --> AppQuit[OnApplicationQuit]
+        AppQuit --> UpdateProd[ConstructedBuildings → <br/>ConstructedBuildingProductions]
+        AppQuit --> UpdateArbeit[npcs → arbeitDatas]
+
+        UpdateProd --> SaveJSON[JSON 파일 저장]
+        UpdateArbeit --> SaveJSON
+        SaveJSON --> End([게임 종료])
+    end
+
+    subgraph Architecture["아키텍처 레이어"]
+        Layer1[데이터 레이어<br/>ScriptableObject, JSON, Resources]
+        Layer2[Repository 레이어<br/>데이터 처리 & 조합]
+        Layer3[Manager 레이어<br/>싱글톤 서비스]
+        Layer4[Controller 레이어<br/>게임 로직]
+        Layer5[UI 레이어<br/>프레젠테이션]
+
+        Layer1 --> Layer2
+        Layer2 --> Layer3
+        Layer3 --> Layer4
+        Layer4 --> Layer5
+    end
+
+    style DataLoading fill:#e1f5ff
+    style RepositoryInit fill:#fff4e1
+    style IslandScene fill:#e8f5e9
+    style BarScene fill:#f3e5f5
+    style SaveSystem fill:#ffebee
+    style Architecture fill:#f5f5f5
+    style RawData fill:#4fc3f7
+    style RuntimeData fill:#81c784
+
+    classDef processNode fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    classDef decisionNode fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef dataNode fill:#c8e6c9,stroke:#388e3c,stroke-width:3px
+
+    class DM_Awake,Repo_Awake,Repo_Start,InitDict,Combine processNode
+    class WaitData,CheckTime,SelectRecipe,CheckRes,CheckComplete,ValidatePos,CamMode decisionNode
+    class RawData,RuntimeData dataNode

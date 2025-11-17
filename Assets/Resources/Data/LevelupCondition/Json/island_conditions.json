@@ -1,0 +1,34 @@
+{
+  "IslandLevels": {
+    "1": {
+      "ConditionCount": 2,
+      "Conditions": [
+        {
+          "conditionType": 1,
+          "buildingName": "LoggingFarm",
+          "value": 1
+        },
+        {
+          "conditionType": 1,
+          "buildingName": "Quarry",
+          "value": 1
+        }
+      ]
+    },
+    "2": {
+      "ConditionCount": 2,
+      "Conditions": [
+        {
+          "conditionType": 1,
+          "buildingName": "LoggingFarm",
+          "value": 2
+        },
+        {
+          "conditionType": 1,
+          "buildingName": "Quarry",
+          "value": 2
+        }
+      ]
+    }
+  }
+}
