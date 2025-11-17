@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class IslandConditionLoader : MonoBehaviour
 {
-    private const string JSON_PATH = "Data/LevelupCondition";
+    private const string JSON_PATH = "Data/LevelupCondition/Json/island_conditions.json";
     private IslandConditionDatabase database;
 
     private void Awake()
@@ -16,7 +16,7 @@ public class IslandConditionLoader : MonoBehaviour
         TextAsset jsonFile = Resources.Load<TextAsset>(JSON_PATH);
         if (jsonFile == null)
         {
-            Debug.LogError($"JSON ÆÄÀÏÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù: {JSON_PATH}");
+            Debug.LogError($"JSON íŒŒì¼ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: {JSON_PATH}");
             return;
         }
 

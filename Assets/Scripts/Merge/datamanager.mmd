@@ -1,0 +1,69 @@
+sequenceDiagram
+    participant UnityEngine as Unity 엔진
+    participant DataManager as DataManager
+    participant ArbeitRepository as ArbeitRepository
+    participant BuildingRepository as BuildingRepository
+    participant DataSources as 데이터 소스<br/>(JSON, SO, Resources)
+
+    Note over UnityEngine, DataManager: 게임 시작 및 초기화
+    UnityEngine->>DataManager: Awake() 호출
+    activate DataManager
+    DataManager->>DataManager: InitializeSingleton()
+    DataManager->>DataSources: InitializeDataFiles() (JSON 파일 생성/확인)
+    DataManager->>DataManager: LoadAllData() 호출
+    
+    rect rgba(200, 200, 255, .1)
+        Note over DataManager: 모든 원본/상태 데이터 로딩
+        DataManager->>DataSources: LoadArbeitData() (JSON)
+        DataManager->>DataSources: LoadPersonalityData() (SO)
+        DataManager->>DataSources: LoadBuildingData() (SO)
+        DataManager->>DataSources: LoadBuildingProductionData() (SO)
+        DataManager->>DataSources: LoadConstructedBuildingProductions() (JSON)
+        Note over DataManager: ...기타 데이터 로드
+    end
+    deactivate DataManager
+
+    Note over UnityEngine, DataManager: 각 Repository 초기화
+    UnityEngine->>ArbeitRepository: Start() 호출
+    activate ArbeitRepository
+    ArbeitRepository->>DataManager: 데이터 로딩 완료 대기 (WaitUntil)
+
+    UnityEngine->>BuildingRepository: Start() 호출
+    activate BuildingRepository
+    BuildingRepository->>DataManager: 데이터 로딩 완료 대기 (WaitUntil)
+
+    Note over DataManager, BuildingRepository: DataManager 로딩 완료 후, Repository들 실행 재개
+
+    rect rgba(200, 255, 200, .1)
+        Note over ArbeitRepository: NPC 데이터 가공
+        ArbeitRepository->>ArbeitRepository: InitializeDictionaries() (Personality 딕셔너리 생성)
+        ArbeitRepository->>ArbeitRepository: PopulateNpcList() 호출
+        activate ArbeitRepository
+            ArbeitRepository->>DataManager: GetNpcs()를 통해 데이터 요청 (ArbeitData, Personality)
+            DataManager-->>ArbeitRepository: 로드된 데이터 반환
+            ArbeitRepository->>ArbeitRepository: 데이터 조합하여 'npc' 리스트 생성
+            ArbeitRepository-->>DataManager: 생성된 'npcs' 리스트 저장
+        deactivate ArbeitRepository
+    end
+    deactivate ArbeitRepository
+
+    rect rgba(255, 255, 200, .1)
+        Note over BuildingRepository: 건물 데이터 가공
+        BuildingRepository->>BuildingRepository: InitializeDictionaries() (Building, Production 딕셔너리 생성)
+        BuildingRepository->>BuildingRepository: PopulateConstructedBuildingsList() 호출
+        activate BuildingRepository
+            BuildingRepository->>DataManager: GetConstructedBuildings()를 통해 데이터 요청
+            DataManager-->>BuildingRepository: 로드된 데이터 반환
+            BuildingRepository->>BuildingRepository: 데이터 조합하여 'ConstructedBuilding' 리스트 생성
+            BuildingRepository-->>DataManager: 생성된 'ConstructedBuildings' 리스트 저장
+        deactivate BuildingRepository
+    end
+    deactivate BuildingRepository
+
+    Note over UnityEngine, DataManager: 게임 종료 시
+    UnityEngine->>DataManager: OnApplicationQuit() 호출
+    activate DataManager
+    DataManager->>DataManager: UpdateConstructedBuildingProductions...()
+    DataManager->>DataManager: SaveConstructedBuildingProductions() (JSON 저장)
+    DataManager->>DataManager: UpdateAndSaveArbeitData() (JSON 저장)
+    deactivate DataManager

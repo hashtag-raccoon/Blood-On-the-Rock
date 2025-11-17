@@ -17,13 +17,13 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     where TData : IScrollItemData
     where TItemUI : MonoBehaviour, IScrollItemUI
 {
-    [Header("Scroll Settings")]
+    [Header("스크롤 세팅")]
     [SerializeField] protected GameObject scrollUI;
     [SerializeField] protected ScrollRect scrollRect;
     [SerializeField] protected Transform content;
     [SerializeField] protected GameObject itemPrefab;
 
-    [Header("Layout Settings")]
+    [Header("레이아웃 설정")]
     [SerializeField] protected float itemWidth = 100f;
     [SerializeField] protected float itemHeight = 100f;
     [SerializeField] protected float spacing = 10f;
@@ -32,7 +32,7 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     [SerializeField] protected int paddingTop = 10;
     [SerializeField] protected int paddingBottom = 10;
 
-    [Header("Control Buttons")]
+    [Header("버튼 할당")]
     [SerializeField] protected Button openButton;
     [SerializeField] protected Button closeButton;
 

@@ -16,5 +16,5 @@ MonoBehaviour:
   goodsName: Money
   type: 4
   icon: {fileID: 21300000, guid: 394899dbf2938874ca7d1025f7598406, type: 3}
-  amount: 1000
+  amount: 999820
   price: 0

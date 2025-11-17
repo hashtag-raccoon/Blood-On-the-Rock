@@ -1,0 +1,12 @@
+name: Gemini Code Review
+on: [pull_request, issues]
+jobs:
+  run-gemini-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run Gemini CLI
+        uses: google-github-actions/run-gemini-cli@v1
+        with:
+          args: "review pr"

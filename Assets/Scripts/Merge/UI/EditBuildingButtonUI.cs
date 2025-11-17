@@ -20,8 +20,8 @@ public class EditBuildingButtonUI : MonoBehaviour, IScrollItemUI
         BuildingData = data;
         var buildingData = data as BuildingData;
         BuildingiconImage.sprite = buildingData.icon;
-        BuildingNameText.text = buildingData.BuildingName;
-        BuildingAmountText.text = buildingData.amount.ToString();
+        BuildingNameText.text = buildingData.Building_Name;
+        //BuildingAmountText.text = buildingData.production_info.output_Amount.ToString();
 
         BuildingButton.onClick.RemoveAllListeners();
         BuildingButton.onClick.AddListener(() => onClickCallback?.Invoke(this));
