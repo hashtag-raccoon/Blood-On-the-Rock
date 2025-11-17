@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +46,7 @@ public class DataManager : MonoBehaviour
 
     // --- 기타 데이터 ---
     [Header("기타 데이터")]
-    public List<goodsData> goodsDatas = new List<goodsData>();
+    public List<ResourceData> goodsDatas = new List<ResourceData>();
     #endregion
 
     #region Runtime Data Lists (가공된 런타임 데이터)
@@ -57,9 +58,6 @@ public class DataManager : MonoBehaviour
 
     #region Game Resources
     [Space(2)]
-    [Header("섬/자원 현황")]
-    public int wood = 0;
-    public int money = 0;
 
     [Header("바 현재 선호도/바 현재 레벨")]
     public float storeFavor = 100f;
@@ -81,10 +79,14 @@ public class DataManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        Debug.Log("[DataManager] 게임 종료 - 데이터 저장 시작");
+        
         // 게임 종료 직전, 변경된 런타임 데이터의 '상태'를 원본 '상태' 데이터에 반영 후 저장합니다.
         UpdateConstructedBuildingProductionsFromConstructedBuildings();
         UpdateAndSaveArbeitData();
         SaveConstructedBuildingProductions();
+        
+        Debug.Log("[DataManager] 게임 종료 - 데이터 저장 완료");
     }
 
     private void OnDestroy()
@@ -179,7 +181,7 @@ public class DataManager : MonoBehaviour
     private void LoadGoodsData()
     {
         // 재화(Goods) 데이터를 Resources 폴더에서 로드합니다.
-        goodsData[] loadedGoods = Resources.LoadAll<goodsData>(GoodsPath);
+        ResourceData[] loadedGoods = Resources.LoadAll<ResourceData>(GoodsPath);
         goodsDatas.Clear();
         foreach (var goods in loadedGoods)
         {
@@ -225,6 +227,7 @@ public class DataManager : MonoBehaviour
 
         var productionDict = ConstructedBuildingProductions.ToDictionary(p => p.building_id);
 
+        int updatedCount = 0;
         foreach (var building in ConstructedBuildings)
         {
             if (productionDict.TryGetValue(building.Id, out var production))
@@ -233,8 +236,11 @@ public class DataManager : MonoBehaviour
                 production.is_producing = building.IsProducing;
                 production.last_production_time = building.LastProductionTime;
                 production.next_production_time = building.NextProductionTime;
+                updatedCount++;
             }
         }
+        
+        Debug.Log($"[DataManager] {updatedCount}개 건물의 생산 정보를 업데이트했습니다.");
     }
 
     /// <summary>
@@ -266,14 +272,14 @@ public class DataManager : MonoBehaviour
     #endregion
 
     #region Resource Query Methods
-    public goodsData GetResourceById(int id)
+    public ResourceData GetResourceById(int id)
     {
-        return goodsDatas.Find(r => r.id == id);
+        return goodsDatas.Find(r => r.resource_id == id);
     }
 
-    public goodsData GetResourceByName(string name)
+    public ResourceData GetResourceByName(string name)
     {
-        return goodsDatas.Find(r => r.goodsName == name);
+        return goodsDatas.Find(r => r.resource_name == name);
     }
     #endregion
 
@@ -441,4 +447,3 @@ class Json
 
 }
 #endregion
-

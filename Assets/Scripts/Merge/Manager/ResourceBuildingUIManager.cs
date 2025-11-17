@@ -159,7 +159,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
             createButton = itemObj.AddComponent<ProductionCreateButton>();
         }
 
-        goodsData resourceData = DataManager.Instance.GetResourceById(productionData.resource_id);
+        ResourceData resourceData = DataManager.Instance.GetResourceById(productionData.resource_id);
 
         createButton.Initialize(productionData, resourceData, currentBuildingLevel);
 
@@ -178,7 +178,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
         productionCreateButtons.Clear();
     }
 
-    public void OnProductionCreateButtonClicked(BuildingProductionInfo productionData, goodsData resourceData)
+    public void OnProductionCreateButtonClicked(BuildingProductionInfo productionData, ResourceData resourceData)
     {
         currentBuilding.StartProduction(productionData, resourceData);
     }

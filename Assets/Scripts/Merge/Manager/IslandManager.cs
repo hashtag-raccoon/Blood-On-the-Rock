@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 //using UnityEngine.UIElements;
 
-public class IslandData : ScriptableObject
+public class mainIslandData
 {
     int island_id;
     public string island_name;

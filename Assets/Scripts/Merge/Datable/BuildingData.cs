@@ -4,6 +4,14 @@ using UnityEngine;
 using System;
 using UnityEditor.ShaderKeywordFilter;
 
+public enum BuildingType
+{
+    None,
+    Production,
+    Decoration,
+    Utility
+}
+
 [CreateAssetMenu(fileName = "Building", menuName = "Building")]
 public class BuildingData : ScriptableObject, IScrollItemData
 {
@@ -19,6 +27,9 @@ public class BuildingData : ScriptableObject, IScrollItemData
 
     // ScriptableObject에서만 사용하는 데이터
     public Sprite icon; // icon sprite
+    public Sprite building_sprite; // 건물 스프라이트 (배치용)
+    public Vector2Int tileSize; // 건물 크기 (타일 단위, 기본값 1x1)
+    public BuildingType buildingType; // 건물의 타입 ex)생성형,유틸형(대형 시계탑 등)
 }
 
 /// <summary>
@@ -38,7 +49,7 @@ public class ConstructedBuildingProduction
 /// 게임 내에 실제로 건설된 건물의 모든 정보를 통합하여 관리하는 클래스입니다.
 /// </summary>
 [Serializable]
-public class ConstructedBuilding
+public class ConstructedBuilding : IScrollItemData
 {
     // BuildingData에서 가져온 정보
     public int Id { get; private set; }

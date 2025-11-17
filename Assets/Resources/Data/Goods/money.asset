@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa6e979415d98214a926f916c5f2ea9e, type: 3}
   m_Name: money
   m_EditorClassIdentifier: 
-  id: 0
-  goodsName: Money
+  resource_id: 0
+  resource_name: Money
   type: 4
   icon: {fileID: 21300000, guid: 394899dbf2938874ca7d1025f7598406, type: 3}
-  amount: 999820
-  price: 0
+  current_amount: 9000
+  max_storage: 10000

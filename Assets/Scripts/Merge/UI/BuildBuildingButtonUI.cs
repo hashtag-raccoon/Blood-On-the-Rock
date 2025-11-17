@@ -17,11 +17,21 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
     //[SerializeField] private Image PriceWoodIconImage;
     [SerializeField] private Button BuyButton;
 
-    private object BuildingData;
+    private object buildingData;
+    private DataManager dataManager;
+    private ResourceData MoneyData;
+    private ResourceData WoodData;
+
+    private void Awake()
+    {
+        dataManager = DataManager.Instance;
+        MoneyData = dataManager.GetResourceByName("Money");
+        WoodData = dataManager.GetResourceByName("Wood");
+    }
 
     public void SetData<T>(T data, Action<IScrollItemUI> onClickCallback) where T : IScrollItemData
     {
-        BuildingData = data;
+        buildingData = data;
 
         var building = data as BuildingData;
 
@@ -37,19 +47,67 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
 
         BuyButton.onClick.AddListener(() =>
         {
-            try
-            {
-                onClickCallback(this);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error invoking onClickCallback: {ex}");
-            }
+            BuyBuilding();
         });
     }
 
     public T GetData<T>() where T : IScrollItemData
     {
-        return (T)BuildingData;
+        return (T)buildingData;
     }
+
+    /// <summary>
+    /// 건물 구매 처리:
+    /// 1. 자원 확인 및 차감
+    /// 2. BuildScrollUI 비활성화 (애니메이션 포함)
+    /// 3. 편집 모드(배치 모드) 진입
+    /// </summary>
+    public void BuyBuilding()
+    {
+        var building = buildingData as BuildingData;
+
+        if (building == null || building.building_sprite == null)
+        {
+            return;
+        }
+
+        // 자원 확인 및 차감
+        if (MoneyData.current_amount < building.construction_cost_gold || 
+            WoodData.current_amount < building.construction_cost_wood)
+        {
+            return;
+        }
+
+        MoneyData.current_amount -= building.construction_cost_gold;
+        WoodData.current_amount -= building.construction_cost_wood;
+
+        // BuildScrollUI 찾아서 비활성화 (애니메이션 포함)
+        BuildScrollUI buildScrollUI = FindObjectOfType<BuildScrollUI>();
+        if (buildScrollUI != null)
+        {
+            buildScrollUI.CloseUI();
+        }
+
+        // 편집 모드(배치 모드) 진입 - BuildingData만 전달
+        DragDropController dragDropController = FindObjectOfType<DragDropController>();
+        if (dragDropController != null)
+        {
+            dragDropController.StartNewBuildingPlacement(building);
+        }
+    }
+
+    // 향후 구현: 건설된 건물 데이터 저장
+    // private void SaveNewConstructedBuilding(BuildingData building)
+    // {
+    //     var newProduction = new ConstructedBuildingProduction
+    //     {
+    //         building_id = building.building_id,
+    //         last_production_time = System.DateTime.Now,
+    //         next_production_time = System.DateTime.Now,
+    //         is_producing = false
+    //     };
+    //     
+    //     dataManager.ConstructedBuildingProductions.Add(newProduction);
+    //     // JSON 저장 호출
+    // }
 }

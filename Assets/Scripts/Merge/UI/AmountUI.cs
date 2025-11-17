@@ -8,7 +8,7 @@ public class AmountUI : MonoBehaviour
 {
     // 재료 표시할 때 필요한 UI 스크립트
     [Header("재료 데이터")]
-    [SerializeField] private goodsData goodsdata;
+    [SerializeField] private ResourceData goodsdata;
     [Header("UI 오브젝트/아이콘 스프라이트")]
     [SerializeField] private Image goodsSprite;
     [Header("UI 오브젝트/텍스트")]
@@ -22,6 +22,6 @@ public class AmountUI : MonoBehaviour
 
     void Update()
     {
-        Text.text = goodsdata.amount.ToString();
+        Text.text = goodsdata.current_amount.ToString();
     }
 }

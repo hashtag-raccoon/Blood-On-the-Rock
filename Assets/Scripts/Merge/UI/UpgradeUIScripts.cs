@@ -116,7 +116,7 @@ public class UpgradeUIScripts : MonoBehaviour
             if (upgradeButtonCostIcon != null && buildingUpgradeData != null)
             {
                 Image costIconImage = upgradeButtonCostIcon.GetComponent<Image>();
-                goodsData moneyData = DataManager.Instance?.GetResourceByName("Money");
+                ResourceData moneyData = DataManager.Instance?.GetResourceByName("Money");
                 
                 if (costIconImage != null && moneyData != null && moneyData.icon != null)
                 {
@@ -222,7 +222,7 @@ public class UpgradeUIScripts : MonoBehaviour
             // 자원 데이터로 아이콘 설정
             if (requirement != null)
             {
-                goodsData resourceData = DataManager.Instance.GetResourceByName(requirement.requirement_type);
+                ResourceData resourceData = DataManager.Instance.GetResourceByName(requirement.requirement_type);
                 
                 if (resourceData != null && resourceData.icon != null)
                 {
@@ -275,20 +275,20 @@ public class UpgradeUIScripts : MonoBehaviour
 
     private void upgradeClick()
     {
-        goodsData consumeResource = DataManager.Instance.GetResourceByName("Money");
-        if (buildingUpgradeData.upgrade_price <= consumeResource.amount)
+        ResourceData consumeResource = DataManager.Instance.GetResourceByName("Money");
+        if (buildingUpgradeData.upgrade_price <= consumeResource.current_amount)
         {
             for (int i = 0; i < buildingUpgradeData.requirements.Count; i++)
             {
                 upgrade_requirements req = buildingUpgradeData.requirements[i];
-                goodsData reqResource = DataManager.Instance.GetResourceByName(req.requirement_type);
+                ResourceData reqResource = DataManager.Instance.GetResourceByName(req.requirement_type);
                 if (reqResource != null)
                 {
-                    reqResource.amount -= req.requirement_value;
+                    reqResource.current_amount -= req.requirement_value;
                 }
             }
 
-            consumeResource.amount -= buildingUpgradeData.upgrade_price;
+            consumeResource.current_amount -= buildingUpgradeData.upgrade_price;
             MyBuilding.UpgradeBuildingLevel();
             Destroy(this.gameObject);
         }

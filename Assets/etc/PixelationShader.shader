@@ -27,12 +27,14 @@ struct appdata
 {
     float4 vertex : POSITION;
     float2 uv : TEXCOORD0;
+    float4 color : COLOR; // Vertex Color 추가
 };
 
 struct v2f
 {
     float2 uv : TEXCOORD0;
     float4 vertex : SV_POSITION;
+    float4 color : COLOR; // Color 전달
 };
 
 v2f vert(appdata v)
@@ -40,22 +42,23 @@ v2f vert(appdata v)
     v2f o;
     o.vertex = UnityObjectToClipPos(v.vertex);
     o.uv = v.uv;
+    o.color = v.color; // Vertex Color를 Fragment Shader로 전달
     return o;
 }
 
 fixed4 frag(v2f i) : SV_Target
 {
-                // �ؽ�ó�� ũ�� ������ ���� �ȼ� ũ�� ����
+                // 텍스처의 크기 기반으로 픽셀 크기 계산
     float2 pixelSize = float2(1.0 / _PixelWidth, 1.0 / _PixelHeight);
 
-                // �ȼ�ȭ�� UV ��ǥ ��� (�߾� ����)
+                // 픽셀화된 UV 좌표 계산 (중앙 정렬)
     float2 uv = floor(i.uv / pixelSize) * pixelSize + (pixelSize * 0.5);
 
-                // �ȼ�ȭ�� UV ��ǥ�� �ؽ�ó ���� ��������
+                // 픽셀화된 UV 좌표로 텍스처 색상 샘플링
     fixed4 color = tex2D(_MainTex, uv);
                 
-                // ���İ��� �����Ͽ� ������ ó��
-    return color;
+                // Vertex Color와 곱하여 SpriteRenderer.color 반영
+    return color * i.color;
 }
             ENDCG
         }

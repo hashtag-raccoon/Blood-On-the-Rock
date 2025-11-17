@@ -5,10 +5,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-public class EditScrollUI : BaseScrollUI<BuildingData, EditBuildingButtonUI>
+public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButtonUI>
 {
     private DataManager dataManager;
     [SerializeField] private IslandManager islandManager;
+    [SerializeField] private DragDropController dragDropController;
     [SerializeField] private float duration = 0.5f;// UI 팝업, 종료 애니메이션 지속 시간
     protected override void Awake()
     {
@@ -18,25 +19,35 @@ public class EditScrollUI : BaseScrollUI<BuildingData, EditBuildingButtonUI>
     private void Start()
     {
         dataManager = DataManager.Instance;
+        StartCoroutine(WaitForDataAndInitialize());
+    }
 
-        GenerateItems(dataManager.BuildingDatas);
+    private IEnumerator WaitForDataAndInitialize()
+    {
+        // DataManager의 ConstructedBuildings가 BuildingRepository에 의해 채워질 때까지 대기
+        yield return new WaitUntil(() => dataManager != null && dataManager.ConstructedBuildings != null && dataManager.ConstructedBuildings.Count > 0);
+
+        Debug.Log($"EditScrollUI: {dataManager.ConstructedBuildings.Count}개의 건물로 UI 생성 시작");
+        GenerateItems(dataManager.ConstructedBuildings);
     }
 
     protected override void OnItemClicked(IScrollItemUI clickedItem)
     {
-        BuildingData data = clickedItem.GetData<BuildingData>();
+        ConstructedBuilding data = clickedItem.GetData<ConstructedBuilding>();
 
-        // 그 후 추가 구현 예정
+        // 추후 구현 예정  
     }
     protected override void OnOpenButtonClicked()
     {
         base.OnOpenButtonClicked();
         StartCoroutine(OpenSlideCoroutine());
+        dragDropController.onEdit = true;
     }
 
     protected override void OnCloseButtonClicked()
     {
         StartCoroutine(CloseSlideCoroutine());
+        dragDropController.onEdit = false;
     }
 
     private IEnumerator OpenSlideCoroutine()

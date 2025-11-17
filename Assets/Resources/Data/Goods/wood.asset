@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa6e979415d98214a926f916c5f2ea9e, type: 3}
   m_Name: wood
   m_EditorClassIdentifier: 
-  id: 1
-  goodsName: Wood
+  resource_id: 1
+  resource_name: Wood
   type: 3
   icon: {fileID: 21300000, guid: 0e1ccb64303778e4081913a6d9cca677, type: 3}
-  amount: 8480
-  price: 0
+  current_amount: 7080
+  max_storage: 10000
