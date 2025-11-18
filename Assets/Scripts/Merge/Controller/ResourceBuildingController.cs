@@ -52,7 +52,7 @@ public class ResourceBuildingController : BuildingBase
         InitializeProductionSlots();
         
         // 재시작 시, 전 게임에서 저장된 생산 정보를 현 에 복원
-        RestoreProductionFromSave();
+        //RestoreProductionFromSave();
     }
 
     protected override void Update()
@@ -481,6 +481,7 @@ public class ResourceBuildingController : BuildingBase
         return earliest;
     }
 
+    /*
     // 게임 시작 시 저장된 생산 정보를 복원
     public void RestoreProductionFromSave()
     {
@@ -498,4 +499,5 @@ public class ResourceBuildingController : BuildingBase
             Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 생산 재개 (남은 시간: {timeRemaining.TotalSeconds:F1}초)");
         }
     }
+    */
 }

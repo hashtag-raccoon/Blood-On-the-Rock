@@ -15,7 +15,7 @@ public class DataManager : MonoBehaviour
     #endregion
 
     #region Constants
-    private const string GoodsPath = "Data/Goods";
+    private const string GoodsPath = "Data/Resource";
     private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
     #endregion
 

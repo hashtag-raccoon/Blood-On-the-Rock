@@ -68,8 +68,10 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
 
         if (building == null || building.building_sprite == null)
         {
+            Debug.LogError("건물 데이터가 올바르지 않습니다.");
             return;
         }
+
 
         // 자원 확인 및 차감
         if (MoneyData.current_amount < building.construction_cost_gold || 

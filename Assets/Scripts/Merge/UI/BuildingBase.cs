@@ -4,13 +4,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Cinemachine;
 
-public enum PositionData
-{
-    Left,
-    Center,
-    Right
-}   
-
 // 건물의 기본 동작을 정의하는 추상 클래스, ResourceBuildingBase 등 (추가기능)건물이 가지는 공통 기능인 스크립트임
 // 다른 건물에는 스크립트를 넣어 둘 필요는 없음
 // 건물 클릭 시 UI 열기/닫기, 카메라 애니메이션, 업그레이드 UI 팝업 등의 기능이 들어감
@@ -26,6 +19,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     [SerializeField] protected Vector2Int tileSize = new Vector2Int(3, 2); // 가로 x 세로로, 건물이 차지하는 타일 크기
     [SerializeField] private DragDropController dragDropController;
     public Vector2Int TileSize => tileSize;
+    public int ConstructedBuildingId => constructedBuildingId; // DragDropController에서 접근 가능하도록 public 프로퍼티 추가
     [SerializeField] protected Button BuildingUpgradeButton;
      [SerializeField] protected GameObject UpgradeUIPrefab;
     [SerializeField] protected GameObject UpgradeBlurUI;
@@ -35,7 +29,6 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     private static bool upgradeButtonInitialized = false; // 버튼 리스너 초기화 여부
     
     [Header("카메라 세팅")]
-    [SerializeField] protected PositionData CameraPositionOffset;
     [SerializeField] protected float AnimationSpeed = 5f;
     [SerializeField] protected float TargetOrthographicSize = 2f;
     [SerializeField] protected float HorizontalOffset = 5f; 
@@ -48,7 +41,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     protected virtual void Start()
     {
-        // DragDropController 자동 할당 (Inspector에 할당되지 않았을 경우)
+        // DragDropController 자동 할당 (Inspector에 할당되지 않았을 경우를 위함)
         if (dragDropController == null)
             dragDropController = FindObjectOfType<DragDropController>();
             
@@ -72,7 +65,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         constructedBuilding = DataManager.Instance.GetConstructedBuildingById(constructedBuildingId);
         if (constructedBuilding == null)
         {
-            Debug.LogError($"ID {constructedBuildingId}에 해당하는 ConstructedBuilding을 찾을 수 없습니다.");
+            Debug.LogError($"ID {constructedBuildingId}에 해당하는 ConstructedBuilding을 찾을 수 없습니다."); // 당분간은 필요
         }
 
         InitializeCamera();
@@ -205,7 +198,15 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         }
         else // 열기 애니메이션
         {
-            Vector3 targetPos = GetTargetCameraPosition(CameraPositionOffset);
+            // ConstructedBuilding -> BuildingData 가져오기
+            BuildingData buildingData = null;
+            if (constructedBuilding != null)
+            {
+                buildingData = DataManager.Instance.BuildingDatas.Find(bd => bd.Building_Name == constructedBuilding.Name);
+            }
+            
+            CameraPositionOffset offset = buildingData != null ? buildingData.cameraPositionOffset : CameraPositionOffset.Center;
+            Vector3 targetPos = GetTargetCameraPosition(offset);
             float initialSize = virtualCamera.m_Lens.OrthographicSize;
 
             Vector3 initialMousePos = mouseFollowingObj.transform.position;
@@ -239,20 +240,20 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         cameraCoroutine = null;
     }
 
-    protected Vector3 GetTargetCameraPosition(PositionData pos)
+    protected Vector3 GetTargetCameraPosition(CameraPositionOffset pos)
     {
         Vector3 buildingPos = transform.position;
         float xOffset = 0f;
 
         switch (pos)
         {
-            case PositionData.Left:
+            case CameraPositionOffset.Left:
                 xOffset = -HorizontalOffset;
                 break;
-            case PositionData.Center:
+            case CameraPositionOffset.Center:
                 xOffset = 0f;
                 break;
-            case PositionData.Right:
+            case CameraPositionOffset.Right:
                 xOffset = HorizontalOffset;
                 break;
         }

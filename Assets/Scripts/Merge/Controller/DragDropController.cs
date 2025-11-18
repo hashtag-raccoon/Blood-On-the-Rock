@@ -20,17 +20,20 @@ public class DragDropController : MonoBehaviour
     [SerializeField] private int buildingTilemapCount = 1; // 건물 타일맵(레이어) 개수
 
     // 건물 타일맵 배열, 그려진 타일 없는 타일맵들
-    [SerializeField] private Tilemap[] buildingTilemaps;
+    [SerializeField] private Tilemap previewTilemap;
+    [SerializeField] private Tilemap banTilemap; // 건물 배치 불가능한 타일맵
+    [SerializeField] private Tilemap ExistingTilemap; // 기존 건물들의 타일맵
     [SerializeField] private TileBase markerTile; // 건물 배치 시 나오는 프리뷰 타일
 
     [Header("드래그 설정")]
     [SerializeField] private Camera mainCamera;
     
-    [Header("편집 모드 진행바 UI")]
+    [Header("편집 모드(스크롤 및 진행바 UI)")]
     [SerializeField] private CircularProgressBar editModeProgressBar; // 편집 모드 활성화 진행바
+    [SerializeField] private EditScrollUI editScrollUI; // 편집 모드 활성화 진행바
 
     [Header("건물 마커 설정/마커 타일맵의 Y 오프셋")]
-    [SerializeField] private int markerOffset = -3;
+    [SerializeField] private float markerOffset = -3;
 
     private bool isDraggingSprite = false; 
     private GameObject draggedSpriteObject = null;
@@ -54,56 +57,19 @@ public class DragDropController : MonoBehaviour
     [SerializeField] private float maxPositionDrift = 0.3f; // 편집 모드 활성화 중 허용되는 최대 마우스 이동 거리, 혹시 모를 손떨림을 대비하기 위함
     
     // 마커 타일 관리
-    private List<Vector3Int> currentMarkerPositions = new List<Vector3Int>(); // 현재 배치된 마커 위치 저장
+    private List<Vector3Int> currentMarkerPositions = new List<Vector3Int>(); // 드래그 중 프리뷰 마커 위치
+    private Vector3Int originalBuildingCell; // 드래그 시작 시 건물의 원래 셀 위치
+    private Vector2Int originalBuildingTileSize; // 드래그 시작 시 건물의 원래 타일 크기
     // 건물 배치 이동 시 잠시 활성화, 반대로 배치 종료 시 비활성화
-    private TilemapRenderer markerTilemapRenderer;
+    private TilemapRenderer previewTilemapRenderer;
+    private TilemapRenderer ExistingTilemapRenderer;
     
-    /// <summary>
-    /// 타일맵 배열 크기 자동 조정
-    /// / </summary>
-    void OnValidate()
-    {
-        // Inspector에서 buildingTilemapCount가 변경되면 배열 크기 조정
-        if (buildingTilemapCount < 1)
-            buildingTilemapCount = 1;
-
-        if (buildingTilemaps == null || buildingTilemaps.Length != buildingTilemapCount)
-        {
-            Tilemap[] oldTilemaps = buildingTilemaps;
-            buildingTilemaps = new Tilemap[buildingTilemapCount];
-            
-            if (oldTilemaps != null)
-            {
-                for (int i = 0; i < Mathf.Min(oldTilemaps.Length, buildingTilemapCount); i++)
-                {
-                    buildingTilemaps[i] = oldTilemaps[i];
-                }
-            }
-        }
-    }
     #region Initialization
     /// <summary>
     /// 초기화 및 타일맵 설정
     /// </summary>
-    void Start()
+    private void Start()
     {
-        // 건물 타일맵 배열 크기 초기화
-        if (buildingTilemaps == null || buildingTilemaps.Length != buildingTilemapCount)
-        {
-            // 기존 값 보존
-            Tilemap[] oldTilemaps = buildingTilemaps;
-            buildingTilemaps = new Tilemap[buildingTilemapCount];
-            
-            // 기존 값 복사
-            if (oldTilemaps != null)
-            {
-                for (int i = 0; i < Mathf.Min(oldTilemaps.Length, buildingTilemapCount); i++)
-                {
-                    buildingTilemaps[i] = oldTilemaps[i];
-                }
-            }
-        }
-
         if (mainCamera == null)
             mainCamera = Camera.main;
 
@@ -130,41 +96,12 @@ public class DragDropController : MonoBehaviour
             }
         }
 
-        // 건물 타일맵 배열 찾기
-        Tilemap[] allTilemaps = FindObjectsOfType<Tilemap>();
-        int foundIndex = 0;
-        foreach (Tilemap tilemap in allTilemaps)
+        if (previewTilemap != null)
         {
-            if (tilemap.name.ToLower().Contains("building") && foundIndex < buildingTilemaps.Length)
+            previewTilemapRenderer = previewTilemap.GetComponent<TilemapRenderer>();
+            if (previewTilemapRenderer != null)
             {
-                if (buildingTilemaps[foundIndex] == null)
-                {
-                    buildingTilemaps[foundIndex] = tilemap;
-                    foundIndex++;
-                }
-            }
-        }
-        
-        // previewTilemap의 렌더러 비활성화 (타일은 유지, 렌더링만 끔)
-        foreach (Tilemap tilemap in allTilemaps)
-        {
-            if (tilemap.name.ToLower().Contains("preview"))
-            {
-                TilemapRenderer renderer = tilemap.GetComponent<TilemapRenderer>();
-                if (renderer != null)
-                {
-                    renderer.enabled = false;
-                }
-            }
-        }
-
-        // markerTilemap의 렌더러 찾기 및 초기 상태 숨김
-        if (buildingTilemaps != null && buildingTilemaps.Length > 0 && buildingTilemaps[0] != null)
-        {
-            markerTilemapRenderer = buildingTilemaps[0].GetComponent<TilemapRenderer>();
-            if (markerTilemapRenderer != null)
-            {
-                markerTilemapRenderer.enabled = false; // 초기 상태: 보이지 않음
+                previewTilemapRenderer.enabled = false;
             }
         }
     }
@@ -379,17 +316,12 @@ public class DragDropController : MonoBehaviour
         Vector3Int groundCell = new Vector3Int(cell.x, cell.y, 0);
         bool hasGround = groundTilemap != null && groundTilemap.HasTile(groundCell);
 
-        // 모든 타일맵에서 건물 타일이 있는지 확인, 건물 타일이 겹치지 않을 경우에만 배치 가능
+        // previewTilemap에서 건물 타일이 있는지 확인, 건물 타일이 겹치지 않을 경우에만 배치 가능
         Vector3Int buildingCell = new Vector3Int(cell.x, cell.y, 0);
         bool emptyBuilding = true;
-        for (int i = 0; i < buildingTilemaps.Length; i++)
+        if (previewTilemap != null && previewTilemap.HasTile(buildingCell))
         {
-            Tilemap tilemap = buildingTilemaps[i];
-            if (tilemap != null && tilemap.HasTile(buildingCell))
-            {
-                emptyBuilding = false; // 이미 건물이 있을경우 break
-                break;
-            }
+            emptyBuilding = false; // 이미 건물이 있을경우
         }
 
         return hasGround && emptyBuilding;
@@ -444,7 +376,7 @@ public class DragDropController : MonoBehaviour
         
         Vector3Int currentCell = GetMouseCell();
         Vector3 worldPos = grid.CellToWorld(currentCell);
-        worldPos.z = originalSpritePosition.z; // 원래 Z 위치 유지
+        worldPos.z = originalSpritePosition.z;
         
         // 오브젝트 위치 업데이트
         draggedSpriteObject.transform.position = worldPos;
@@ -471,7 +403,7 @@ public class DragDropController : MonoBehaviour
         // 마우스 위치의 그리드 셀 좌표
         Vector3Int dropCell = GetMouseCell();
         
-        // 설마우스 위치에서 오브젝트가 배치가 가능한지
+        // 마우스 위치에서 오브젝트가 배치가 가능한지
         if (CanPlaceAt(dropCell))
         {
             // 그리드 셀 위치로 오브젝트 배치(월드 좌표로 변환 후)
@@ -529,6 +461,12 @@ public class DragDropController : MonoBehaviour
             draggedSpriteObject.transform.position = originalSpritePosition;
             draggedSpriteRenderer.color = originalSpriteColor;
             
+            // 프리뷰 마커 삭제
+            ClearMarkers();
+            
+            // 원래 위치에 마커 복구
+            PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize);
+            
             // 드래그 모드 취소
             isDraggingSprite = false;
             draggedSpriteObject = null;
@@ -546,6 +484,7 @@ public class DragDropController : MonoBehaviour
         if (editTargetObject == null) return;
         
         onEdit = true;
+        StartCoroutine(editScrollUI.OpenIsEditModeUI());
         // BuildingBase 컴포넌트가 있는지 확인
         BuildingBase buildingBase = editTargetObject.GetComponent<BuildingBase>();
         if (buildingBase != null)
@@ -568,18 +507,42 @@ public class DragDropController : MonoBehaviour
     {
         if (editTargetObject == null) return;
         
-        // BuildingBase 컴포넌트에서 타일 크기 가져오기
+        // BuildingBase 컴포넌트에서 타일 크기 및 BuildingData 가져오기
         BuildingBase buildingBase = editTargetObject.GetComponent<BuildingBase>();
         if (buildingBase != null)
         {
             editBuildingTileSize = buildingBase.TileSize;
+            
+            // BuildingData에서 MarkerPositionOffset 가져오기
+            if (DataManager.Instance != null && DataManager.Instance.ConstructedBuildings != null)
+            {
+                ConstructedBuilding constructedBuilding = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
+                if (constructedBuilding != null && DataManager.Instance.BuildingDatas != null)
+                {
+                    BuildingData buildingData = DataManager.Instance.BuildingDatas.Find(data => data.building_id == constructedBuilding.Id);
+                    if (buildingData != null)
+                    {
+                        markerOffset = buildingData.MarkerPositionOffset;
+                    }
+                }
+            }
         }
         else
         {
             editBuildingTileSize = Vector2Int.one;
         }
         
-        // 이전 마커 삭제 및 렌더러 활성화
+        // 기존 건물의 원래 위치 저장 및 마커 제거
+        if (editTargetObject != null)
+        {
+            originalBuildingCell = grid.WorldToCell(editTargetObject.transform.position);
+            originalBuildingTileSize = editBuildingTileSize;
+            
+            // 기존 건물 마커만 제거
+            RemoveBuildingMarkers(originalBuildingCell, editBuildingTileSize);
+        }
+        
+        // 이전 프리뷰 마커만 삭제
         ClearMarkers();
         ShowMarkerRenderer();
         
@@ -609,7 +572,7 @@ public class DragDropController : MonoBehaviour
         
         Vector3Int currentCell = GetMouseCell();
         Vector3 worldPos = grid.CellToWorld(currentCell);
-        worldPos.z = originalSpritePosition.z; // 원래 Z 위치 유지
+        worldPos.z = originalSpritePosition.z;
         
         draggedSpriteObject.transform.position = worldPos;
         
@@ -627,8 +590,9 @@ public class DragDropController : MonoBehaviour
     }
     
     /// <summary>
-    /// 타일 크기가 되는지, 배치 가능 여부 확인
-    /// markerTile이 있으면 배치 가능한 위치로 간주
+    /// 타일 크기를 고려하여 배치 가능 여부 확인
+    /// 건물의 TileSize 범위 내 모든 셀에서 Ground 타일이 있고 다른 건물이 없어야 함
+    /// markerTile = 배치 가능한 위치
     /// </summary>
     private bool CanPlaceWithSize(Vector3Int startCell, Vector2Int tileSize)
     {
@@ -652,30 +616,18 @@ public class DragDropController : MonoBehaviour
                     var groundTile = groundTilemap.GetTile(offsetCell);
                     if (groundTile == null)
                     {
-                        return false;
+                        return false; // Ground 타일이 없으면 배치 불가
                     }
                 }
                 
-                // 건물 타일 확인 - markerTile이 있으면 배치 가능
-                bool hasOtherBuilding = false;
-                
-                foreach (Tilemap buildingTilemap in buildingTilemaps)
+                // ExistingTilemap에서 기존 건물 마커 확인 = 다른 건물과 겹치는지 검사
+                if (ExistingTilemap != null)
                 {
-                    if (buildingTilemap != null)
+                    var existingTile = ExistingTilemap.GetTile(offsetCell);
+                    if (existingTile != null)
                     {
-                        var buildingTile = buildingTilemap.GetTile(checkCell);
-                        if (buildingTile != null && buildingTile != markerTile)
-                        {
-                            hasOtherBuilding = true;
-                            break;
-                        }
+                        return false; // 기존 건물 마커가 있으면 배치 불가
                     }
-                }
-                
-                // markerTile이 아닌 다른 건물이 있으면 배치 불가
-                if (hasOtherBuilding)
-                {
-                    return false;
                 }
             }
         }
@@ -727,7 +679,7 @@ public class DragDropController : MonoBehaviour
                     // ConstructedBuildingProduction 데이터 생성 및 저장
                     if(DataManager.Instance.GetConstructedBuildingById(buildingData.building_id) == null)
                     {
-                        SaveNewConstructedBuilding(buildingData);
+                        //SaveNewConstructedBuilding(buildingData);
                     }
                 }
                 
@@ -759,41 +711,16 @@ public class DragDropController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 새로 건설된 건물의 데이터를 DataManager에 저장
-    /// ConstructedBuildingProduction 생성 및 JSON 저장
-    /// </summary>
-    private void SaveNewConstructedBuilding(BuildingData buildingData)
-    {
-        if (buildingData == null) return;
 
-        // ConstructedBuildingProduction 생성
-        var newProduction = new ConstructedBuildingProduction
-        {
-            building_id = buildingData.building_id,
-            last_production_time = System.DateTime.Now,
-            next_production_time = System.DateTime.Now,
-            is_producing = false
-        };
-
-        // DataManager에 추가
-        DataManager.Instance.ConstructedBuildingProductions.Add(newProduction);
-
-        // BuildingRepository를 통해 ConstructedBuildings 갱신
-        if (BuildingRepository.Instance != null)
-        {
-            BuildingRepository.Instance.InitializeDictionaries();
-            DataManager.Instance.ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildings();
-        }
-    }
     
     // 타일맵에 마커(건물이 차지하는 영역 표시) 배치
+    // 기존 건물의 마커는 ExistingTilemap에 저장됨
     private void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize)
     {
-        // 첫 번째 건물 타일맵에 마커 배치
-        if (buildingTilemaps.Length > 0 && buildingTilemaps[0] != null && markerTile != null)
+        // ExistingTilemap에 기존 건물 마커 배치
+        if (ExistingTilemap != null && markerTile != null)
         {
-            // 이전 마커 삭제
+            // 드래그 중 프리뷰 마커만 삭제 (배치된 다른 건물 마커는 유지)
             ClearMarkers();
             
             for (int x = 0; x < tileSize.x; x++)
@@ -810,28 +737,32 @@ public class DragDropController : MonoBehaviour
                     Vector3Int placeCell = grid.WorldToCell(worldPos);
                     placeCell.z = startCell.z; 
                     
-                    buildingTilemaps[0].SetTile(placeCell, markerTile);
-                    currentMarkerPositions.Add(placeCell); // 마커 위치 추적
+                    ExistingTilemap.SetTile(placeCell, markerTile);
+                    // 배치 완료된 마커는 currentMarkerPositions에 추가하지 않음 (다른 건물 드래그 시 유지되도록)
                 }
             }
             
-            // 배치 완료 후 렌더러 숨김
+            // 배치 완료 후 currentMarkerPositions 클리어 (배치된 마커는 추적하지 않음)
+            currentMarkerPositions.Clear();
+            
+            // 배치 완료 후 마커를 숨김
             HideMarkerRenderer();
         }
     }
 
     /// <summary>
     /// 드래그 중 마커 프리뷰 실시간 업데이트
+    /// 프리뷰 마커는 기존 마커 위에 덮어쓰지만, ClearMarkers 시 프리뷰만 삭제됨
     /// </summary>
     private void UpdateMarkerPreview(Vector3Int startCell, Vector2Int tileSize)
     {
-        if (buildingTilemaps.Length == 0 || buildingTilemaps[0] == null || markerTile == null)
+        if (previewTilemap == null || markerTile == null)
             return;
 
-        // 이전 프리뷰 마커 삭제
+        // 이전 프리뷰 마커만 삭제
         ClearMarkers();
         
-        // 새 위치에 마커 프리뷰 배치
+        // 새 위치에 프리뷰 마커 배치
         for (int x = 0; x < tileSize.x; x++)
         {
             for (int y = 0; y < tileSize.y; y++)
@@ -845,7 +776,7 @@ public class DragDropController : MonoBehaviour
                 Vector3Int placeCell = grid.WorldToCell(worldPos);
                 placeCell.z = startCell.z;
                 
-                buildingTilemaps[0].SetTile(placeCell, markerTile);
+                previewTilemap.SetTile(placeCell, markerTile);
                 currentMarkerPositions.Add(placeCell);
             }
         }
@@ -856,6 +787,7 @@ public class DragDropController : MonoBehaviour
     /// </summary>
     private void DeactivateEditMode()
     {
+        StartCoroutine(editScrollUI.CloseIsEditModeUI());
         // 원본 스프라이트 렌더러 색상 복원
         if (draggedSpriteRenderer != null)
         {
@@ -875,40 +807,76 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// 현재 추적 중인 모든 마커 삭제
+    /// 프리뷰 마커만 삭제 (기존 건물의 마커는 유지)
+    /// currentMarkerPositions에 있는 위치만 null로 설정
     /// </summary>
     private void ClearMarkers()
     {
-        if (buildingTilemaps == null || buildingTilemaps.Length == 0 || buildingTilemaps[0] == null)
+        if (previewTilemap == null)
             return;
 
         foreach (Vector3Int pos in currentMarkerPositions)
         {
-            buildingTilemaps[0].SetTile(pos, null);
+            previewTilemap.SetTile(pos, null);
         }
         
         currentMarkerPositions.Clear();
     }
 
     /// <summary>
-    /// 마커 타일맵 렌더러 활성화 (드래그 중)
+    /// 특정 위치의 건물 마커를 타일 크기만큼 제거하고
+    /// 기존 건물을 이동할 때 원래 위치의 마커를 ExistingTilemap에서 제거하는 데 사용하는 메소드
     /// </summary>
-    private void ShowMarkerRenderer()
+    private void RemoveBuildingMarkers(Vector3Int startCell, Vector2Int tileSize)
     {
-        if (markerTilemapRenderer != null)
+        if (ExistingTilemap == null)
+            return;
+
+        for (int x = 0; x < tileSize.x; x++)
         {
-            markerTilemapRenderer.enabled = true;
+            for (int y = 0; y < tileSize.y; y++)
+            {
+                Vector3Int tilePos = new Vector3Int(startCell.x + x, startCell.y + y, startCell.z);
+                Vector3 worldPos = grid.CellToWorld(tilePos);
+                
+                // 오프셋 적용
+                worldPos.y += markerOffset;
+                
+                Vector3Int placeCell = grid.WorldToCell(worldPos);
+                placeCell.z = startCell.z;
+                
+                ExistingTilemap.SetTile(placeCell, null);
+            }
         }
     }
 
     /// <summary>
-    /// 마커 타일맵 렌더러 비활성화 (배치 완료 후)
+    /// 마커 타일맵 렌더러 활성화 (드래그 중일때 호출)
+    /// </summary>
+    private void ShowMarkerRenderer()
+    {
+        if (previewTilemapRenderer != null)
+        {
+            previewTilemapRenderer.enabled = true;
+        }
+        if (ExistingTilemapRenderer != null)
+        {
+            ExistingTilemapRenderer.enabled = true;
+        }
+    }
+
+    /// <summary>
+    /// 마커 타일맵 렌더러 비활성화 (배치 완료 후 호출)
     /// </summary>
     private void HideMarkerRenderer()
     {
-        if (markerTilemapRenderer != null)
+        if (previewTilemapRenderer != null)
         {
-            markerTilemapRenderer.enabled = false;
+            previewTilemapRenderer.enabled = false;
+        }
+        if (ExistingTilemapRenderer != null)
+        {
+            ExistingTilemapRenderer.enabled = false;
         }
     }
     #endregion
@@ -962,9 +930,16 @@ public class DragDropController : MonoBehaviour
         // 타일 크기 설정
         editBuildingTileSize = buildingData.tileSize;
         
+        // BuildingData에서 MarkerPositionOffset 가져오기 (새 건물 프리뷰용)
+        markerOffset = buildingData.MarkerPositionOffset;
+        
         // BuildingData를 임시 저장할 컴포넌트 추가
         var tempData = previewObj.AddComponent<TempBuildingData>();
         tempData.buildingData = buildingData;
+        
+        // 렌더러 활성화 및 초기 마커 프리뷰 삭제
+        ClearMarkers();
+        ShowMarkerRenderer();
     }
     #endregion
 }

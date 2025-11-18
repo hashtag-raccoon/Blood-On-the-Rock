@@ -1,8 +1,14 @@
 [
   {
     "building_id": 1,
-    "last_production_time": "2025-11-17T18:00:07.7350394+09:00",
-    "next_production_time": "2025-11-17T18:01:47.3580394+09:00",
-    "is_producing": true
+    "last_production_time": "0001-01-01T00:00:00",
+    "next_production_time": "0001-01-01T00:00:00",
+    "is_producing": false
+  },
+  {
+    "building_id": 0,
+    "last_production_time": "0001-01-01T00:00:00",
+    "next_production_time": "0001-01-01T00:00:00",
+    "is_producing": false
   }
 ]

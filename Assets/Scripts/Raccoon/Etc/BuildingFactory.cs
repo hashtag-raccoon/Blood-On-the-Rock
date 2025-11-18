@@ -101,6 +101,8 @@ public static class BuildingFactory
         // Reflection을 사용하여 private/protected 필드 할당
         var type = typeof(BuildingBase);
 
+        BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id);
+
         // constructedBuildingId를 조회하여 할당
         int constructedBuildingId = GetConstructedBuildingId(buildingData.building_id);
         SetField(type, buildingBase, "constructedBuildingId", constructedBuildingId);
@@ -139,9 +141,6 @@ public static class BuildingFactory
         // DragDropController 할당하여 배치 모드 진입 가능하게 설정
         DragDropController dragDropController = UnityEngine.Object.FindObjectOfType<DragDropController>();
         SetField(type, buildingBase, "dragDropController", dragDropController);
-
-        // 카메라 애니메이션을 위해 CameraPositionOffset을 Center로 기본 설정
-        SetField(type, buildingBase, "CameraPositionOffset", PositionData.Center);
     }
 
     /// <summary>
@@ -180,7 +179,8 @@ public static class BuildingFactory
         var field = type.GetField(fieldName, 
             System.Reflection.BindingFlags.NonPublic | 
             System.Reflection.BindingFlags.Public | 
-            System.Reflection.BindingFlags.Instance);
+            System.Reflection.BindingFlags.Instance)
+            ;
         
         if (field != null)
         {
@@ -204,12 +204,12 @@ public static class BuildingFactory
             return buildingId; // ConstructedBuildingProduction이 없으면 building_id를 그대로 사용
         }
 
-        // building_id로 ConstructedBuildingProduction 조회
-        var production = DataManager.Instance.ConstructedBuildingProductions
-            .Find(p => p.building_id == buildingId);
+        // building_id로 ConstructedBuilding 조회
+        var Constructed = DataManager.Instance.ConstructedBuildings
+            .Find(p => p.Id == buildingId);
 
         // 찾았으면 해당 building_id 사용, 못 찾으면 기본값 사용
-        return production != null ? production.building_id : buildingId;
+        return Constructed != null ? Constructed.Id : buildingId;
     }
     #endregion
 }

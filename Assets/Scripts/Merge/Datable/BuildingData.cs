@@ -4,6 +4,13 @@ using UnityEngine;
 using System;
 using UnityEditor.ShaderKeywordFilter;
 
+public enum CameraPositionOffset
+{
+    Left,
+    Center,
+    Right
+}   
+
 public enum BuildingType
 {
     None,
@@ -12,7 +19,7 @@ public enum BuildingType
     Utility
 }
 
-[CreateAssetMenu(fileName = "Building", menuName = "Building")]
+[CreateAssetMenu(fileName = "Building", menuName = "Building/BuildingData", order = 0)]
 public class BuildingData : ScriptableObject, IScrollItemData
 {
     // BUILDING 테이블에 해당하는 데이터
@@ -30,6 +37,8 @@ public class BuildingData : ScriptableObject, IScrollItemData
     public Sprite building_sprite; // 건물 스프라이트 (배치용)
     public Vector2Int tileSize; // 건물 크기 (타일 단위, 기본값 1x1)
     public BuildingType buildingType; // 건물의 타입 ex)생성형,유틸형(대형 시계탑 등)
+    public CameraPositionOffset cameraPositionOffset; // 건물 클릭 시 카메라 오프셋 위치
+    public float MarkerPositionOffset; // 건물 배치 시 프리뷰 마커 오프셋 높이
 }
 
 /// <summary>
