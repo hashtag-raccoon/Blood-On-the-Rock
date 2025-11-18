@@ -29,9 +29,5 @@ public class CocktailRepository : MonoBehaviour
     {
         return _cocktailDict.TryGetValue(name, out var cocktail) ? cocktail : null;
     }
-    // [MermaidChart: b885a2ee-ae43-4965-bbcc-e08cc467610b]
-    // [MermaidChart: b885a2ee-ae43-4965-bbcc-e08cc467610b]
-    // [MermaidChart: b885a2ee-ae43-4965-bbcc-e08cc467610b]
-    // [MermaidChart: b885a2ee-ae43-4965-bbcc-e08cc467610b]
     #endregion
 }

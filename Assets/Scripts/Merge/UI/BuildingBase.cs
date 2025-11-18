@@ -14,25 +14,25 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     protected ConstructedBuilding constructedBuilding; // 런타임 건물 데이터
     [SerializeField] protected Sprite BuildingSprite;
     [SerializeField] protected GameObject BuildingUI;
-    
+
     [Header("타일맵 크기 설정")]
     [SerializeField] protected Vector2Int tileSize = new Vector2Int(3, 2); // 가로 x 세로로, 건물이 차지하는 타일 크기
     [SerializeField] private DragDropController dragDropController;
     public Vector2Int TileSize => tileSize;
     public int ConstructedBuildingId => constructedBuildingId; // DragDropController에서 접근 가능하도록 public 프로퍼티 추가
     [SerializeField] protected Button BuildingUpgradeButton;
-     [SerializeField] protected GameObject UpgradeUIPrefab;
+    [SerializeField] protected GameObject UpgradeUIPrefab;
     [SerializeField] protected GameObject UpgradeBlurUI;
-    
+
     protected static GameObject activeUpgradeUI;
     protected static BuildingBase currentActiveBuilding; // 현재 활성화된 건물
     private static bool upgradeButtonInitialized = false; // 버튼 리스너 초기화 여부
-    
+
     [Header("카메라 세팅")]
     [SerializeField] protected float AnimationSpeed = 5f;
     [SerializeField] protected float TargetOrthographicSize = 2f;
-    [SerializeField] protected float HorizontalOffset = 5f; 
-    
+    [SerializeField] protected float HorizontalOffset = 5f;
+
     private CinemachineVirtualCamera virtualCamera;
     private Coroutine cameraCoroutine;
 
@@ -44,7 +44,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         // DragDropController 자동 할당 (Inspector에 할당되지 않았을 경우를 위함)
         if (dragDropController == null)
             dragDropController = FindObjectOfType<DragDropController>();
-            
+
         StartCoroutine(WaitForDataAndInitialize());
     }
 
@@ -87,7 +87,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     private void InitializeCamera()
     {
         if (cameraInitialized) return;
-        
+
         if (CameraManager.instance != null)
         {
             virtualCamera = CameraManager.instance.virtualCamera;
@@ -100,7 +100,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     protected virtual void Update()
     {
-        
+
     }
 
     #region Click => Camera Animation & UI Open/Close
@@ -110,7 +110,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     /// </summary>
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !DragDropController.instance.isUI)
         {
             if (dragDropController != null && dragDropController.IsEditMode)
             {
@@ -124,7 +124,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
             // 건물 UI 열기, 닫기 토글 방식 => 건물 UI가 열려 있지 않다면 열기, 아니라면 닫기
             bool isOpening = !BuildingUI.activeSelf;
-            
+
             if (isOpening)
             {
                 CameraManager.instance.isBuildingUIActive = true;
@@ -139,10 +139,10 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             }
         }
     }
-    
+
     public virtual void AnimateCamera(bool isOpening)
     {
-         if (cameraCoroutine != null)
+        if (cameraCoroutine != null)
         {
             StopCoroutine(cameraCoroutine);
         }
@@ -206,7 +206,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             {
                 buildingData = DataManager.Instance.BuildingDatas.Find(bd => bd.Building_Name == constructedBuilding.Name);
             }
-            
+
             CameraPositionOffset offset = buildingData != null ? buildingData.cameraPositionOffset : CameraPositionOffset.Center;
             Vector3 targetPos = GetTargetCameraPosition(offset);
             float initialSize = virtualCamera.m_Lens.OrthographicSize;
@@ -291,7 +291,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         BlurOnOff();
         UpgradeUIUpdate();
     }
-    
+
     public void UpgradeUIUpdate()
     {
         if (constructedBuilding == null)
@@ -302,17 +302,17 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
         UpgradeUIScripts upgradeScript = activeUpgradeUI.GetComponent<UpgradeUIScripts>();
         upgradeScript.MyBuilding = this;
-        
+
         if (upgradeScript != null)
         {
             upgradeScript.SetData(constructedBuilding);
-            
+
             // 다음 레벨의 업그레이드 데이터 찾기
             BuildingUpgradeData upgradeData = DataManager.Instance.GetBuildingUpgradeDataByLevel(
                 DataManager.Instance.GetBuildingUpgradeDataByType(constructedBuilding.Name),
                 constructedBuilding.Level + 1
             );
-            
+
             if (upgradeData != null)
             {
                 upgradeScript.SetUpgradeData(upgradeData);
