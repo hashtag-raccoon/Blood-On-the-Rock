@@ -16,7 +16,7 @@ public class CharacterAnimationController : MonoBehaviour
 	[SerializeField] private bool updateAnimatorParameters = false;
 	[SerializeField] private string speedParameter = "Speed";
 	[SerializeField] private string isWalkingParameter = "IsWalking";
-	[SerializeField] private string isRunningParameter = "IsRunning";
+	[SerializeField] private string moveYParameter = "MoveY";
 
 	[Header("Movement")]
 	[SerializeField] private Transform movementRoot; // 위치 이동 대상 (기본: this.transform)
@@ -131,18 +131,22 @@ public class CharacterAnimationController : MonoBehaviour
 			return;
 
 		float speed = 0f;
+        float directionY = 0f; // Y축 방향 값 저장 변수
 		if (hasTarget)
 		{
 			Vector3 velocity = (targetPosition - movementRoot.position) / Mathf.Max(Time.deltaTime, 0.0001f);
 			speed = velocity.magnitude;
+
+			// Y축 방향 계산 (수정된 부분)
+            // velocity.y가 0.01보다 크면 '위로', -0.01보다 작으면 '아래로'
+            directionY = velocity.y;
 		}
 
 		animator.SetFloat(speedParameter, speed);
 		bool isWalking = hasTarget && speed > 0.1f;
 		animator.SetBool(isWalkingParameter, isWalking);
 
-		bool isRunning = isWalking && speed > moveSpeed * 0.7f;
-		animator.SetBool(isRunningParameter, isRunning);
+		animator.SetFloat(moveYParameter, directionY);
 	}
 
 	/// <summary>
