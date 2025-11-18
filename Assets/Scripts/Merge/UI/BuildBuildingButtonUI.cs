@@ -72,17 +72,6 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
             return;
         }
 
-
-        // 자원 확인 및 차감
-        if (MoneyData.current_amount < building.construction_cost_gold || 
-            WoodData.current_amount < building.construction_cost_wood)
-        {
-            return;
-        }
-
-        MoneyData.current_amount -= building.construction_cost_gold;
-        WoodData.current_amount -= building.construction_cost_wood;
-
         // BuildScrollUI 찾아서 비활성화 (애니메이션 포함)
         BuildScrollUI buildScrollUI = FindObjectOfType<BuildScrollUI>();
         if (buildScrollUI != null)
