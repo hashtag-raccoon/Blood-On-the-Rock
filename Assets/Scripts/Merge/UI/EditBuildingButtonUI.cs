@@ -13,14 +13,14 @@ public class EditBuildingButtonUI : MonoBehaviour, IScrollItemUI
     [SerializeField] private TextMeshProUGUI BuildingAmountText;
     [SerializeField] private Button BuildingButton;
 
-    private object BuildingData;
+    private object constructedBuildingData;
 
     public void SetData<T>(T data, Action<IScrollItemUI> onClickCallback) where T : IScrollItemData
     {
-        BuildingData = data;
-        var buildingData = data as BuildingData;
-        BuildingiconImage.sprite = buildingData.icon;
-        BuildingNameText.text = buildingData.Building_Name;
+        constructedBuildingData = data;
+        var buildingData = data as ConstructedBuilding;
+        BuildingiconImage.sprite = buildingData.Icon;
+        BuildingNameText.text = buildingData.Name;
         //BuildingAmountText.text = buildingData.production_info.output_Amount.ToString();
 
         BuildingButton.onClick.RemoveAllListeners();
@@ -30,6 +30,6 @@ public class EditBuildingButtonUI : MonoBehaviour, IScrollItemUI
 
     public T GetData<T>() where T : IScrollItemData
     {
-        return (T)BuildingData;
+        return (T)constructedBuildingData;
     }
 }

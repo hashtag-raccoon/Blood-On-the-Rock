@@ -173,4 +173,12 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
             scrollUI.SetActive(false);
         }
     }
+
+    /// <summary>
+    /// 외부에서 ScrollUI를 닫을 때 호출
+    /// </summary>
+    public virtual void CloseUI()
+    {
+        OnCloseButtonClicked();
+    }
 }

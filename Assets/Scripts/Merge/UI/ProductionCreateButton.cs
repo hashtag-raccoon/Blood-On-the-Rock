@@ -17,10 +17,10 @@ public class ProductionCreateButton : MonoBehaviour
     //[SerializeField] private TextMeshProUGUI lockedLevelText;
     
     private BuildingProductionInfo productionData;
-    private goodsData resourceData;
+    private ResourceData resourceData;
     private bool isUnlocked = true;
     
-    public void Initialize(BuildingProductionInfo production, goodsData resource, int currentBuildingLevel)
+    public void Initialize(BuildingProductionInfo production, ResourceData resource, int currentBuildingLevel)
     {
         createButton = GetComponent<Button>();
         productionData = production;
@@ -48,7 +48,7 @@ public class ProductionCreateButton : MonoBehaviour
         
         if (goodsNameText != null)
         {
-            goodsNameText.text = resourceData.goodsName;
+            goodsNameText.text = resourceData.resource_name;
         }
         
         if (goodsAmountText != null)

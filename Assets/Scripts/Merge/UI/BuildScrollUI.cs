@@ -7,8 +7,9 @@ using UnityEngine.UI;
 public class BuildScrollUI : BaseScrollUI<BuildingData, BuildBuildingButtonUI>
 {
     private DataManager dataManager;
+    [Header("IslandManager 할당/연결")]
     [SerializeField] private IslandManager islandManager;
-
+    [Header("UI 애니메이션 설정")]
     [SerializeField] float duration = 1f; // UI 팝업/종료 애니메이션 지속 시간
 
     // ui들 원래 위치 담을 딕셔너리, 키: ui 오브젝트, 값: 원래 위치, OpenButton 누를 시 저장 및 초기화
@@ -85,6 +86,7 @@ public class BuildScrollUI : BaseScrollUI<BuildingData, BuildBuildingButtonUI>
 
         yield return new WaitForSeconds(duration);
     }
+    
     // isOpen이 true면<열기 애니메이션>, false면<닫기 애니메이션>
     // <열기 애니메이션> - isLeft가 true면 왼쪽에서 화면 밖으로 슬라이드, false면 오른쪽에서 화면 밖으로 슬라이드,
     // <닫기 애니메이션> - isLeft가 true면 화면 밖에서 오른쪽으로 슬라이드, false면 화면 밖에서 왼쪽으로 슬라이드

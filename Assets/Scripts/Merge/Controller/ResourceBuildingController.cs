@@ -10,12 +10,12 @@ public class ResourceBuildingController : BuildingBase
     public class ProductionInfo
     {
         public BuildingProductionInfo productionData;
-        public goodsData resourceData;
+        public ResourceData resourceData;
         public float totalProductionTime;
         public float timeRemaining;
         public int slotIndex;
 
-        public ProductionInfo(BuildingProductionInfo prodData, goodsData resData, int index)
+        public ProductionInfo(BuildingProductionInfo prodData, ResourceData resData, int index)
         {
             productionData = prodData;
             resourceData = resData;
@@ -45,11 +45,14 @@ public class ResourceBuildingController : BuildingBase
 
     protected override IEnumerator WaitForDataAndInitialize()
     {
-        // 부모 클래스의 초기화 대기
+        // 부모 클래스의 초기화 대기, 부모 클래스 초기화 후 현재 클래스 초기화
         yield return StartCoroutine(base.WaitForDataAndInitialize());
 
-        // ResourceBuildingController 고유 초기화
+        // ResourceBuildingController 클래스 초기화
         InitializeProductionSlots();
+        
+        // 재시작 시, 전 게임에서 저장된 생산 정보를 현 에 복원
+        //RestoreProductionFromSave();
     }
 
     protected override void Update()
@@ -64,6 +67,9 @@ public class ResourceBuildingController : BuildingBase
             return;
         }
         UpdateAllProductions();
+        
+        // 현재 생산 정보(생산 중인 자원들 정보)를 ConstructedBuilding에 동기화
+        SyncProductionToConstructedBuilding();
     }
 
     protected override void OnUpgradeUI()
@@ -222,7 +228,7 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
-    public bool StartProduction(BuildingProductionInfo productionData, goodsData resourceData)
+    public bool StartProduction(BuildingProductionInfo productionData, ResourceData resourceData)
     {
         int emptySlotIndex = FindEmptySlotIndex();
 
@@ -232,13 +238,13 @@ public class ResourceBuildingController : BuildingBase
         }
 
         // 재화 소비
-        goodsData consumeResource = DataManager.Instance.GetResourceByName(productionData.consume_resource_type);
-        if (consumeResource.amount < productionData.consume_amount)
+        ResourceData consumeResource = DataManager.Instance.GetResourceByName(productionData.consume_resource_type);
+        if (consumeResource.current_amount < productionData.consume_amount)
         {
             return false;
         }
 
-        consumeResource.amount -= productionData.consume_amount;
+        consumeResource.current_amount -= productionData.consume_amount;
 
         // 생산 시작
         ProductionInfo newProduction = new ProductionInfo(productionData, resourceData, emptySlotIndex);
@@ -263,8 +269,8 @@ public class ResourceBuildingController : BuildingBase
 
         // 재화 반환
         ProductionInfo production = activeProductions[slotIndex];
-        goodsData consumeResource = DataManager.Instance.GetResourceByName(production.productionData.consume_resource_type);
-        consumeResource.amount += production.productionData.consume_amount;
+        ResourceData consumeResource = DataManager.Instance.GetResourceByName(production.productionData.consume_resource_type);
+        consumeResource.current_amount += production.productionData.consume_amount;
 
         activeProductions[slotIndex] = null;
 
@@ -287,8 +293,8 @@ public class ResourceBuildingController : BuildingBase
             {
                 // 재화 반환
                 ProductionInfo production = activeProductions[i];
-                goodsData consumeResource = DataManager.Instance.GetResourceByName(production.productionData.consume_resource_type);
-                consumeResource.amount += production.productionData.consume_amount;
+                ResourceData consumeResource = DataManager.Instance.GetResourceByName(production.productionData.consume_resource_type);
+                consumeResource.current_amount += production.productionData.consume_amount;
 
                 activeProductions[i] = null;
             }
@@ -306,7 +312,7 @@ public class ResourceBuildingController : BuildingBase
             return;
 
         // 생산물 지급
-        production.resourceData.amount += production.productionData.output_amount;
+        production.resourceData.current_amount += production.productionData.output_amount;
 
         activeProductions[slotIndex] = null;
 
@@ -332,7 +338,7 @@ public class ResourceBuildingController : BuildingBase
                 ProductionInfo production = activeProductions[i];
 
                 // 생산물 지급
-                production.resourceData.amount += production.productionData.output_amount;
+                production.resourceData.current_amount += production.productionData.output_amount;
 
                 // 슬롯 비우기
                 activeProductions[i] = null;
@@ -431,4 +437,67 @@ public class ResourceBuildingController : BuildingBase
 
         base.CloseBuildingUI();
     }
+
+    // 현재 생산 정보를 ConstructedBuilding.json에 동기화
+    private void SyncProductionToConstructedBuilding()
+    {
+        if (constructedBuilding == null) return;
+
+        bool hasActiveProduction = GetActiveProductionCount() > 0;
+        constructedBuilding.IsProducing = hasActiveProduction;
+
+        if (hasActiveProduction)
+        {
+            // 가장 먼저 완료될 생산의 시간 정보 사용
+            ProductionInfo earliestProduction = GetEarliestProduction();
+            if (earliestProduction != null)
+            {
+                constructedBuilding.LastProductionTime = System.DateTime.Now;
+                float remainingSeconds = earliestProduction.timeRemaining;
+                constructedBuilding.NextProductionTime = System.DateTime.Now.AddSeconds(remainingSeconds);
+            }
+        }
+        else
+        {
+            constructedBuilding.IsProducing = false;
+        }
+    }
+
+    // 가장 먼저 완료될 생산 정보 반환
+    private ProductionInfo GetEarliestProduction()
+    {
+        ProductionInfo earliest = null;
+        float minTime = float.MaxValue;
+
+        foreach (var production in activeProductions)
+        {
+            if (production != null && production.timeRemaining < minTime)
+            {
+                minTime = production.timeRemaining;
+                earliest = production;
+            }
+        }
+
+        return earliest;
+    }
+
+    /*
+    // 게임 시작 시 저장된 생산 정보를 복원
+    public void RestoreProductionFromSave()
+    {
+        if (constructedBuilding == null || !constructedBuilding.IsProducing) return;
+
+        // 저장된 생산 완료 시간과 현재 시간 비교
+        System.TimeSpan timeRemaining = constructedBuilding.NextProductionTime - System.DateTime.Now;
+
+        if (timeRemaining.TotalSeconds <= 0)
+        {
+            Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 저장된 생산이 완료되었습니다.");
+        }
+        else
+        {
+            Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 생산 재개 (남은 시간: {timeRemaining.TotalSeconds:F1}초)");
+        }
+    }
+    */
 }
