@@ -151,6 +151,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public virtual void OpenBuildingUI()
     {
+        DragDropController.instance.isUI = true;
         BuildingUI?.SetActive(true);
         CameraManager.instance.isBuildingUIActive = true;
         currentActiveBuilding = this; // 현재 건물을 활성 건물로 설정
@@ -158,6 +159,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public virtual void CloseBuildingUI()
     {
+        DragDropController.instance.isUI = false;
         BuildingUI?.SetActive(false);
         CameraManager.instance.isBuildingUIActive = false;
         if (currentActiveBuilding == this)

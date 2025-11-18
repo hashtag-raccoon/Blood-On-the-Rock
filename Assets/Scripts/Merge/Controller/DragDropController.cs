@@ -14,6 +14,8 @@ using Merge;
 /// </summary>
 public class DragDropController : MonoBehaviour
 {
+    public static DragDropController instance;
+
     [Header("타일맵 설정")]
     [SerializeField] private Grid grid;
     [SerializeField] private Tilemap groundTilemap; // 땅 타일맵, 건물 배치 시, 배치될 땅 타일
@@ -43,6 +45,7 @@ public class DragDropController : MonoBehaviour
     private Color originalSpriteColor; // 원래 스프라이트 색상 (프리뷰용)
     
     public bool onEdit = false; // 편집 모드 활성화 여부
+    public bool isUI = false;
     
     // 편집 모드 or 스프라이트 드래그 중일 경우 => IsEditMode true 반환
     // BuildingBase.cs 스크립트에서 편집모드일때 클릭되는걸 방지하기 위해 사용됨
@@ -65,6 +68,20 @@ public class DragDropController : MonoBehaviour
     private TilemapRenderer ExistingTilemapRenderer;
     
     #region Initialization
+
+    private void Awake()
+    {
+        // 싱글턴 패턴 초기화
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     /// <summary>
     /// 초기화 및 타일맵 설정
     /// </summary>
@@ -104,13 +121,25 @@ public class DragDropController : MonoBehaviour
                 previewTilemapRenderer.enabled = false;
             }
         }
+
+        if (ExistingTilemap != null)
+        {
+            ExistingTilemapRenderer = ExistingTilemap.GetComponent<TilemapRenderer>();
+            if (ExistingTilemapRenderer != null)
+            {
+                ExistingTilemapRenderer.enabled = false;
+            }
+        }
     }
     #endregion
 
     #region Update, Mouse Input
     void Update()
     {
-        HandleMouseInput();
+        if (!isUI)
+        {
+            HandleMouseInput();
+        }
         
         if (isDraggingSprite)
         {
