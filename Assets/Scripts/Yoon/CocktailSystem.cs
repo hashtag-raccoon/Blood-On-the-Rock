@@ -10,6 +10,7 @@ public class CocktailSystem : MonoBehaviour
 
     private CocktailData cocktailData;
     private CocktailRecipeJson recipeData;
+    private Dictionary<int, int> Ingridiants = new Dictionary<int, int>();
 
     public void Awake()
     {
@@ -25,7 +26,8 @@ public class CocktailSystem : MonoBehaviour
     public void CheckCocktailToRecipe()
     {
         float Percent = 0.0f;
-
+        cocktailData = _dataManager.GetCocktailDataById(1);
+        recipeData = _dataManager.GetCocktailRecipeByCocktailId(1);
     }
     #endregion
 

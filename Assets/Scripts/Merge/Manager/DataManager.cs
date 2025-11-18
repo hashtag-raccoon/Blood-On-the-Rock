@@ -45,6 +45,7 @@ public class DataManager : MonoBehaviour
     public List<Personality> personalities = new List<Personality>();
 
     // -- Cocktail 관련 원본 데이터 --
+    [Header("칵테일 데이터")]
     public List<CocktailRecipeJson> recipes = new List<CocktailRecipeJson>();
 
     // --- 기타 데이터 ---
@@ -340,6 +341,21 @@ public class DataManager : MonoBehaviour
     public ConstructedBuilding GetConstructedBuildingById(int buildingId)
     {
         return ConstructedBuildings.Find(data => data.Id == buildingId);
+    }
+
+    #endregion
+
+    #region Cocktail Methods
+
+    public CocktailData GetCocktailDataById(int cocktailId)
+    {
+        return cocktails.Find(data => data.Cocktail_ID == cocktailId);
+
+    }
+
+    public CocktailRecipeJson GetCocktailRecipeByCocktailId(int cocktailId)
+    {
+        return recipes.Find(data => data.CocktailId == cocktailId);
     }
 
     #endregion

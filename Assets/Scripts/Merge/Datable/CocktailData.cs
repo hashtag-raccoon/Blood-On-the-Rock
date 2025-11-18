@@ -32,7 +32,7 @@ public class CocktailData
 public class CocktailRecipeJson
 {
     public int RecipeId { get; private set; }
-    public int CocktailID { get; private set; }
+    public int CocktailId { get; private set; }
     public int Technique { get; private set; } // (0/1/2) : (build, floating, shaking)
     public string CocktailName { get; private set; }
     public string Description { get; private set; }
