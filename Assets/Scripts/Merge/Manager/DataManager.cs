@@ -15,7 +15,7 @@ public class DataManager : MonoBehaviour
     #endregion
 
     #region Constants
-    private const string GoodsPath = "Data/Goods";
+    private const string GoodsPath = "Data/Resource";
     private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
     #endregion
 
@@ -50,7 +50,7 @@ public class DataManager : MonoBehaviour
 
     // --- 기타 데이터 ---
     [Header("기타 데이터")]
-    public List<goodsData> goodsDatas = new List<goodsData>();
+    public List<ResourceData> goodsDatas = new List<ResourceData>();
     #endregion
 
     #region Runtime Data Lists (가공된 런타임 데이터)
@@ -187,7 +187,7 @@ public class DataManager : MonoBehaviour
     private void LoadGoodsData()
     {
         // 재화(Goods) 데이터를 Resources 폴더에서 로드합니다.
-        goodsData[] loadedGoods = Resources.LoadAll<goodsData>(GoodsPath);
+        ResourceData[] loadedGoods = Resources.LoadAll<ResourceData>(GoodsPath);
         goodsDatas.Clear();
         foreach (var goods in loadedGoods)
         {
@@ -274,14 +274,14 @@ public class DataManager : MonoBehaviour
     #endregion
 
     #region Resource Query Methods
-    public goodsData GetResourceById(int id)
+    public ResourceData GetResourceById(int id)
     {
-        return goodsDatas.Find(r => r.id == id);
+        return goodsDatas.Find(r => r.resource_id == id);
     }
 
-    public goodsData GetResourceByName(string name)
+    public ResourceData GetResourceByName(string name)
     {
-        return goodsDatas.Find(r => r.goodsName == name);
+        return goodsDatas.Find(r => r.resource_name == name);
     }
     #endregion
 
