@@ -51,6 +51,10 @@ public class DataManager : MonoBehaviour
     // --- 기타 데이터 ---
     [Header("기타 데이터")]
     public List<ResourceData> goodsDatas = new List<ResourceData>();
+    
+    // --- 인테리어 관련 원본 데이터 ---
+    [Header("인테리어 데이터")]
+    public List<InteriorData> InteriorDatas = new List<InteriorData>();
     #endregion
 
     #region Runtime Data Lists (가공된 런타임 데이터)
