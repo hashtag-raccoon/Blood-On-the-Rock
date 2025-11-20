@@ -9,5 +9,13 @@ namespace Merge
     public class TempBuildingData : MonoBehaviour
     {
         public BuildingData buildingData;
+        
+        // 인벤토리에서 꺼낸 건물인지 여부
+        // ConstructedBuilding에도 있지만, TempBuilding을 새 건물을 생성 중인지 인벤토리에서 꺼낸 건물인지 구분하기 위한 임시 Bool 값이 필요함
+        public bool isFromInventory = false;
+        
+        // 인벤토리에서 꺼낸 경우, 기존 ConstructedBuilding ID
+        // 이 ID를 통해 기존 건물과 같은 건물인지 구분할 수 있음
+        public int constructedBuildingId = -1;
     }
 }

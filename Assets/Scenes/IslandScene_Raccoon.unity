@@ -3755,7 +3755,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 441182886}
   groundTilemap: {fileID: 1436755464}
-  buildingTilemapCount: 1
   previewTilemap: {fileID: 92233670}
   banTilemap: {fileID: 0}
   ExistingTilemap: {fileID: 189612839}
@@ -3763,11 +3762,12 @@ MonoBehaviour:
   mainCamera: {fileID: 1350856029}
   editModeProgressBar: {fileID: 524218158}
   editScrollUI: {fileID: 1804216985}
-  markerOffset: -2
-  onEdit: 0
-  isUI: 0
   EditMode_Time: 1
   maxPositionDrift: 0.3
+  markerOffset: -2
+  newBuildingCompleteUI: {fileID: 8656005401561145268, guid: a1134f0938f693844a190211089d5554, type: 3}
+  onEdit: 0
+  isUI: 0
 --- !u!4 &691807501
 Transform:
   m_ObjectHideFlags: 0
@@ -36384,6 +36384,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9e1cf8a609e62ff469018fcc3ee0625c, type: 2}
   npcs: []
   ConstructedBuildings: []
+  cocktails: []
+  EditMode_InventoryBuildings: []
+  wood: 0
+  money: 0
   storeFavor: 100
   barLevel: 1
 --- !u!224 &1621429737 stripped

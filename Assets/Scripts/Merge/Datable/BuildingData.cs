@@ -79,6 +79,10 @@ public class ConstructedBuilding : IScrollItemData
     public DateTime NextProductionTime { get; set; }
     public bool IsProducing { get; set; }
 
+    // 기타
+    public bool IsEditInventory { get; set; } // 편집 모드 - 건물 인벤토리 안에 있는지
+    public Vector2 ConstructedPosition { get; set; } // 건설된 위치 (월드 좌표)
+
     // 생성자: 여러 데이터 소스를 조합하여 하나의 완전한 객체를 생성.
     public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus)
     {

@@ -34,10 +34,11 @@ public class ResourceBuildingController : BuildingBase
     public Vector2 limitBuildingImageSize = new Vector2(100, 100);
     private static GameObject ActiveLimitUpgradeUI;
 
-    private GameObject activeCompleteUI; // 생산완료 UI (Canvas 포함)
+    private GameObject activeCompleteUI; // 생산완료 UI 
 
     private List<ProductionInfo> activeProductions = new List<ProductionInfo>();
 
+    #region Initialize
     protected override void Start()
     {
         base.Start();
@@ -55,6 +56,17 @@ public class ResourceBuildingController : BuildingBase
         //RestoreProductionFromSave();
     }
 
+     private void InitializeProductionSlots()
+    {
+        for (int i = 0; i < maxProductionSlots; i++)
+        {
+            activeProductions.Add(null);
+        }
+    }
+
+    #endregion
+
+    #region Update
     protected override void Update()
     {
         if (GetActiveProductionCount() <= 0)
@@ -69,9 +81,37 @@ public class ResourceBuildingController : BuildingBase
         UpdateAllProductions();
         
         // 현재 생산 정보(생산 중인 자원들 정보)를 ConstructedBuilding에 동기화
-        SyncProductionToConstructedBuilding();
+        if(this.constructedBuilding != null)
+        {
+            bool isProducing = GetActiveProductionCount() > 0;
+            
+            ProductionInfo earliestProduction = GetEarliestProduction();
+            if (earliestProduction != null && BuildingRepository.Instance != null)
+            {
+                System.DateTime now = System.DateTime.Now;
+                System.TimeSpan timeRemaining = System.TimeSpan.FromSeconds(earliestProduction.timeRemaining);
+                System.DateTime nextProductionTime = now.Add(timeRemaining);
+                
+                // BuildingRepository를 통해 생산 상태 업데이트
+                BuildingRepository.Instance.UpdateBuildingProductionStatus(
+                    this.constructedBuilding.Id,
+                    isProducing,
+                    nextProductionTime
+                );
+            }
+            else if (!isProducing && BuildingRepository.Instance != null)
+            {
+                // 생산 중이 아닐 때도 상태 업데이트
+                BuildingRepository.Instance.UpdateBuildingProductionStatus(
+                    this.constructedBuilding.Id,
+                    false
+                );
+            }
+        }
     }
+    #endregion
 
+    #region Upgrade UI
     protected override void OnUpgradeUI()
     {
         // 생산 중이면 제한 UI 표시
@@ -86,6 +126,7 @@ public class ResourceBuildingController : BuildingBase
         base.OnUpgradeUI();
     }
 
+    
     private void ShowLimitUpgradeUI()
     {
         // 기존 UI가 있으면 먼저 제거하고, 후에 새로 생성함
@@ -155,13 +196,38 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
+    #endregion
 
-    private void InitializeProductionSlots()
+    #region Production Methods
+    public bool StartProduction(BuildingProductionInfo productionData, ResourceData resourceData)
     {
-        for (int i = 0; i < maxProductionSlots; i++)
+        int emptySlotIndex = FindEmptySlotIndex();
+
+        if (emptySlotIndex == -1)
         {
-            activeProductions.Add(null);
+            return false;
         }
+
+        // 재화 소비
+        ResourceData consumeResource = DataManager.Instance.GetResourceByName(productionData.consume_resource_type);
+        if (consumeResource.current_amount < productionData.consume_amount)
+        {
+            return false;
+        }
+
+        consumeResource.current_amount -= productionData.consume_amount;
+
+        // 생산 시작
+        ProductionInfo newProduction = new ProductionInfo(productionData, resourceData, emptySlotIndex);
+        activeProductions[emptySlotIndex] = newProduction;
+
+        // UI 업데이트
+        if (ResourceBuildingUIManager.Instance != null)
+        {
+            ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
+        }
+
+        return true;
     }
 
     private void UpdateAllProductions()
@@ -228,37 +294,6 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
-    public bool StartProduction(BuildingProductionInfo productionData, ResourceData resourceData)
-    {
-        int emptySlotIndex = FindEmptySlotIndex();
-
-        if (emptySlotIndex == -1)
-        {
-            return false;
-        }
-
-        // 재화 소비
-        ResourceData consumeResource = DataManager.Instance.GetResourceByName(productionData.consume_resource_type);
-        if (consumeResource.current_amount < productionData.consume_amount)
-        {
-            return false;
-        }
-
-        consumeResource.current_amount -= productionData.consume_amount;
-
-        // 생산 시작
-        ProductionInfo newProduction = new ProductionInfo(productionData, resourceData, emptySlotIndex);
-        activeProductions[emptySlotIndex] = newProduction;
-
-        // UI 업데이트
-        if (ResourceBuildingUIManager.Instance != null)
-        {
-            ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
-        }
-
-        return true;
-    }
-
     public void CancelProduction(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= activeProductions.Count)
@@ -302,6 +337,7 @@ public class ResourceBuildingController : BuildingBase
     }
     */
 
+    // 생산 완료 메소드
     public void CompleteProduction(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= activeProductions.Count)
@@ -326,6 +362,7 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
+    // 생산 모두 완료시키는 메소드
     private void ALLCompleteProduction()
     {
         int completedCount = 0;
@@ -356,7 +393,7 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
-    private void CompactProductionSlots()
+    private void CompactProductionSlots() // 생산 중 슬롯 정렬
     {
         List<ProductionInfo> compactedList = new List<ProductionInfo>();
 
@@ -438,31 +475,8 @@ public class ResourceBuildingController : BuildingBase
         base.CloseBuildingUI();
     }
 
-    // 현재 생산 정보를 ConstructedBuilding.json에 동기화
-    private void SyncProductionToConstructedBuilding()
-    {
-        if (constructedBuilding == null) return;
-
-        bool hasActiveProduction = GetActiveProductionCount() > 0;
-        constructedBuilding.IsProducing = hasActiveProduction;
-
-        if (hasActiveProduction)
-        {
-            // 가장 먼저 완료될 생산의 시간 정보 사용
-            ProductionInfo earliestProduction = GetEarliestProduction();
-            if (earliestProduction != null)
-            {
-                constructedBuilding.LastProductionTime = System.DateTime.Now;
-                float remainingSeconds = earliestProduction.timeRemaining;
-                constructedBuilding.NextProductionTime = System.DateTime.Now.AddSeconds(remainingSeconds);
-            }
-        }
-        else
-        {
-            constructedBuilding.IsProducing = false;
-        }
-    }
-
+    
+    #endregion
     // 가장 먼저 완료될 생산 정보 반환
     private ProductionInfo GetEarliestProduction()
     {

@@ -13,7 +13,7 @@ public class BuildingRepository : MonoBehaviour
     private DataManager _dataManager;
     private readonly Dictionary<int, BuildingData> _buildingDataDict = new Dictionary<int, BuildingData>();
     private readonly Dictionary<string, BuildingProductionInfo> _productionInfoDict = new Dictionary<string, BuildingProductionInfo>();
-
+    
     private void Awake()
     {
         if (Instance == null)

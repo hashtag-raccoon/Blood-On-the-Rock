@@ -60,6 +60,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
+    [SerializeField] public List<ConstructedBuilding> EditMode_InventoryBuildings = new List<ConstructedBuilding>();
     #endregion
 
     #region Game Resources
@@ -84,6 +85,7 @@ public class DataManager : MonoBehaviour
         jsonDataHandler = new JsonDataHandler();
         InitializeDataFiles();
         LoadAllData();
+        EditMode_InventoryBuildings = GetInventoryBuildings();
         Debug.Log("DataManager 초기화 및 모든 데이터 로딩 완료.");
     }
 
@@ -341,6 +343,41 @@ public class DataManager : MonoBehaviour
     public ConstructedBuilding GetConstructedBuildingById(int buildingId)
     {
         return ConstructedBuildings.Find(data => data.Id == buildingId);
+    }
+
+    #endregion
+
+    #region Constructed Building_Inventory Methods
+
+    public List<ConstructedBuilding> GetInventoryBuildings()
+    {
+        return ConstructedBuildings.FindAll(data => data.IsEditInventory);
+    }
+
+    /// <summary>
+    /// 편집 모드 인벤토리 리스트를 갱신합니다.
+    /// </summary>
+    public void RefreshEditModeInventory()
+    {
+        EditMode_InventoryBuildings = GetInventoryBuildings();
+        Debug.Log($"EditMode_InventoryBuildings 갱신: {EditMode_InventoryBuildings.Count}개의 건물");
+    }
+
+    /// <summary>
+    /// 건물의 인벤토리 상태를 업데이트합니다.
+    /// </summary>
+    public void UpdateBuildingInventoryStatus(int buildingId, bool isInInventory)
+    {
+        var building = ConstructedBuildings.Find(b => b.Id == buildingId);
+        if (building != null)
+        {
+            building.IsEditInventory = isInInventory;
+            Debug.Log($"건물 ID '{buildingId}'의 인벤토리 상태를 업데이트했습니다: {isInInventory}");
+        }
+        else
+        {
+            Debug.LogWarning($"건물 ID '{buildingId}'를 찾을 수 없습니다.");
+        }
     }
 
     #endregion

@@ -110,13 +110,8 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     /// </summary>
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        if (Input.GetMouseButtonDown(0) && !DragDropController.instance.isUI)
+        if (Input.GetMouseButtonDown(0) && !DragDropController.instance.onEdit)
         {
-            if (dragDropController != null && dragDropController.IsEditMode)
-            {
-                return;
-            }
-
             if (virtualCamera == null)
             {
                 InitializeCamera();
