@@ -25,8 +25,8 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
     private void Awake()
     {
         dataManager = DataManager.Instance;
-        MoneyData = dataManager.GetResourceByName("Money");
-        WoodData = dataManager.GetResourceByName("Wood");
+        MoneyData = ResourceRepository.Instance.GetResourceByName("Money");
+        WoodData = ResourceRepository.Instance.GetResourceByName("Wood");
     }
 
     public void SetData<T>(T data, Action<IScrollItemUI> onClickCallback) where T : IScrollItemData

@@ -1,33 +1,96 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
+using System.Linq;
 
-public class CocktailRepository : MonoBehaviour
+public class CocktailRepository : MonoBehaviour, IRepository
 {
-    #region Repository_element
     private static CocktailRepository _instance;
-    public static CocktailRepository Instance => _instance;
+    public static CocktailRepository Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<CocktailRepository>();
+            }
+            return _instance;
+        }
+    }
+    public bool IsInitialized { get; private set; } = false;
 
-    [SerializeField] private List<CocktailData> allCocktails;
-    private Dictionary<string, CocktailData> _cocktailDict;
-    #endregion
+    [Header("데이터 에셋 (SO)")]
+    [Tooltip("칵테일의 고정 정보(ID, 이름, 아이콘 등)를 담고 있는 ScriptableObject")]
+    [SerializeField] private CocktailDataSO cocktailDataSO;
+    [Tooltip("칵테일 레시피 정보를 담고 있는 ScriptableObject")]
+    [SerializeField] private CocktailRecipeSO cocktailRecipeSO;
 
-    #region Repository_function
+    private readonly Dictionary<int, CocktailData> _cocktailDataDict = new Dictionary<int, CocktailData>();
+    private readonly Dictionary<int, CocktailRecipeJson> _cocktailRecipeDict = new Dictionary<int, CocktailRecipeJson>();
+
     private void Awake()
     {
-        _instance = this;
-        InitializeDictionary();
+        if (_instance == null)
+        {
+            _instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    private void InitializeDictionary()
+    private void Start()
     {
-        _cocktailDict = new Dictionary<string, CocktailData>();
+        // DataManager가 초기화를 요청할 때까지 대기합니다.
+        DataManager.Instance.RegisterRepository(this);
     }
 
-    public CocktailData GetCocktail(string name)
+    public void Initialize()
     {
-        return _cocktailDict.TryGetValue(name, out var cocktail) ? cocktail : null;
+        InitializeDictionaries();
+        IsInitialized = true;
+        Debug.Log("CocktailRepository 초기화 완료.");
     }
-    #endregion
+
+    private void InitializeDictionaries()
+    {
+        if (cocktailDataSO != null && cocktailDataSO.cocktails != null)
+        {
+            _cocktailDataDict.Clear();
+            foreach (var cocktail in cocktailDataSO.cocktails)
+            {
+                if (cocktail != null && !_cocktailDataDict.ContainsKey(cocktail.Cocktail_ID))
+                {
+                    _cocktailDataDict.Add(cocktail.Cocktail_ID, cocktail);
+                }
+            }
+        }
+
+        if (cocktailRecipeSO != null && cocktailRecipeSO.recipes != null)
+        {
+            _cocktailRecipeDict.Clear();
+            foreach (var recipe in cocktailRecipeSO.recipes)
+            {
+                if (recipe != null && !_cocktailRecipeDict.ContainsKey(recipe.CocktailId))
+                {
+                    _cocktailRecipeDict.Add(recipe.CocktailId, recipe);
+                }
+            }
+        }
+    }
+
+    public CocktailData GetCocktailDataById(int cocktailId)
+    {
+        _cocktailDataDict.TryGetValue(cocktailId, out var data);
+        return data;
+    }
+
+    public CocktailRecipeJson GetCocktailRecipeByCocktailId(int cocktailId)
+    {
+        _cocktailRecipeDict.TryGetValue(cocktailId, out var recipe);
+        return recipe;
+    }
 }

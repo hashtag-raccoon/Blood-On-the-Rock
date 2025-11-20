@@ -14,7 +14,18 @@ using Merge;
 /// </summary>
 public class DragDropController : MonoBehaviour
 {
-    public static DragDropController instance;
+    private static DragDropController _instance;
+    public static DragDropController Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<DragDropController>();
+            }
+            return _instance;
+        }
+    }
 
     [Header("타일맵 설정")]
     [SerializeField] private Grid grid;
@@ -72,11 +83,13 @@ public class DragDropController : MonoBehaviour
     private void Awake()
     {
         // 싱글턴 패턴 초기화
-        if (instance == null)
+        if (_instance == null)
         {
-            instance = this;
+            _instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
-        else if (instance != this)
+        else if (_instance != this)
         {
             Destroy(gameObject);
         }
@@ -476,12 +489,12 @@ public class DragDropController : MonoBehaviour
             draggedSpriteRenderer = null;
             isDraggingSprite = false;
             Destroy(previewObj);
-            var refundMoneyData = DataManager.Instance.GetResourceByName("Money");
-            var refundWoodData = DataManager.Instance.GetResourceByName("Wood");
-            if (refundMoneyData != null)
+            var refundMoneyData = ResourceRepository.Instance.GetResourceByName("Money");
+            var refundWoodData = ResourceRepository.Instance.GetResourceByName("Wood");
+            if (refundMoneyData != null && refundWoodData != null)
             {
-                refundMoneyData.current_amount -= tempData.buildingData.construction_cost_gold;
-                refundMoneyData.current_amount -= tempData.buildingData.construction_cost_wood;
+                refundMoneyData.current_amount += tempData.buildingData.construction_cost_gold;
+                refundWoodData.current_amount += tempData.buildingData.construction_cost_wood;
             }
         }
         else
@@ -546,9 +559,10 @@ public class DragDropController : MonoBehaviour
             if (DataManager.Instance != null && DataManager.Instance.ConstructedBuildings != null)
             {
                 ConstructedBuilding constructedBuilding = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
-                if (constructedBuilding != null && DataManager.Instance.BuildingDatas != null)
+                if (constructedBuilding != null && BuildingRepository.Instance != null)
                 {
-                    BuildingData buildingData = DataManager.Instance.BuildingDatas.Find(data => data.building_id == constructedBuilding.Id);
+                    BuildingData buildingData = BuildingRepository.Instance.GetAllBuildingData()
+                        .Find(data => data.building_id == constructedBuilding.Id);
                     if (buildingData != null)
                     {
                         markerOffset = buildingData.MarkerPositionOffset;
@@ -564,7 +578,9 @@ public class DragDropController : MonoBehaviour
         // 기존 건물의 원래 위치 저장 및 마커 제거
         if (editTargetObject != null)
         {
-            originalBuildingCell = grid.WorldToCell(editTargetObject.transform.position);
+            Vector3 buildingPos = editTargetObject.transform.position;
+            buildingPos.z = 0; // Z값을 0으로 고정
+            originalBuildingCell = grid.WorldToCell(buildingPos);
             originalBuildingTileSize = editBuildingTileSize;
 
             // 기존 건물 마커만 제거

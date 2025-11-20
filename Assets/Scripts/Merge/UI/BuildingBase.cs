@@ -110,7 +110,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     /// </summary>
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        if (Input.GetMouseButtonDown(0) && !DragDropController.instance.isUI)
+        if (Input.GetMouseButtonDown(0) && !DragDropController.Instance.isUI)
         {
             if (dragDropController != null && dragDropController.IsEditMode)
             {
@@ -151,7 +151,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public virtual void OpenBuildingUI()
     {
-        DragDropController.instance.isUI = true;
+        DragDropController.Instance.isUI = true;
         BuildingUI?.SetActive(true);
         CameraManager.instance.isBuildingUIActive = true;
         currentActiveBuilding = this; // 현재 건물을 활성 건물로 설정
@@ -159,7 +159,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public virtual void CloseBuildingUI()
     {
-        DragDropController.instance.isUI = false;
+        DragDropController.Instance.isUI = false;
         BuildingUI?.SetActive(false);
         CameraManager.instance.isBuildingUIActive = false;
         if (currentActiveBuilding == this)
@@ -204,7 +204,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             BuildingData buildingData = null;
             if (constructedBuilding != null)
             {
-                buildingData = DataManager.Instance.BuildingDatas.Find(bd => bd.Building_Name == constructedBuilding.Name);
+                buildingData = BuildingRepository.Instance.GetBuildingDataById(constructedBuilding.Id);
             }
 
             CameraPositionOffset offset = buildingData != null ? buildingData.cameraPositionOffset : CameraPositionOffset.Center;
@@ -308,8 +308,8 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             upgradeScript.SetData(constructedBuilding);
 
             // 다음 레벨의 업그레이드 데이터 찾기
-            BuildingUpgradeData upgradeData = DataManager.Instance.GetBuildingUpgradeDataByLevel(
-                DataManager.Instance.GetBuildingUpgradeDataByType(constructedBuilding.Name),
+            BuildingUpgradeData upgradeData = BuildingRepository.Instance.GetBuildingUpgradeDataByLevel(
+                BuildingRepository.Instance.GetBuildingUpgradeDataByType(constructedBuilding.Name),
                 constructedBuilding.Level + 1
             );
 

@@ -5,18 +5,28 @@ using UnityEngine;
 using System.Linq;
 using Newtonsoft.Json;
 using System;
+using System.Data;
 
 
 public class DataManager : MonoBehaviour
 {
     #region Singleton
 
-    public static DataManager Instance { get; private set; }
+    private static DataManager _instance;
+    public static DataManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<DataManager>();
+            }
+            return _instance;
+        }
+    }
     #endregion
 
     #region Constants
-    private const string GoodsPath = "Data/Resource";
-    private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
     #endregion
 
     #region Data Sources (ScriptableObject)
@@ -29,28 +39,11 @@ public class DataManager : MonoBehaviour
     [SerializeField] private BuildingProductionInfoSO buildingProductionInfoSO;
     #endregion
 
-    #region Raw Data Lists (원본 데이터)
-    // --- 건물 관련 원본 데이터 ---
-    [Header("건물 데이터")]
-    public List<BuildingData> BuildingDatas = new List<BuildingData>();
-    public List<BuildingProductionInfo> BuildingProductionInfos = new List<BuildingProductionInfo>();
-    public List<BuildingUpgradeData> BuildingUpgradeDatas = new List<BuildingUpgradeData>();
-
+    #region Raw Data Lists (원본 데이터 - 일부는 Repository로 이전)
+    // --- 건물 관련 데이터 (저장/로드) ---
+    [Header("저장/로드 데이터 (Player-specific)")]
     // 현재 건설된 건물의 생산 상태 (플레이어 세이브 파일에서 로드)
     public List<ConstructedBuildingProduction> ConstructedBuildingProductions = new List<ConstructedBuildingProduction>();
-
-    // --- NPC 관련 원본 데이터 ---
-    [Header("NPC 데이터")]
-    public List<ArbeitData> arbeitDatas = new List<ArbeitData>();
-    public List<Personality> personalities = new List<Personality>();
-
-    // -- Cocktail 관련 원본 데이터 --
-    [Header("칵테일 데이터")]
-    public List<CocktailRecipeJson> recipes = new List<CocktailRecipeJson>();
-
-    // --- 기타 데이터 ---
-    [Header("기타 데이터")]
-    public List<ResourceData> goodsDatas = new List<ResourceData>();
     #endregion
 
     #region Runtime Data Lists (가공된 런타임 데이터)
@@ -59,7 +52,6 @@ public class DataManager : MonoBehaviour
 
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
-    [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
     #endregion
 
     #region Game Resources
@@ -77,6 +69,8 @@ public class DataManager : MonoBehaviour
     private JsonDataHandler jsonDataHandler;
     #endregion
 
+    private readonly List<IRepository> _repositories = new List<IRepository>();
+
     #region Unity Lifecycle
     private void Awake()
     {
@@ -85,6 +79,34 @@ public class DataManager : MonoBehaviour
         InitializeDataFiles();
         LoadAllData();
         Debug.Log("DataManager 초기화 및 모든 데이터 로딩 완료.");
+    }
+
+    private IEnumerator Start()
+    {
+        // 모든 Repository가 DataManager에 등록될 때까지 잠시 대기합니다.
+        // (Awake 순서는 보장되지 않으므로, 한 프레임 대기하는 것이 안전합니다.)
+        yield return null;
+
+        // Repository 초기화
+        foreach (var repo in _repositories)
+        {
+            // BuildingRepository와 같이 특별한 데이터가 필요한 경우
+            if (repo is BuildingRepository buildingRepo)
+            {
+                buildingRepo.Initialize(ConstructedBuildingProductions);
+            }
+            else // 그 외 일반적인 Repository
+            {
+                repo.Initialize();
+            }
+        }
+
+        // 초기화가 끝날 때까지 대기
+        yield return new WaitUntil(() => _repositories.All(r => r.IsInitialized));
+
+        // Repository로부터 가공된 런타임 데이터를 받아옵니다.
+        ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildings();
+        npcs = ArbeitRepository.Instance.GetNpcs();
     }
 
     private void OnApplicationQuit()
@@ -104,15 +126,25 @@ public class DataManager : MonoBehaviour
     #region Initialization
     private void InitializeSingleton()
     {
-        if (Instance == null)
+        if (_instance == null)
         {
-            Instance = this;
+            _instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    /// <summary>
+    /// 각 Repository가 Awake 시점에 자신을 등록하기 위해 호출하는 메서드입니다.
+    /// </summary>
+    /// <param name="repository">등록할 Repository 인스턴스</param>
+    public void RegisterRepository(IRepository repository)
+    {
+        _repositories.Add(repository);
     }
 
     private void InitializeDataFiles()
@@ -123,92 +155,6 @@ public class DataManager : MonoBehaviour
     private void LoadAllData()
     {
         // 게임 시작에 필요한 모든 데이터를 로드합니다.
-        LoadArbeitData();
-        LoadPersonalityData();
-        LoadBuildingData();
-        LoadBuildingProductionData();
-        LoadGoodsData();
-        LoadBuildingUpgradeData();
-        LoadConstructedBuildingProductions();
-    }
-    #endregion
-
-    #region Data Loading Methods
-    private void LoadArbeitData()
-    // NPC의 상태 데이터(레벨, 경험치 등)를 JSON 파일에서 로드합니다.
-    {
-        arbeitDatas = jsonDataHandler.LoadArbeitData();
-    }
-
-    private void LoadPersonalityData()
-    {
-        if (personalityDataSO != null)
-        // NPC의 정의 데이터(성격, 고유 능력치 등)를 ScriptableObject에서 로드합니다.
-        {
-            personalities = personalityDataSO.personalities;
-        }
-        else
-        {
-            Debug.LogWarning("PersonalityDataSO가 DataManager에 할당되지 않았습니다. 빈 리스트로 초기화합니다.");
-            personalities = new List<Personality>();
-        }
-    }
-
-    private void LoadBuildingData()
-    {
-        // 건물의 기본 정의 데이터(이름, 타입, 레벨 등)를 ScriptableObject에서 로드합니다.
-        if (buildingDataSO != null && buildingDataSO.buildings != null)
-        {
-            BuildingDatas = buildingDataSO.buildings;
-            Debug.Log($"BuildingData {BuildingDatas.Count}개를 ScriptableObject에서 로드했습니다.");
-        }
-        else
-        {
-            Debug.LogWarning("BuildingDataSO가 DataManager에 할당되지 않았거나 비어있습니다. 빈 리스트로 초기화합니다.");
-            BuildingDatas = new List<BuildingData>();
-        }
-    }
-
-    private void LoadBuildingProductionData()
-    {
-        // 건물의 생산 정의 데이터(생산품, 생산 시간 등)를 ScriptableObject에서 로드합니다.
-        if (buildingProductionInfoSO != null && buildingProductionInfoSO.productionInfos != null)
-        {
-            BuildingProductionInfos = buildingProductionInfoSO.productionInfos;
-            Debug.Log($"BuildingProductionInfo {BuildingProductionInfos.Count}개를 ScriptableObject에서 로드했습니다.");
-        }
-        else
-        {
-            Debug.LogWarning("BuildingProductionInfoSO가 DataManager에 할당되지 않았거나 비어있습니다. 빈 리스트로 초기화합니다.");
-            BuildingProductionInfos = new List<BuildingProductionInfo>();
-        }
-    }
-
-    private void LoadGoodsData()
-    {
-        // 재화(Goods) 데이터를 Resources 폴더에서 로드합니다.
-        ResourceData[] loadedGoods = Resources.LoadAll<ResourceData>(GoodsPath);
-        goodsDatas.Clear();
-        foreach (var goods in loadedGoods)
-        {
-            goodsDatas.Add(goods);
-        }
-    }
-
-    private void LoadBuildingUpgradeData()
-    {
-        // 건물 업그레이드 데이터를 Resources 폴더에서 로드합니다.
-        BuildingUpgradeData[] loadedUpgrades = Resources.LoadAll<BuildingUpgradeData>(BuildingUpgradePath);
-        BuildingUpgradeDatas.Clear();
-        foreach (var upgrade in loadedUpgrades)
-        {
-            BuildingUpgradeDatas.Add(upgrade);
-        }
-    }
-
-    private void LoadConstructedBuildingProductions()
-    {
-        // 건설된 건물의 상태 데이터(생산 상태, 시간 등)를 JSON 파일에서 로드합니다.
         ConstructedBuildingProductions = jsonDataHandler.LoadConstructedBuildingProductions();
         Debug.Log($"ConstructedBuildingProduction {ConstructedBuildingProductions.Count}개를 JSON에서 로드했습니다.");
     }
@@ -231,7 +177,18 @@ public class DataManager : MonoBehaviour
     {
         if (ConstructedBuildings == null || ConstructedBuildingProductions == null) return;
 
-        var productionDict = ConstructedBuildingProductions.ToDictionary(p => p.building_id);
+        var productionDict = new Dictionary<int, ConstructedBuildingProduction>();
+        foreach (var production in ConstructedBuildingProductions)
+        {
+            if (!productionDict.ContainsKey(production.building_id))
+            {
+                productionDict.Add(production.building_id, production);
+            }
+            else
+            {
+                Debug.LogWarning($"[Data Duplication] ConstructedBuildingProductions에 중복된 building_id '{production.building_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
+            }
+        }
 
         foreach (var building in ConstructedBuildings)
         {
@@ -243,6 +200,9 @@ public class DataManager : MonoBehaviour
                 production.next_production_time = building.NextProductionTime;
             }
         }
+
+
+
     }
 
     /// <summary>
@@ -251,15 +211,15 @@ public class DataManager : MonoBehaviour
     /// </summary>
     private void UpdateAndSaveArbeitData()
     {
-        if (npcs == null || arbeitDatas == null) return;
+        if (npcs == null) return;
 
-        var arbeitDict = arbeitDatas.ToDictionary(a => a.part_timer_id);
+        var arbeitDict = jsonDataHandler.LoadArbeitData().ToDictionary(a => a.part_timer_id);
 
-        foreach (var npc in npcs)
+        foreach (var npc in this.npcs)
         {
             if (arbeitDict.TryGetValue(npc.part_timer_id, out var arbeitData))
             {
-                // npc 객체의 변경 가능한 상태(레벨, 경험치 등)를 arbeitData에 덮어씁니다.
+                // npc 객체의 변경 가능한 상태(레벨, 경험치 등)를 arbeitData에 덮어씁니다. 
                 arbeitData.level = npc.level;
                 arbeitData.exp = npc.exp;
                 arbeitData.employment_state = npc.employment_state;
@@ -269,51 +229,9 @@ public class DataManager : MonoBehaviour
         }
 
         // 최신 상태가 반영된 arbeitDatas 리스트를 파일에 저장합니다.
-        jsonDataHandler.SaveArbeitData(arbeitDatas);
+        jsonDataHandler.SaveArbeitData(arbeitDict.Values.ToList());
     }
     #endregion
-
-    #region Resource Query Methods
-    public ResourceData GetResourceById(int id)
-    {
-        return goodsDatas.Find(r => r.resource_id == id);
-    }
-
-    public ResourceData GetResourceByName(string name)
-    {
-        return goodsDatas.Find(r => r.resource_name == name);
-    }
-    #endregion
-
-
-
-    #region Building Production Query Methods
-    public List<BuildingProductionInfo> GetBuildingProductionInfoList()
-    {
-        return BuildingProductionInfos;
-    }
-
-    /// <summary>
-    /// 해당 건물 이름의 건물 생산 데이터 가져옴
-    /// </summary>
-
-    public List<BuildingProductionInfo> GetBuildingProductionInfoByType(string buildingType)
-    {
-        return BuildingProductionInfos.FindAll(data => data.building_type == buildingType);
-    }
-    #endregion
-
-    #region Building Upgrade Methods
-
-    public List<BuildingUpgradeData> GetBuildingUpgradeDataByType(string buildingType)
-    {
-        return BuildingUpgradeDatas.FindAll(data => data.building_type == buildingType);
-    }
-
-    public BuildingUpgradeData GetBuildingUpgradeDataByLevel(List<BuildingUpgradeData> upgradeDataList, int level)
-    {
-        return upgradeDataList.Find(data => data.level == level);
-    }
 
     public void UpgradeBuildingLevel(int buildingId)
     {
@@ -329,8 +247,6 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    #endregion
-
     #region  ConstructedBuilding Methods
 
     public ConstructedBuilding GetConstructedBuildingName(string buildingType)
@@ -343,50 +259,39 @@ public class DataManager : MonoBehaviour
         return ConstructedBuildings.Find(data => data.Id == buildingId);
     }
 
-    #endregion
-
-    #region Cocktail Methods
-
-    public CocktailData GetCocktailDataById(int cocktailId)
+    /// <summary>
+    /// Main_Island에 건설된 모든 건물의 통합 데이터를 가져옴
+    /// </summary>
+    /// <param name="mainIslandId">메인 섬의 ID</param>
+    /// <returns>건설된 건물 정보 리스트</returns>
+    public List<ConstructedBuilding> GetConstructedBuildingsOnMainIsland(int mainIslandId = 1)
     {
-        return cocktails.Find(data => data.Cocktail_ID == cocktailId);
-
-    }
-
-    public CocktailRecipeJson GetCocktailRecipeByCocktailId(int cocktailId)
-    {
-        return recipes.Find(data => data.CocktailId == cocktailId);
-    }
-
-    #endregion
-
-    #region Cleanup
-    private void CleanupResources()
-    {
-        if (Instance == this)
+        if (ConstructedBuildings == null)
         {
-            // Clear and nullify lists to free up memory
-            BuildingDatas?.Clear();
-            goodsDatas?.Clear();
-            BuildingProductionInfos?.Clear();
-            BuildingUpgradeDatas?.Clear();
-            ConstructedBuildingProductions?.Clear();
-            arbeitDatas?.Clear();
-            personalities?.Clear();
-            npcs?.Clear();
-
-            BuildingDatas = null;
-            goodsDatas = null;
-            BuildingProductionInfos = null;
-            BuildingUpgradeDatas = null;
-            ConstructedBuildingProductions = null;
-            ConstructedBuildings = null;
-            arbeitDatas = null;
-            personalities = null;
-            npcs = null;
-
-            Instance = null;
+            Debug.LogWarning("ConstructedBuildings가 초기화되지 않았습니다.");
+            return new List<ConstructedBuilding>();
         }
+
+        // 특정 섬에 속한 건물만 필터링
+        return ConstructedBuildings.Where(b =>
+            BuildingRepository.Instance.GetBuildingDataById(b.Id)?.island_id == mainIslandId
+        ).ToList();
+    }
+
+    /// <summary>
+    /// 특정 타입의 건설된 건물들을 찾습니다.
+    /// </summary>
+    public List<ConstructedBuilding> GetConstructedBuildingsByType(string buildingType)
+    {
+        return ConstructedBuildings.FindAll(b => b.Type == buildingType);
+    }
+
+    /// <summary>
+    /// 현재 생산 중인 건물들을 찾습니다.
+    /// </summary>
+    public List<ConstructedBuilding> GetProducingBuildings()
+    {
+        return ConstructedBuildings.FindAll(b => b.IsProducing);
     }
     #endregion
 }

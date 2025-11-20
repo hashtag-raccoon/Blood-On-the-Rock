@@ -7,7 +7,18 @@ using UnityEngine;
 public class BuildingReferenceManager : MonoBehaviour
 {
     #region Singleton
-    public static BuildingReferenceManager Instance { get; private set; }
+    private static BuildingReferenceManager _instance;
+    public static BuildingReferenceManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<BuildingReferenceManager>();
+            }
+            return _instance;
+        }
+    }
     #endregion
 
     #region Common Building UI References
@@ -65,9 +76,10 @@ public class BuildingReferenceManager : MonoBehaviour
     /// </summary>
     private void InitializeSingleton()
     {
-        if (Instance == null)
+        if (_instance == null)
         {
-            Instance = this;
+            _instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -85,8 +97,8 @@ public class BuildingReferenceManager : MonoBehaviour
     /// <returns>건물 UI 프리팹 참조</returns>
     public GameObject GetBuildingUIPrefab(BuildingType buildingType)
     {
-        return buildingType == BuildingType.Production 
-            ? productionBuildingUIPrefab 
+        return buildingType == BuildingType.Production
+            ? productionBuildingUIPrefab
             : commonBuildingUIPrefab;
     }
 
@@ -97,8 +109,8 @@ public class BuildingReferenceManager : MonoBehaviour
     /// <returns>업그레이드 버튼 프리팹 참조</returns>
     public GameObject GetBuildingUpgradeButtonPrefab(BuildingType buildingType)
     {
-        return buildingType == BuildingType.Production 
-            ? productionBuildingUpgradeButtonPrefab 
+        return buildingType == BuildingType.Production
+            ? productionBuildingUpgradeButtonPrefab
             : commonBuildingUpgradeButtonPrefab;
     }
 
