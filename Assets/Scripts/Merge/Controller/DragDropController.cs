@@ -841,6 +841,9 @@ public class DragDropController : MonoBehaviour
                 {
                     // 타일맵에 마커 배치 (인테리어)
                     PlaceTilemapMarkers(dropCell, editBuildingTileSize, true);
+
+                    // 호감도 상승 처리
+                    InteriorFavorManager.AddFavorFromPlacement(5);
                 }
 
                 return; // 배치 완료 후 바로 종료
@@ -1169,5 +1172,7 @@ public class DragDropController : MonoBehaviour
     }
     #endregion
 }
+
+
 
 
