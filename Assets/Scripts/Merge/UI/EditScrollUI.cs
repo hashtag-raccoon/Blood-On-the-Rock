@@ -19,6 +19,12 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
     private Vector2 IsEdit_closedPosition;
     private Coroutine openIsEditModeCoroutine;
     private Coroutine closeIsEditModeCoroutine;
+    private Coroutine openSlideCoroutine;
+    private Coroutine closeSlideCoroutine;
+    private bool isOpeningScroll = false;
+    private bool isClosingScroll = false;
+    private bool isOpeningEditMode = false;
+    private bool isClosingEditMode = false;
     protected override void Awake()
     {
         base.Awake();
@@ -52,19 +58,18 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
         // 인벤토리에서 건물을 꺼내 배치 시작
         if (data != null && dragDropController != null)
         {
-            StartBuildingPlacementFromInventory(data); // 인벤토리에서 건물을 꺼내 건물 배치 시작
+            StartBuildingPlacementFromInventory(data); 
         }
     }
 
     /// <summary>
-    /// 인벤토리 UI를 갱신합니다.
+    /// 인벤토리 UI 갱신
     /// </summary>
     public void RefreshInventoryUI()
     {
         if (dataManager != null && dataManager.EditMode_InventoryBuildings != null)
         {
             GenerateItems(dataManager.EditMode_InventoryBuildings);
-            Debug.Log($"EditScrollUI 갱신: {dataManager.EditMode_InventoryBuildings.Count}개의 인벤토리 건물");
         }
     }
 
@@ -81,35 +86,63 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
             return;
         }
 
-        // TempBuilding 배치 시작
+        // 임시 건물 배치 시작
         dragDropController.StartInventoryBuildingPlacement(buildingData, building.Id);
     }
+
     // 인벤토리 UI 열기 버튼 클릭 시 호출
     protected override void OnOpenButtonClicked()
     {
         base.OnOpenButtonClicked();
-        StartCoroutine(OpenSlideCoroutine());
-        if (openIsEditModeCoroutine == null)
+        
+        if (openSlideCoroutine == null && !isOpeningScroll)
+        {
+            openSlideCoroutine = StartCoroutine(OpenSlideCoroutine());
+        }
+        
+        if (openIsEditModeCoroutine == null && !isOpeningEditMode)
         {
             openIsEditModeCoroutine = StartCoroutine(OpenIsEditModeUI());
         }
+        
         dragDropController.onEdit = true;
     }
     // 인벤토리 UI 닫기 버튼 클릭 시 호출
     protected override void OnCloseButtonClicked()
     {
-        StartCoroutine(CloseSlideCoroutine());
+        if (closeSlideCoroutine == null && !isClosingScroll)
+        {
+            closeSlideCoroutine = StartCoroutine(CloseSlideCoroutine());
+        }
+        
         base.OnCloseButtonClicked();
-        if (closeIsEditModeCoroutine == null)
+        
+        if (closeIsEditModeCoroutine == null && !isClosingEditMode)
         {
             closeIsEditModeCoroutine = StartCoroutine(CloseIsEditModeUI());
         }
+        
         dragDropController.onEdit = false;
     }
 
     // Animations
+    #region Animations
     private IEnumerator OpenSlideCoroutine()
     {
+        // 이미 실행 중이면 실행하지 않음
+        if (isOpeningScroll)
+        {
+            openSlideCoroutine = null;
+            yield break;
+        }
+        
+        isOpeningScroll = true;
+        
+        if (!scrollUI.activeSelf)
+        {
+            scrollUI.SetActive(true);
+        }
+        
         float elapsedTime = 0f;
         Vector2 closedPosition = new Vector2(-scrollUI.GetComponent<RectTransform>().rect.width, scrollUI.GetComponent<RectTransform>().rect.height / 2);
         Vector2 openPosition = new Vector2(0, scrollUI.GetComponent<RectTransform>().rect.height / 2);
@@ -123,10 +156,22 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
             yield return null;
         }
         scrollUI.GetComponent<RectTransform>().anchoredPosition = openPosition;
+        
+        isOpeningScroll = false;
+        openSlideCoroutine = null;
     }
 
     private IEnumerator CloseSlideCoroutine()
     {
+        // 이미 실행 중이거나 닫혀있으면 실행하지 않음
+        if (isClosingScroll || !scrollUI.activeSelf)
+        {
+            closeSlideCoroutine = null;
+            yield break;
+        }
+        
+        isClosingScroll = true;
+        
         float elapsedTime = 0f;
         Vector2 closedPosition = new Vector2(-scrollUI.GetComponent<RectTransform>().rect.width, scrollUI.GetComponent<RectTransform>().rect.height / 2);
         Vector2 openPosition = new Vector2(0, scrollUI.GetComponent<RectTransform>().rect.height / 2);
@@ -139,23 +184,32 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
             yield return null;
         }
         scrollUI.GetComponent<RectTransform>().anchoredPosition = closedPosition;
+        
+        // scrollUI 비활성화
+        scrollUI.SetActive(false);
+        
+        isClosingScroll = false;
+        closeSlideCoroutine = null;
     }
 
     public IEnumerator OpenIsEditModeUI()
     {
+        // 이미 실행 중이거나 열려있으면 실행하지 않음
+        if (isOpeningEditMode || IsEditModeUI.activeSelf)
+        {
+            openIsEditModeCoroutine = null;
+            yield break;
+        }
+        
         // 이미 실행 중인 닫기 코루틴이 있으면 중지
         if (closeIsEditModeCoroutine != null)
         {
             StopCoroutine(closeIsEditModeCoroutine);
             closeIsEditModeCoroutine = null;
+            isClosingEditMode = false;
         }
         
-        // 이미 열려있으면 실행하지 않음
-        if (IsEditModeUI.activeSelf)
-        {
-            yield break;
-        }
-        
+        isOpeningEditMode = true;
         IsEditModeUI.SetActive(true);
         
         RectTransform rectTransform = IsEditModeUI.GetComponent<RectTransform>();
@@ -172,23 +226,29 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
         }
         
         rectTransform.anchoredPosition = IsEdit_targetPosition;
+        
+        isOpeningEditMode = false;
         openIsEditModeCoroutine = null;
     }
     
     public IEnumerator CloseIsEditModeUI()
     {
+        // 이미 실행 중이거나 닫혀있으면 실행하지 않음
+        if (isClosingEditMode || !IsEditModeUI.activeSelf)
+        {
+            closeIsEditModeCoroutine = null;
+            yield break;
+        }
+        
         // 이미 실행 중인 열기 코루틴이 있으면 중지
         if (openIsEditModeCoroutine != null)
         {
             StopCoroutine(openIsEditModeCoroutine);
             openIsEditModeCoroutine = null;
+            isOpeningEditMode = false;
         }
         
-        // 이미 닫혀있으면 실행하지 않음
-        if (!IsEditModeUI.activeSelf)
-        {
-            yield break;
-        }
+        isClosingEditMode = true;
         
         RectTransform rectTransform = IsEditModeUI.GetComponent<RectTransform>();
         float elapsedTime = 0f;
@@ -205,9 +265,13 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
         
         rectTransform.anchoredPosition = IsEdit_closedPosition;
         IsEditModeUI.SetActive(false);
+        
+        isClosingEditMode = false;
         closeIsEditModeCoroutine = null;
     }
+    #endregion
 
+    #region Toggle Methods
     public void ToggleScrollUI()
     {
         if (!dragDropController.onEdit)
@@ -219,4 +283,17 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
             OnOpenButtonClicked();
         }
     }
+
+    public void ToggleOnlyEditMode()
+    {
+        if (IsEditModeUI.activeSelf)
+        {
+            StartCoroutine(CloseIsEditModeUI());
+        }
+        else
+        {
+            StartCoroutine(OpenIsEditModeUI());
+        }
+    }
+    #endregion
 }

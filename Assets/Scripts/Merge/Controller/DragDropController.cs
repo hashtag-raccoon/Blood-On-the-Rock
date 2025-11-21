@@ -324,7 +324,8 @@ public class DragDropController : MonoBehaviour
             // 편집 모드 활성화 상태면 종료
             if (onEdit)
             {
-                DeactivateEditMode();
+                onEdit = false;
+                editScrollUI.ToggleScrollUI();
             }
             
             // 진행바 숨기기
@@ -332,6 +333,9 @@ public class DragDropController : MonoBehaviour
             {
                 editModeProgressBar.Hide();
             }
+
+            // 현재 배치되어 있는 preview 마커 삭제
+            ClearMarkers();
         }
 
         // Ctrl + 우클릭으로 건물을 인벤토리에 넣기
@@ -743,11 +747,16 @@ public class DragDropController : MonoBehaviour
                 draggedSpriteObject = null;
                 draggedSpriteRenderer = null;
                 
-                // 인벤토리 건물은 편집 모드 유지, 새 건물은 편집 모드 종료
+                // 새 건물은 편집 모드 종료 및 EditScroll OFF, 인벤토리 건물은 그대로 편집 모드 유지
                 if (!isFromInventory)
                 {
                     onEdit = false;
-                    StartCoroutine(editScrollUI.CloseIsEditModeUI());
+                    
+                    // EditScroll UI 닫기
+                    if (editScrollUI != null)
+                    {
+                        StartCoroutine(editScrollUI.CloseIsEditModeUI());
+                    }
                 }
                 
                 // 일정 시간 후 완료 UI 표시하는 코루틴 시작 (인벤토리 건물은 즉시 건설)
@@ -991,10 +1000,10 @@ public class DragDropController : MonoBehaviour
         isDraggingSprite = true;
         onEdit = true;
         
-        // EditScroll UI 열기 (IsEditModeUI + ScrollUI)
+        // EditScroll UI 열기 (IsEditModeUI만 !!)
         if (editScrollUI != null)
         {
-            editScrollUI.ToggleScrollUI();
+            editScrollUI.ToggleOnlyEditMode();
         }
 
         // 화면 중앙에 초기 배치
