@@ -107,6 +107,9 @@ public class DataManager : MonoBehaviour
         // Repository로부터 가공된 런타임 데이터를 받아옵니다.
         ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildings();
         npcs = ArbeitRepository.Instance.GetNpcs();
+
+        // 저장된 건물들을 씬에 생성합니다.
+        BuildingRepository.Instance.SpawnSavedBuildings();
     }
 
     private void OnApplicationQuit()

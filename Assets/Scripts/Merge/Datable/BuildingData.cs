@@ -52,6 +52,7 @@ public class ConstructedBuildingProduction
     public DateTime last_production_time; // 마지막 생산 시간
     public DateTime next_production_time; // 다음 생산 완료 시간
     public bool is_producing; // 생산 중 여부
+    public Vector2 pos;
 }
 
 [Serializable]
@@ -93,7 +94,7 @@ public class ConstructedBuilding : IScrollItemData
     public float rotation { get; set; }
 
     // 생성자: 여러 데이터 소스를 조합하여 하나의 완전한 객체를 생성.
-    public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus)
+    public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus, Vector2 position)
     {
         // 기본 정보
         Id = buildingData.building_id;
@@ -101,6 +102,7 @@ public class ConstructedBuilding : IScrollItemData
         Type = buildingData.building_Type;
         Level = buildingData.level;
         Icon = buildingData.icon;
+        Position = position;
 
         // 생산 정의 정보 (생산 건물이 아닌 경우 null일 수 있음)
         if (productionInfo != null)

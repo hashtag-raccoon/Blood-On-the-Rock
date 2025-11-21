@@ -22,6 +22,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     public bool IsInitialized { get; private set; } = false;
 
     private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
+    private const string BuildingPositionPath = "buildingPosition.json";
 
     [Header("데이터 에셋 (SO)")]
     [Tooltip("건물의 고정 정보(ID, 이름, 레벨, 아이콘 등)를 담고 있는 ScriptableObject")]
@@ -65,9 +66,52 @@ public class BuildingRepository : MonoBehaviour, IRepository
     {
         LoadBuildingUpgradeData();
         InitializeDictionaries();
+        LoadBuildingPositions(constructedBuildingProductions);
         CreateConstructedBuildingsList(constructedBuildingProductions);
         IsInitialized = true;
         Debug.Log("BuildingRepository 초기화 완료.");
+    }
+
+    /// <summary>
+    /// 저장된 건물 위치 정보를 기반으로 씬에 건물들을 실제로 생성합니다.
+    /// DataManager의 Start() 코루틴에서 모든 초기화가 완료된 후 호출되어야 합니다.
+    /// </summary>
+    public void SpawnSavedBuildings()
+    {
+        if (_constructedBuildings == null || _constructedBuildings.Count == 0)
+        {
+            Debug.Log("생성할 건물이 없습니다.");
+            return;
+        }
+
+        int spawnedCount = 0;
+        // ToList()로 복사본을 만들어 순회 (foreach 중 리스트 수정 방지)
+        foreach (var constructedBuilding in _constructedBuildings.ToList())
+        {
+            // BuildingData 가져오기
+            BuildingData buildingData = GetBuildingDataById(constructedBuilding.Id);
+            if (buildingData == null)
+            {
+                Debug.LogWarning($"건물 ID {constructedBuilding.Id}에 해당하는 BuildingData를 찾을 수 없습니다.");
+                continue;
+            }
+
+            // 저장된 위치에 건물 생성 (isLoadingExisting = true로 중복 추가 방지)
+            Vector3 spawnPosition = new(constructedBuilding.Position.x, constructedBuilding.Position.y, 0);
+            GameObject spawnedBuilding = BuildingFactory.CreateBuilding(buildingData, spawnPosition, null, true);
+
+            if (spawnedBuilding != null)
+            {
+                spawnedCount++;
+                Debug.Log($"건물 '{buildingData.Building_Name}' (ID: {constructedBuilding.Id})을 위치 {spawnPosition}에 생성했습니다.");
+            }
+            else
+            {
+                Debug.LogError($"건물 '{buildingData.Building_Name}' (ID: {constructedBuilding.Id}) 생성에 실패했습니다.");
+            }
+        }
+
+        Debug.Log($"총 {spawnedCount}개의 건물을 씬에 생성했습니다.");
     }
 
     /// <summary>
@@ -168,7 +212,8 @@ public class BuildingRepository : MonoBehaviour, IRepository
                 var constructedBuilding = new ConstructedBuilding(
                     buildingData,
                     productionInfo,
-                    production
+                    production,
+                    production.pos
                 );
 
                 _constructedBuildings.Add(constructedBuilding);
@@ -245,7 +290,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     /// <summary>
     /// 새로운 건물을 건설 목록에 추가합니다.
     /// </summary>
-    public void AddConstructedBuilding(int buildingId)
+    public void AddConstructedBuilding(int buildingId, Vector2 position)
     {
         // 1. BuildingData 확인
         if (!_buildingDataDict.TryGetValue(buildingId, out BuildingData buildingData))
@@ -260,7 +305,8 @@ public class BuildingRepository : MonoBehaviour, IRepository
             building_id = buildingId,
             last_production_time = System.DateTime.Now,
             next_production_time = System.DateTime.Now,
-            is_producing = false
+            is_producing = false,
+            pos = position
         };
 
         // 3. DataManager의 ConstructedBuildingProductions에 추가
@@ -321,6 +367,70 @@ public class BuildingRepository : MonoBehaviour, IRepository
         }
     }
 
+    public void UpdateBuildingPosition(int buildingId, Vector2 newPosition)
+    {
+        var constructedBuilding = _constructedBuildings.Find(b => b.Id == buildingId);
+        if (constructedBuilding != null)
+        {
+            constructedBuilding.Position = newPosition;
+        }
+
+        var production = DataManager.Instance.ConstructedBuildingProductions.Find(p => p.building_id == buildingId);
+        if (production != null)
+        {
+            production.pos = newPosition;
+        }
+    }
+
+    /// <summary>
+    /// 건물의 위치를 업데이트하고 모든 건물 위치를 파일에 즉시 저장합니다.
+    /// </summary>
+    public void UpdateAndSaveBuildingPosition(int buildingId, Vector2 newPosition)
+    {
+        UpdateBuildingPosition(buildingId, newPosition);
+        SaveBuildingPositions();
+        Debug.Log($"Building position for ID '{buildingId}' updated and all positions saved.");
+    }
+    
+    public void SaveBuildingPositions()
+    {
+        List<ConstructedBuildingPos> buildingPositions = new List<ConstructedBuildingPos>();
+        foreach (var building in _constructedBuildings)
+        {
+            buildingPositions.Add(new ConstructedBuildingPos
+            {
+                building_id = building.Id,
+                pos = building.Position,
+                rotation = building.rotation
+            });
+        }
+
+        string json = JsonUtility.ToJson(new Serialization<ConstructedBuildingPos>(buildingPositions), true);
+        string path = System.IO.Path.Combine(Application.persistentDataPath, BuildingPositionPath);
+        System.IO.File.WriteAllText(path, json);
+        Debug.Log($"Building positions saved to {path}");
+    }
+
+    public void LoadBuildingPositions(List<ConstructedBuildingProduction> productions)
+    {
+        string path = System.IO.Path.Combine(Application.persistentDataPath, BuildingPositionPath);
+        if (System.IO.File.Exists(path))
+        {
+            string json = System.IO.File.ReadAllText(path);
+            var loadedPositions = JsonUtility.FromJson<Serialization<ConstructedBuildingPos>>(json).ToList();
+
+            foreach (var production in productions)
+            {
+                var posData = loadedPositions.Find(p => p.building_id == production.building_id);
+                if (posData != null)
+                {
+                    production.pos = posData.pos;
+                }
+            }
+            Debug.Log($"Building positions loaded from {path}");
+        }
+    }
+
     /// <summary>
     /// 모든 건설된 건물 정보를 로그로 출력합니다. (디버깅용)
     /// </summary>
@@ -340,5 +450,17 @@ public class BuildingRepository : MonoBehaviour, IRepository
                      $"ProductionTime: {building.BaseProductionTimeMinutes}min, " +
                      $"LastProduction: {building.LastProductionTime}, NextProduction: {building.NextProductionTime}");
         }
+    }
+}
+[Serializable]
+public class Serialization<T>
+{
+    [SerializeField]
+    List<T> target;
+    public List<T> ToList() { return target; }
+
+    public Serialization(List<T> target)
+    {
+        this.target = target;
     }
 }

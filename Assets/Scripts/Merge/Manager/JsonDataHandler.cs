@@ -32,7 +32,12 @@ public class JsonDataHandler
     // ... (save/load 메서드들) ...
     public void SaveData<T>(List<T> data, string path)
     {
-        string jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
+        var settings = new JsonSerializerSettings
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            Formatting = Formatting.Indented
+        };
+        string jsonData = JsonConvert.SerializeObject(data, settings);
         File.WriteAllText(path, jsonData);
         Debug.Log($"{typeof(T).Name} 데이터 {data.Count}개를 {path}에 저장했습니다.");
     }

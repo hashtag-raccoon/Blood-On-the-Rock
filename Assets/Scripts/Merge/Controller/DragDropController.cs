@@ -720,6 +720,7 @@ public class DragDropController : MonoBehaviour
                 {
                     // 타일맵에 마커 배치
                     PlaceTilemapMarkers(dropCell, editBuildingTileSize);
+                    BuildingRepository.Instance.SaveBuildingPositions();
 
                     // ConstructedBuildingProduction 데이터 생성 및 저장
                     if (DataManager.Instance.GetConstructedBuildingById(buildingData.building_id) == null)
@@ -739,6 +740,12 @@ public class DragDropController : MonoBehaviour
                     draggedSpriteRenderer.color = originalSpriteColor;
 
                 PlaceTilemapMarkers(dropCell, editBuildingTileSize);
+
+                BuildingBase buildingBase = draggedSpriteObject.GetComponent<BuildingBase>();
+                if (buildingBase != null)
+                {
+                    BuildingRepository.Instance.UpdateAndSaveBuildingPosition(buildingBase.ConstructedBuildingId, worldPos);
+                }
 
                 // 기존 건물 배치 완료 - 드래그 상태만 초기화 (편집 모드는 유지)
                 isDraggingSprite = false;

@@ -14,8 +14,12 @@ public static class BuildingFactory
     /// BuildingData로부터 완전한 건물 GameObject를 생성합니다.
     /// 건물 타입에 따라 적절한 컴포넌트를 자동으로 추가합니다.
     /// </summary>
+    /// <param name="buildingData">건물 데이터</param>
+    /// <param name="position">생성 위치</param>
+    /// <param name="parent">부모 Transform (선택)</param>
+    /// <param name="isLoadingExisting">true이면 저장된 건물을 불러오는 것, false이면 새 건물 생성</param>
     /// <returns>생성된 건물 GameObject</returns>
-    public static GameObject CreateBuilding(BuildingData buildingData, Vector3 position, Transform parent = null)
+    public static GameObject CreateBuilding(BuildingData buildingData, Vector3 position, Transform parent = null, bool isLoadingExisting = false)
     {
         if (buildingData == null || buildingData.building_sprite == null)
         {
@@ -37,7 +41,7 @@ public static class BuildingFactory
         switch(buildingData.buildingType)
         {
             case BuildingType.Production: // 생산형 건물일 경우
-                AddProductionBuildingComponents(buildingObj, buildingData);
+                AddProductionBuildingComponents(buildingObj, buildingData, position, isLoadingExisting);
                 break;
             // 추후 비생산형 건물 타입 추가 예정
             default: // 그 외의 건물일 경우(꾸미는 용도의 건물 등등)
@@ -70,13 +74,13 @@ public static class BuildingFactory
     /// 생산형 건물에 필요한 컴포넌트 추가
     /// ResourceBuildingController 스크립트를 추가하고 필요한 필드를 자동 할당시킴
     /// </summary>
-    private static void AddProductionBuildingComponents(GameObject buildingObj, BuildingData buildingData)
+    private static void AddProductionBuildingComponents(GameObject buildingObj, BuildingData buildingData, Vector3 position, bool isLoadingExisting)
     {
         ResourceBuildingController controller = buildingObj.AddComponent<ResourceBuildingController>();
-        
+
         // BuildingBase 필드 자동 할당
-        AssignBuildingBaseFields(controller, buildingData);
-        
+        AssignBuildingBaseFields(controller, buildingData, position, isLoadingExisting);
+
         // ResourceBuildingController 전용 필드 할당
         AssignProductionBuildingFields(controller);
     }
@@ -94,14 +98,18 @@ public static class BuildingFactory
     /// <summary>
     /// BuildingBase의 필드들을 자동으로 할당시키는 메소드
     /// </summary>
-    private static void AssignBuildingBaseFields(BuildingBase buildingBase, BuildingData buildingData)
+    private static void AssignBuildingBaseFields(BuildingBase buildingBase, BuildingData buildingData, Vector3 position, bool isLoadingExisting)
     {
         if (buildingBase == null || buildingData == null) return;
 
         // Reflection을 사용하여 private/protected 필드 할당
         var type = typeof(BuildingBase);
 
-        BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id);
+        // 새 건물 생성 시에만 ConstructedBuilding 추가 (저장된 건물 불러올 때는 이미 존재함)
+        if (!isLoadingExisting)
+        {
+            BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id, position);
+        }
 
         // constructedBuildingId를 조회하여 할당
         int constructedBuildingId = GetConstructedBuildingId(buildingData.building_id);
