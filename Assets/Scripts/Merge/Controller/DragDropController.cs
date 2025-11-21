@@ -103,6 +103,16 @@ public class DragDropController : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
+        // Grid 자동 찾기
+        if (grid == null)
+        {
+            grid = FindObjectOfType<Grid>();
+            if (grid == null)
+            {
+                Debug.LogError("[DragDropController] Scene에서 Grid를 찾을 수 없습니다!");
+            }
+        }
+
         // 카메라 투명도 정렬축을 Y 축으로 설정
         // 필요한 이유 = 2D 타일맵에서 Y 축 기준으로 오브젝트가 앞뒤로 겹쳐질 때 올바르게 정렬하기 위함
         if (mainCamera != null)
@@ -760,7 +770,7 @@ public class DragDropController : MonoBehaviour
 
     // 타일맵에 마커(건물이 차지하는 영역 표시) 배치
     // 기존 건물의 마커는 ExistingTilemap에 저장됨
-    private void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize)
+    public void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize)
     {
         // ExistingTilemap에 기존 건물 마커 배치
         if (ExistingTilemap != null && markerTile != null)

@@ -58,7 +58,7 @@ public class ConstructedBuildingProduction
 public class ConstructedBuildingPos
 {
     public int building_id;
-    public Vector2 pos;
+    public Vector3Int pos;
     public float rotation;
 }
 
@@ -89,11 +89,11 @@ public class ConstructedBuilding : IScrollItemData
     public bool IsProducing { get; set; }
 
     // constructedBuilding 에서만
-    public Vector2 Position { get; set; }
-    public float rotation { get; set; }
+    public Vector3Int Position { get; set; }
+    public float Rotation { get; set; }
 
     // 생성자: 여러 데이터 소스를 조합하여 하나의 완전한 객체를 생성.
-    public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus)
+    public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus, ConstructedBuildingPos constructedBuildingPos)
     {
         // 기본 정보
         Id = buildingData.building_id;
@@ -101,6 +101,8 @@ public class ConstructedBuilding : IScrollItemData
         Type = buildingData.building_Type;
         Level = buildingData.level;
         Icon = buildingData.icon;
+        Position = constructedBuildingPos.pos;
+        Rotation = constructedBuildingPos.rotation;
 
         // 생산 정의 정보 (생산 건물이 아닌 경우 null일 수 있음)
         if (productionInfo != null)
@@ -117,5 +119,6 @@ public class ConstructedBuilding : IScrollItemData
             NextProductionTime = productionStatus.next_production_time;
             IsProducing = productionStatus.is_producing;
         }
+        
     }
 }

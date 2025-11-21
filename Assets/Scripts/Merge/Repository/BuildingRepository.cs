@@ -22,6 +22,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     public bool IsInitialized { get; private set; } = false;
 
     private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
+    
 
     [Header("데이터 에셋 (SO)")]
     [Tooltip("건물의 고정 정보(ID, 이름, 레벨, 아이콘 등)를 담고 있는 ScriptableObject")]
@@ -35,7 +36,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     private readonly Dictionary<int, BuildingData> _buildingDataDict = new Dictionary<int, BuildingData>();
     private readonly Dictionary<string, BuildingProductionInfo> _productionInfoDict = new Dictionary<string, BuildingProductionInfo>();
 
-
+    [SerializeField] private Grid grid;
     private void Awake()
     {
         if (_instance == null)
@@ -54,6 +55,12 @@ public class BuildingRepository : MonoBehaviour, IRepository
     {
         // DataManager가 초기화를 요청할 때까지 대기합니다.
         DataManager.Instance.RegisterRepository(this);
+
+        grid = FindObjectOfType<Grid>();
+        if(grid == null)
+        {
+            Debug.Log("Scene에서 Grid를 찾을 수 없음.");
+        }
     }
 
     public void Initialize()
@@ -61,11 +68,11 @@ public class BuildingRepository : MonoBehaviour, IRepository
         // DataManager가 데이터를 전달하는 Initialize(data)를 호출하므로 이 메서드는 비워둡니다.
     }
 
-    public void Initialize(List<ConstructedBuildingProduction> constructedBuildingProductions) // 오버로딩된 메서드
+    public void Initialize(List<ConstructedBuildingProduction> constructedBuildingProductions, List<ConstructedBuildingPos> constructedBuildingPositions) // 오버로딩된 메서드
     {
         LoadBuildingUpgradeData();
         InitializeDictionaries();
-        CreateConstructedBuildingsList(constructedBuildingProductions);
+        CreateConstructedBuildingsList(constructedBuildingProductions, constructedBuildingPositions);
         IsInitialized = true;
         Debug.Log("BuildingRepository 초기화 완료.");
     }
@@ -144,38 +151,42 @@ public class BuildingRepository : MonoBehaviour, IRepository
     /// 로드된 원본 데이터(BuildingData, BuildingProductionInfo, ConstructedBuildingProduction)를 조합하여
     /// 실제 게임에서 사용될 ConstructedBuilding 객체 리스트를 생성하고, DataManager에 저장합니다.
     /// </summary>
-    private void CreateConstructedBuildingsList(List<ConstructedBuildingProduction> constructedBuildingProductions)
+    private void CreateConstructedBuildingsList(List<ConstructedBuildingProduction> constructedBuildingProductions, List<ConstructedBuildingPos> constructedBuildingPositions)
     {
         _constructedBuildings.Clear();
 
-        if (constructedBuildingProductions == null || _buildingDataDict == null || _productionInfoDict == null)
+        if (constructedBuildingProductions == null || _buildingDataDict == null || _productionInfoDict == null )
         {
             Debug.LogError("Building data or Production data is not loaded yet.");
             return;
         }
-
-        foreach (var production in constructedBuildingProductions)
+        //
+        foreach (var item in constructedBuildingProductions.Zip(constructedBuildingPositions, (Production, Pos) => new {production = Production, pos = Pos}))
         {
             // 1. 건물의 상태(production) 데이터에서 ID를 가져와, 건물의 기본 정의(BuildingData)를 딕셔너리에서 찾습니다.
-            if (_buildingDataDict.TryGetValue(production.building_id, out BuildingData buildingData))
+            if (_buildingDataDict.TryGetValue(item.production.building_id, out BuildingData buildingData))
             {
-                // 2. 건물의 타입(building_Type)을 사용하여, 건물의 생산 정의(BuildingProductionInfo)를 딕셔너리에서 찾습니다.
-                //    생산 기능이 없는 건물일 경우 productionInfo는 null이 될 수 있습니다.
-                BuildingProductionInfo productionInfo = null;
-                _productionInfoDict.TryGetValue(buildingData.building_Type, out productionInfo);
+                if(buildingData.building_id == item.pos.building_id) {
+                    // 2. 건물의 타입(building_Type)을 사용하여, 건물의 생산 정의(BuildingProductionInfo)를 딕셔너리에서 찾습니다.
+                    //    생산 기능이 없는 건물일 경우 productionInfo는 null이 될 수 있습니다.
+                    BuildingProductionInfo productionInfo = null;
+                    _productionInfoDict.TryGetValue(buildingData.building_Type, out productionInfo);
 
-                // 3. 세 종류의 데이터를 모두 조합하여 완전한 ConstructedBuilding 객체를 생성합니다.
-                var constructedBuilding = new ConstructedBuilding(
-                    buildingData,
-                    productionInfo,
-                    production
-                );
+                    // 3. 세 종류의 데이터를 모두 조합하여 완전한 ConstructedBuilding 객체를 생성합니다.
+                    var constructedBuilding = new ConstructedBuilding(
+                        buildingData,
+                        productionInfo,
+                        item.production,
+                        item.pos
+                    );
 
-                _constructedBuildings.Add(constructedBuilding);
+                    _constructedBuildings.Add(constructedBuilding);
+                }
+                
             }
             else
             {
-                Debug.LogWarning($"ConstructedBuildingProduction의 building_id '{production.building_id}'에 해당하는 BuildingData를 찾을 수 없습니다.");
+                Debug.LogWarning($"ConstructedBuildingProduction의 building_id '{item.production.building_id}'에 해당하는 BuildingData를 찾을 수 없습니다.");
             }
         }
         Debug.Log($"건설된 건물 {_constructedBuildings.Count}개를 생성했습니다.");
@@ -267,7 +278,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
         DataManager.Instance.ConstructedBuildingProductions.Add(newProduction);
 
         // 4. ConstructedBuildings 리스트 갱신
-        CreateConstructedBuildingsList(DataManager.Instance.ConstructedBuildingProductions);
+        CreateConstructedBuildingsList(DataManager.Instance.ConstructedBuildingProductions, DataManager.Instance.ConstructedBuildingPositions);
 
         Debug.Log($"건물 '{buildingData.Building_Name}' (ID: {buildingId})을 건설 목록에 추가했습니다.");
     }
@@ -284,7 +295,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
             DataManager.Instance.ConstructedBuildingProductions.Remove(production);
 
             // 2. ConstructedBuildings 리스트 갱신
-            CreateConstructedBuildingsList(DataManager.Instance.ConstructedBuildingProductions);
+            CreateConstructedBuildingsList(DataManager.Instance.ConstructedBuildingProductions, DataManager.Instance.ConstructedBuildingPositions);
 
             Debug.Log($"건물 ID '{buildingId}'를 건설 목록에서 제거했습니다.");
         }
@@ -311,13 +322,35 @@ public class BuildingRepository : MonoBehaviour, IRepository
             }
 
             // ConstructedBuildings 리스트 갱신
-            CreateConstructedBuildingsList(DataManager.Instance.ConstructedBuildingProductions);
+            CreateConstructedBuildingsList(DataManager.Instance.ConstructedBuildingProductions, DataManager.Instance.ConstructedBuildingPositions);
 
             Debug.Log($"건물 ID '{buildingId}'의 생산 상태를 업데이트했습니다. 생산 중: {isProducing}");
         }
         else
         {
             Debug.LogWarning($"건물 ID '{buildingId}'를 찾을 수 없습니다.");
+        }
+    }
+
+    public void SpawnConstructedBuildings()
+    {
+        try
+        {
+           foreach(var building in _constructedBuildings)
+            {
+                Vector3Int gridpos = building.Position;
+                Vector3 worldPos = grid.CellToWorld(gridpos);
+                //Vector3Int worldPos = grid.CellToWorld
+                //float rot = building.Rotation;
+                BuildingData buildingData = GetBuildingDataById(building.Id);
+                GameObject constructedbuilding = BuildingFactory.CreateBuilding(buildingData, worldPos);
+                DragDropController.Instance.PlaceTilemapMarkers(gridpos, buildingData.tileSize);
+            } 
+        }
+        catch(Exception ex)
+        {
+            Debug.Log(ex);
+            return;
         }
     }
 

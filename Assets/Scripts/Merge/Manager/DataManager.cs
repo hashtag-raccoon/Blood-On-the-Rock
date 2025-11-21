@@ -44,6 +44,7 @@ public class DataManager : MonoBehaviour
     [Header("저장/로드 데이터 (Player-specific)")]
     // 현재 건설된 건물의 생산 상태 (플레이어 세이브 파일에서 로드)
     public List<ConstructedBuildingProduction> ConstructedBuildingProductions = new List<ConstructedBuildingProduction>();
+    public List<ConstructedBuildingPos> ConstructedBuildingPositions = new List<ConstructedBuildingPos>();
     #endregion
 
     #region Runtime Data Lists (가공된 런타임 데이터)
@@ -93,13 +94,15 @@ public class DataManager : MonoBehaviour
             // BuildingRepository와 같이 특별한 데이터가 필요한 경우
             if (repo is BuildingRepository buildingRepo)
             {
-                buildingRepo.Initialize(ConstructedBuildingProductions);
+                buildingRepo.Initialize(ConstructedBuildingProductions, ConstructedBuildingPositions);
             }
             else // 그 외 일반적인 Repository
             {
                 repo.Initialize();
             }
         }
+
+        BuildingRepository.Instance.SpawnConstructedBuildings();
 
         // 초기화가 끝날 때까지 대기
         yield return new WaitUntil(() => _repositories.All(r => r.IsInitialized));
@@ -157,6 +160,9 @@ public class DataManager : MonoBehaviour
         // 게임 시작에 필요한 모든 데이터를 로드합니다.
         ConstructedBuildingProductions = jsonDataHandler.LoadConstructedBuildingProductions();
         Debug.Log($"ConstructedBuildingProduction {ConstructedBuildingProductions.Count}개를 JSON에서 로드했습니다.");
+
+        ConstructedBuildingPositions = jsonDataHandler.LoadBuildingPositons();
+        Debug.Log($"ConstructedBuildingPositions {ConstructedBuildingPositions.Count}개를 JSON에서 로드했습니다.");
     }
     #endregion
 

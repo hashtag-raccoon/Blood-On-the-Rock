@@ -7,12 +7,14 @@ public class JsonDataHandler
 {
     private readonly string arbeitDataPath;
     private readonly string constructedBuildingProductionPath;
+    private readonly string BuildingPositonPath;
 
     public JsonDataHandler()
     {
         // Application.persistentDataPath를 사용하여 빌드 후에도 안전하게 파일을 읽고 쓸 수 있도록 경로를 설정합니다.
         arbeitDataPath = Path.Combine(Application.persistentDataPath, "ArbeitData.json");
         constructedBuildingProductionPath = Path.Combine(Application.persistentDataPath, "ConstructedBuildingProduction.json");
+        BuildingPositonPath = Path.Combine(Application.persistentDataPath, "BuildingPosition.json");
     }
 
     public void InitializeFiles()
@@ -68,5 +70,15 @@ public class JsonDataHandler
     public List<ConstructedBuildingProduction> LoadConstructedBuildingProductions()
     {
         return LoadData<ConstructedBuildingProduction>(constructedBuildingProductionPath);
+    }
+
+    public void SaveBuildingPosition(List<ConstructedBuildingPos> positions)
+    {
+        SaveData(positions, BuildingPositonPath);
+    }
+
+    public List<ConstructedBuildingPos> LoadBuildingPositons()
+    {
+        return LoadData<ConstructedBuildingPos>(BuildingPositonPath);
     }
 }
