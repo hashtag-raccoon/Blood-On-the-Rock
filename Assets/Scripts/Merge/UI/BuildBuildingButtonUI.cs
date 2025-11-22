@@ -58,9 +58,8 @@ public class BuildBuildingButtonUI : MonoBehaviour, IScrollItemUI
 
     /// <summary>
     /// 건물 구매 처리:
-    /// 1. 자원 확인 및 차감
-    /// 2. BuildScrollUI 비활성화 (애니메이션 포함)
-    /// 3. 편집 모드(배치 모드) 진입
+    /// 1. BuildScrollUI 비활성화 (애니메이션 포함)
+    /// 2. 편집 모드(배치 모드) 진입
     /// </summary>
     public void BuyBuilding()
     {

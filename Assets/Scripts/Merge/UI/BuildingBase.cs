@@ -110,33 +110,27 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     /// </summary>
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        if (Input.GetMouseButtonDown(0) && !DragDropController.Instance.isUI)
+        // 왼쪽 버튼이 아닐 경우 무시
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+
+        // dragDropController가 설정되어 있지 않다면 싱글톤 또는 씬에서 찾아서 할당
+        var dd = dragDropController ?? DragDropController.Instance ?? FindObjectOfType<DragDropController>();
+        if (dd == null) return; // 컴파일 오류 방지용, 뺴면 안됨 !!
+        if (dd.onEdit) return;  // 편집 모드 중이면 UI Open X
+
+        if (virtualCamera == null) InitializeCamera();
+
+        bool isOpening = !BuildingUI.activeSelf;
+
+        if (isOpening)
         {
-            if (dragDropController != null && dragDropController.IsEditMode)
-            {
-                return;
-            }
-
-            if (virtualCamera == null)
-            {
-                InitializeCamera();
-            }
-
-            // 건물 UI 열기, 닫기 토글 방식 => 건물 UI가 열려 있지 않다면 열기, 아니라면 닫기
-            bool isOpening = !BuildingUI.activeSelf;
-
-            if (isOpening)
-            {
-                CameraManager.instance.isBuildingUIActive = true;
-                OpenBuildingUI();
-                AnimateCamera(true); // 열기 애니메이션
-            }
-            else
-            {
-                CameraManager.instance.isBuildingUIActive = false;
-                CloseBuildingUI();
-                AnimateCamera(false); // 닫기 애니메이션
-            }
+            OpenBuildingUI();
+            AnimateCamera(true);
+        }
+        else
+        {
+            CloseBuildingUI();
+            AnimateCamera(false);
         }
     }
 

@@ -91,7 +91,7 @@ public class ConstructedBuilding : IScrollItemData
     // constructedBuilding 에서만
     public Vector3Int Position { get; set; }
     public float Rotation { get; set; }
-
+    public bool IsEditInventory { get; set; } = false; // 인벤토리에 있는지 여부
     // 생성자: 여러 데이터 소스를 조합하여 하나의 완전한 객체를 생성.
     public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus, ConstructedBuildingPos constructedBuildingPos)
     {
