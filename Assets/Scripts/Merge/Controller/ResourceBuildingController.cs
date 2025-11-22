@@ -199,37 +199,6 @@ public class ResourceBuildingController : BuildingBase
     #endregion
 
     #region Production Methods
-    public bool StartProduction(BuildingProductionInfo productionData, ResourceData resourceData)
-    {
-        int emptySlotIndex = FindEmptySlotIndex();
-
-        if (emptySlotIndex == -1)
-        {
-            return false;
-        }
-
-        // 재화 소비
-        ResourceData consumeResource = DataManager.Instance.GetResourceByName(productionData.consume_resource_type);
-        if (consumeResource.current_amount < productionData.consume_amount)
-        {
-            return false;
-        }
-
-        consumeResource.current_amount -= productionData.consume_amount;
-
-        // 생산 시작
-        ProductionInfo newProduction = new ProductionInfo(productionData, resourceData, emptySlotIndex);
-        activeProductions[emptySlotIndex] = newProduction;
-
-        // UI 업데이트
-        if (ResourceBuildingUIManager.Instance != null)
-        {
-            ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
-        }
-
-        return true;
-    }
-
     private void UpdateAllProductions()
     {
         bool hasCompletedProduction = false;

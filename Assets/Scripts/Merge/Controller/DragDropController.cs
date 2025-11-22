@@ -48,11 +48,12 @@ public class DragDropController : MonoBehaviour
     [SerializeField] private EditScrollUI editScrollUI; // 편집 모드 활성화 진행바
     [SerializeField] private float EditMode_Time = 3f; // 편집 모드 활성화 시간(우클릭 꾹 누르면 활성화)
     [SerializeField] private float maxPositionDrift = 0.3f; // 편집 모드 활성화 중 허용되는 최대 마우스 이동 거리, 혹시 모를 손떨림을 대비하기 위함
-
+    public bool onEdit = false; // 편집 모드 활성화 여부
     [Header("건물 마커 설정/마커 타일맵의 Y 오프셋")]
-    [SerializeField] private float markerOffset = -3;
+    [SerializeField] private float markerOffset;
     [Header("새 건물 건설 완료 UI")]
     [SerializeField] private GameObject newBuildingCompleteUI;
+    [SerializeField] private Vector2 newBuildingCompleteSize = new Vector2(100,100);
     private float buildingConstructionDelay; // 건물 건설 완료 대기시간
 
     private bool isDraggingSprite = false; 
@@ -61,8 +62,7 @@ public class DragDropController : MonoBehaviour
     private Vector3 originalSpritePosition; // 오브젝트의 원래 월드 위치
     private SpriteRenderer draggedSpriteRenderer = null; // 드래그 중인 오브젝트의 스프라이트 렌더러
     private Color originalSpriteColor; // 원래 스프라이트 색상 (프리뷰용)
-    
-    public bool onEdit = false; // 편집 모드 활성화 여부
+
     [HideInInspector]
     public bool isUI = false;
     
@@ -90,7 +90,7 @@ public class DragDropController : MonoBehaviour
     private void Awake()
     {
         // 싱글톤 패턴 초기화, 추후 싱글톤이 아닌 방법으로 변경할 예정
-        if (instance == null)
+        if (_instance == null)
         {
             _instance = this;
             transform.SetParent(null);
@@ -534,8 +534,8 @@ public class DragDropController : MonoBehaviour
             else
             {
                 // 새 건물인 경우: 비용 환불
-                var refundMoneyData = DataManager.Instance.GetResourceByName("Money");
-                var refundWoodData = DataManager.Instance.GetResourceByName("Wood");
+                var refundMoneyData = ResourceRepository.Instance.GetResourceByName("Money");
+                var refundWoodData = ResourceRepository.Instance.GetResourceByName("Wood");
                 if (refundMoneyData != null)
                 {
                     refundMoneyData.current_amount -= tempData.buildingData.construction_cost_gold;
@@ -763,7 +763,7 @@ public class DragDropController : MonoBehaviour
                     draggedSpriteRenderer.color = originalSpriteColor;
                 
                 // 타일맵에 마커 배치
-                PlaceTilemapMarkers(dropCell, editBuildingTileSize);
+                PlaceTilemapMarkers(dropCell, editBuildingTileSize, markerOffset);
                 
                 // 인벤토리 건물 여부 확인
                 bool isFromInventory = tempData.isFromInventory;
@@ -948,10 +948,13 @@ public class DragDropController : MonoBehaviour
     /// 특정 위치의 건물 마커를 타일 크기만큼 제거하고
     /// 기존 건물을 이동할 때 원래 위치의 마커를 ExistingTilemap에서 제거하는 데 사용하는 메소드
     /// </summary>
-    private void RemoveBuildingMarkers(Vector3Int startCell, Vector2Int tileSize)
+    private void RemoveBuildingMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset = 0f)
     {
         if (ExistingTilemap == null)
             return;
+
+        // 실제 해당 스크립트에서 사용할 오프셋, customOffset가 0이 아니면 해당 customOffset을 사용하지만, 0이면 markerOffset 사용함
+        float offsetToUse = customOffset != 0f ? customOffset : markerOffset;
 
         for (int x = 0; x < tileSize.x; x++)
         {
@@ -961,7 +964,8 @@ public class DragDropController : MonoBehaviour
                 Vector3 worldPos = grid.CellToWorld(tilePos);
                 
                 // 오프셋 적용
-                worldPos.y += markerOffset;
+                worldPos.y += offsetToUse;
+                //Debug.Log("Removing marker at world position: " + worldPos + " 이때 offsetToUse : " + offsetToUse);
                 
                 Vector3Int placeCell = grid.WorldToCell(worldPos);
                 placeCell.z = startCell.z;
@@ -1104,10 +1108,10 @@ public class DragDropController : MonoBehaviour
         isDraggingSprite = true;
         onEdit = true;
         
-        // EditScroll UI 열기 (IsEditModeUI + ScrollUI)
+        // EditScroll UI 열기 (ScrollUI만 !!)
         if (editScrollUI != null)
         {
-            editScrollUI.ToggleScrollUI();
+            editScrollUI.ToggleOnlyScrollUI();
         }
 
         // 화면 중앙에 초기 배치
@@ -1153,8 +1157,8 @@ public class DragDropController : MonoBehaviour
         // 새 건물인 경우에만 재화 소비 및 건설 시간 대기
         if (!isFromInventory)
         {
-            ResourceData moneyData = DataManager.Instance.GetResourceByName("Money");
-            ResourceData woodData = DataManager.Instance.GetResourceByName("Wood");
+            ResourceData moneyData = ResourceRepository.Instance.GetResourceByName("Money");
+            ResourceData woodData = ResourceRepository.Instance.GetResourceByName("Wood");
             moneyData.current_amount -= buildingData.construction_cost_gold; // 재화 소비
             woodData.current_amount -= buildingData.construction_cost_wood; // 재화 소비
 
@@ -1180,15 +1184,9 @@ public class DragDropController : MonoBehaviour
             
             if (canvas != null)
             {
-                if (canvas.renderMode == RenderMode.WorldSpace)
+                if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
                 {
-                    // World Space는 사용 안할 예정이지만 혹시 몰라 남겨둠
-                    uiInstance.transform.SetParent(tempBuilding.transform);
-                    uiInstance.transform.localPosition = Vector3.up * 2f;
-                }
-                else if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
-                {
-                    // Screen Space Overlay -> 월드 좌표를 스크린 좌표로 변환
+                    // 월드 좌표를 스크린 좌표로 변환
                     Vector3 screenPos = mainCamera.WorldToScreenPoint(tempBuilding.transform.position + Vector3.up * 2f);
                     
                     RectTransform[] rectTransforms = uiInstance.GetComponentsInChildren<RectTransform>();
@@ -1198,20 +1196,10 @@ public class DragDropController : MonoBehaviour
                         {
                             uiElement = rt;
                             uiElement.position = screenPos;
+                            // UI 크기를 newBuildingCompleteSize로 고정
+                            uiElement.sizeDelta = newBuildingCompleteSize;
                             break;
                         }
-                    }
-                }
-                else if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
-                {
-                    // Screen Space Camera -> 카메라 할당 및 위치 설정
-                    canvas.worldCamera = mainCamera;
-                    Vector3 screenPos = mainCamera.WorldToScreenPoint(tempBuilding.transform.position + Vector3.up * 2f);
-                    
-                    uiElement = uiInstance.GetComponentInChildren<RectTransform>();
-                    if (uiElement != null && uiElement.gameObject != canvas.gameObject)
-                    {
-                        uiElement.position = screenPos;
                     }
                 }
             }
@@ -1231,59 +1219,78 @@ public class DragDropController : MonoBehaviour
             }
             
             // if)Screen Space Canvas -> UI가 TempBuilding을 따라다니도록 코루틴 시작, Update 함수 대신 씀
-            if (canvas != null && canvas.renderMode != RenderMode.WorldSpace && uiElement != null)
+            if (canvas != null && canvas.renderMode == RenderMode.ScreenSpaceOverlay && uiElement != null)
             {
-                StartCoroutine(UpdateUIPosition(tempBuilding, uiElement, uiInstance));
+                // UI 위치 업데이트 코루틴 시작
+                StartCoroutine(UpdateUIPositionOverlay(tempBuilding, uiElement, uiInstance));
             }
         }
     }
 
     /// <summary>
-    /// Screen Space UI를 TempBuilding 위치에 맞춰 계속 업데이트하는 코루틴,Update 함수 대신 사용
+    /// Screen Space Overlay UI를 TempBuilding 위치에 맞춰 업데이트
+    /// 만약 줌 인 시에 UI 크기 커지고 반대로 줌 아웃 시 UI 크기가 작아져, UI 크기가 일정하게 유지되어 보이게 함
     /// </summary>
-    private IEnumerator UpdateUIPosition(GameObject tempBuilding, RectTransform uiElement, GameObject uiInstance)
+    private IEnumerator UpdateUIPositionOverlay(GameObject tempBuilding, RectTransform uiElement, GameObject uiInstance)
     {
+        // UI 크기 고정 = newBuildingCompleteSize로
+        if (uiElement != null)
+        {
+            uiElement.sizeDelta = newBuildingCompleteSize;
+        }
+        
+        // 초기 설정 저장
+        float initialOrthoSize = mainCamera != null ? mainCamera.orthographicSize : 5f;
+        Vector3 initialCameraPos = mainCamera != null ? mainCamera.transform.position : Vector3.zero;
+        Vector3 initialBuildingPos = tempBuilding != null ? tempBuilding.transform.position : Vector3.zero;
+        
         while (tempBuilding != null && uiInstance != null && uiElement != null)
         {
-            // 카메라가 유효한지 확인
             if (mainCamera == null)
             {
                 mainCamera = Camera.main;
                 if (mainCamera == null)
                 {
-                    Debug.LogWarning("Main Camera를 찾을 수 없습니다.");
+                    Debug.LogWarning("Main Camera를 찾을 수 없습니다."); // 없으면 곤란함 !!!
                     yield break;
                 }
             }
-            
-            // TempBuilding 위치를 스크린 좌표로 변환하여 UI 위치 업데이트
+
+            // TempBuilding의 월드 좌표 (오프셋 포함)
             Vector3 worldPos = tempBuilding.transform.position + Vector3.up * 2f;
+            
+            // 현재 카메라의 OrthographicSize로 스크린 좌표 계산
             Vector3 screenPos = mainCamera.WorldToScreenPoint(worldPos);
             
-            // 화면 밖에 있으면 UI를 숨기거나 처리 (선택사항)
-            if (screenPos.z > 0) // 카메라 앞에 있는 경우만
+            // 줌 비율 계산 = 현재 줌 / 초기 줌
+            float zoomRatio = initialOrthoSize / mainCamera.orthographicSize;
+            
+            // UI 크기를 줌 비율에 맞춰 조정, 줌 인 => UI 커짐, 줌 아웃 => UI 작아짐
+            Vector2 scaledSize = newBuildingCompleteSize * zoomRatio;
+            
+            // UI 위치 업데이트 및 가시성 처리
+            if (screenPos.z > 0)
             {
                 uiElement.position = screenPos;
+                uiElement.sizeDelta = scaledSize;
+                
                 if (!uiElement.gameObject.activeSelf)
                     uiElement.gameObject.SetActive(true);
             }
             else
             {
-                // 카메라 뒤에 있으면 UI 숨김
                 if (uiElement.gameObject.activeSelf)
                     uiElement.gameObject.SetActive(false);
             }
             
-            yield return null; // 매 프레임 업데이트
+            yield return null;
         }
         
-        // 루프 종료 시 UI 정리
         if (uiInstance != null)
         {
             Destroy(uiInstance);
         }
     }
-
     /// <summary>
     /// TempBuilding을 삭제하고 실제 건물을 생성하는 메서드
     /// 완료 UI의 버튼 클릭 시 호출됨
@@ -1335,7 +1342,7 @@ public class DragDropController : MonoBehaviour
                 // 새로 구매한 건물인 경우 -> ConstructedBuilding 데이터 생성 및 저장
                 if(DataManager.Instance.GetConstructedBuildingById(buildingData.building_id) == null)
                 {
-                    BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id);
+                    BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id, cellPosition);
                 }
             }
         }
@@ -1358,7 +1365,7 @@ public class DragDropController : MonoBehaviour
             BuildingBase buildingBase = hit.collider.GetComponent<BuildingBase>();
             TempBuildingData tempData = hit.collider.GetComponent<TempBuildingData>();
             
-            // 일반 건물만 인벤토리로 이동 가능
+            // 건물만 인벤토리로 이동 가능
             if (buildingBase != null && tempData == null)
             {
                 // DataManager를 통해 IsEditInventory 상태 업데이트
@@ -1375,9 +1382,25 @@ public class DragDropController : MonoBehaviour
                         editScrollUI.RefreshInventoryUI();
                     }
                     
-                    // 건물 오브젝트 삭제
+                    // 건물 오브젝트 삭제 전에 해당 건물의 MarkerPositionOffset 가져오기
                     Vector3Int buildingCell = grid.WorldToCell(hit.collider.transform.position);
-                    RemoveBuildingMarkers(buildingCell, buildingBase.TileSize);
+                    float buildingMarkerOffset = markerOffset; // 기본값
+                    
+                    if (DataManager.Instance != null && BuildingRepository.Instance != null)
+                    {
+                        ConstructedBuilding constructedBuilding = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
+                        if (constructedBuilding != null)
+                        {
+                            BuildingData buildingData = BuildingRepository.Instance.GetAllBuildingData()
+                                .Find(data => data.building_id == constructedBuilding.Id);
+                            if (buildingData != null)
+                            {
+                                buildingMarkerOffset = buildingData.MarkerPositionOffset;
+                            }
+                        }
+                    }
+                    
+                    RemoveBuildingMarkers(buildingCell, buildingBase.TileSize, buildingMarkerOffset);
                     Destroy(hit.collider.gameObject);
                 }
             }

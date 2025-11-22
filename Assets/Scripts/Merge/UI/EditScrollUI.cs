@@ -50,7 +50,7 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
         GenerateItems(dataManager.EditMode_InventoryBuildings);
     }
 
-    // 아이템 클릭 시 인벤토리에서 건물을 꺼내 배치 시작
+    // EditScroll 내의 Button 클릭 시 인벤토리에서 건물을 꺼내 배치 시작
     protected override void OnItemClicked(IScrollItemUI clickedItem)
     {
         ConstructedBuilding data = clickedItem.GetData<ConstructedBuilding>();
@@ -79,7 +79,7 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
     private void StartBuildingPlacementFromInventory(ConstructedBuilding building)
     {
         // BuildingData 찾기
-        BuildingData buildingData = dataManager.BuildingDatas.Find(b => b.building_id == building.Id);
+        BuildingData buildingData = BuildingRepository.Instance.GetAllBuildingData().Find(b => b.building_id == building.Id);
         if (buildingData == null)
         {
             Debug.LogError($"BuildingData를 찾을 수 없음 ID: {building.Id}");
@@ -159,6 +159,7 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
         
         isOpeningScroll = false;
         openSlideCoroutine = null;
+        
     }
 
     private IEnumerator CloseSlideCoroutine()
@@ -187,7 +188,6 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
         
         // scrollUI 비활성화
         scrollUI.SetActive(false);
-        
         isClosingScroll = false;
         closeSlideCoroutine = null;
     }
@@ -293,6 +293,28 @@ public class EditScrollUI : BaseScrollUI<ConstructedBuilding, EditBuildingButton
         else
         {
             StartCoroutine(OpenIsEditModeUI());
+        }
+    }
+
+    public void ToggleOnlyScrollUI()
+    {
+        if (scrollUI.activeSelf)
+        {
+            // ScrollUI만 닫기
+            if (closeSlideCoroutine == null && !isClosingScroll)
+            {
+                closeSlideCoroutine = StartCoroutine(CloseSlideCoroutine());
+            }
+            base.OnCloseButtonClicked();
+        }
+        else
+        {
+            // ScrollUI만 열기
+            if (openSlideCoroutine == null && !isOpeningScroll)
+            {
+                openSlideCoroutine = StartCoroutine(OpenSlideCoroutine());
+            }
+            base.OnOpenButtonClicked();
         }
     }
     #endregion
