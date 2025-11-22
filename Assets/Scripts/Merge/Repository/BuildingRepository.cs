@@ -254,9 +254,9 @@ public class BuildingRepository : MonoBehaviour, IRepository
     }
 
     /// <summary>
-    /// 새로운 건물을 건설 목록에 추가합니다.
+    /// 새로운 건물을 건설 목록에 추가하거나, 이미 존재하면 위치만 업데이트합니다.
     /// </summary>
-    public void AddConstructedBuilding(int buildingId)
+    public void AddConstructedBuilding(int buildingId, Vector3Int position)
     {
         // 1. BuildingData 확인
         if (!_buildingDataDict.TryGetValue(buildingId, out BuildingData buildingData))
@@ -265,22 +265,54 @@ public class BuildingRepository : MonoBehaviour, IRepository
             return;
         }
 
-        // 2. 새로운 ConstructedBuildingProduction 생성
-        ConstructedBuildingProduction newProduction = new ConstructedBuildingProduction
+        // 2. 이미 존재하는 건물인지 확인
+        var existingProduction = DataManager.Instance.ConstructedBuildingProductions
+            .Find(p => p.building_id == buildingId);
+        var existingPosition = DataManager.Instance.ConstructedBuildingPositions
+            .Find(p => p.building_id == buildingId);
+
+        if (existingProduction != null && existingPosition != null)
         {
-            building_id = buildingId,
-            last_production_time = System.DateTime.Now,
-            next_production_time = System.DateTime.Now,
-            is_producing = false
-        };
+            // 이미 존재하는 경우 - 위치만 업데이트 (변경사항이 있는 경우에만)
+            if (existingPosition.pos != position)
+            {
+                existingPosition.pos = position;
+                Debug.Log($"건물 '{buildingData.Building_Name}' (ID: {buildingId})의 위치를 {position}로 업데이트했습니다.");
+            }
+        }
+        else
+        {
+            // 새로운 건물인 경우 - 데이터 추가
+            // Production 데이터가 없으면 생성
+            if (existingProduction == null)
+            {
+                ConstructedBuildingProduction newProduction = new ConstructedBuildingProduction
+                {
+                    building_id = buildingId,
+                    last_production_time = System.DateTime.Now,
+                    next_production_time = System.DateTime.Now,
+                    is_producing = false
+                };
+                DataManager.Instance.ConstructedBuildingProductions.Add(newProduction);
+            }
 
-        // 3. DataManager의 ConstructedBuildingProductions에 추가
-        DataManager.Instance.ConstructedBuildingProductions.Add(newProduction);
+            // Position 데이터가 없으면 생성
+            if (existingPosition == null)
+            {
+                ConstructedBuildingPos newPosition = new ConstructedBuildingPos
+                {
+                    building_id = buildingId,
+                    pos = position,
+                    rotation = 0f
+                };
+                DataManager.Instance.ConstructedBuildingPositions.Add(newPosition);
+            }
 
-        // 4. ConstructedBuildings 리스트 갱신
+            Debug.Log($"건물 '{buildingData.Building_Name}' (ID: {buildingId})을 위치 {position}에 건설 목록에 추가했습니다.");
+        }
+
+        // ConstructedBuildings 리스트 갱신
         CreateConstructedBuildingsList(DataManager.Instance.ConstructedBuildingProductions, DataManager.Instance.ConstructedBuildingPositions);
-
-        Debug.Log($"건물 '{buildingData.Building_Name}' (ID: {buildingId})을 건설 목록에 추가했습니다.");
     }
 
     /// <summary>
@@ -344,7 +376,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
                 //float rot = building.Rotation;
                 BuildingData buildingData = GetBuildingDataById(building.Id);
                 GameObject constructedbuilding = BuildingFactory.CreateBuilding(buildingData, worldPos);
-                DragDropController.Instance.PlaceTilemapMarkers(gridpos, buildingData.tileSize);
+                DragDropController.Instance.PlaceTilemapMarkers(gridpos, buildingData.tileSize, buildingData.MarkerPositionOffset);
             } 
         }
         catch(Exception ex)

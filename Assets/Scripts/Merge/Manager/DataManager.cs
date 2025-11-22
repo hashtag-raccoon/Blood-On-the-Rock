@@ -116,8 +116,10 @@ public class DataManager : MonoBehaviour
     {
         // 게임 종료 직전, 변경된 런타임 데이터의 '상태'를 원본 '상태' 데이터에 반영 후 저장합니다.
         UpdateConstructedBuildingProductionsFromConstructedBuildings();
+        UpdateConstructedBuildingPositionsFromConstructedBuildings();
         UpdateAndSaveArbeitData();
         SaveConstructedBuildingProductions();
+        SaveConstructedBuidlingPositions();
     }
 
     private void OnDestroy()
@@ -161,12 +163,20 @@ public class DataManager : MonoBehaviour
         ConstructedBuildingProductions = jsonDataHandler.LoadConstructedBuildingProductions();
         Debug.Log($"ConstructedBuildingProduction {ConstructedBuildingProductions.Count}개를 JSON에서 로드했습니다.");
 
-        ConstructedBuildingPositions = jsonDataHandler.LoadBuildingPositons();
+        ConstructedBuildingPositions = jsonDataHandler.LoadBuildingPositions();
         Debug.Log($"ConstructedBuildingPositions {ConstructedBuildingPositions.Count}개를 JSON에서 로드했습니다.");
     }
     #endregion
 
     #region Data Saving Methods
+    /// <summary>
+    /// 현재 건설된 건물 위치를 JSON 파일에 저장합니다.
+    /// </summary>
+    public void SaveConstructedBuidlingPositions()
+    {
+        jsonDataHandler.SaveBuildingPosition(ConstructedBuildingPositions);
+    }
+
     /// <summary>
     /// 현재 건설된 건물 생산 상태를 JSON 파일에 저장합니다.
     /// </summary>
@@ -196,19 +206,98 @@ public class DataManager : MonoBehaviour
             }
         }
 
+        int updateCount = 0;
         foreach (var building in ConstructedBuildings)
         {
             if (productionDict.TryGetValue(building.Id, out var production))
-            // 딕셔너리에서 ID로 해당 건물의 상태 데이터를 찾습니다.
             {
-                production.is_producing = building.IsProducing;
-                production.last_production_time = building.LastProductionTime;
-                production.next_production_time = building.NextProductionTime;
+                // 변경사항이 있는지 확인하고 업데이트
+                bool hasChanges = false;
+
+                if (production.is_producing != building.IsProducing)
+                {
+                    production.is_producing = building.IsProducing;
+                    hasChanges = true;
+                }
+
+                if (production.last_production_time != building.LastProductionTime)
+                {
+                    production.last_production_time = building.LastProductionTime;
+                    hasChanges = true;
+                }
+
+                if (production.next_production_time != building.NextProductionTime)
+                {
+                    production.next_production_time = building.NextProductionTime;
+                    hasChanges = true;
+                }
+
+                if (hasChanges)
+                {
+                    updateCount++;
+                }
             }
         }
 
+        if (updateCount > 0)
+        {
+            Debug.Log($"ConstructedBuildingProduction {updateCount}개의 데이터를 업데이트했습니다.");
+        }
+    }
 
+    /// <summary>
+    /// 게임 플레이 중 변경된 'ConstructedBuilding' 런타임 객체의 위치를
+    /// 저장을 위한 원본 위치 데이터인 'ConstructedBuildingPositions' 리스트에 다시 반영합니다.
+    /// </summary>
+    private void UpdateConstructedBuildingPositionsFromConstructedBuildings()
+    {
+        if (ConstructedBuildings == null || ConstructedBuildingPositions == null) return;
 
+        var positionDict = new Dictionary<int, ConstructedBuildingPos>();
+        foreach (var position in ConstructedBuildingPositions)
+        {
+            if (!positionDict.ContainsKey(position.building_id))
+            {
+                positionDict.Add(position.building_id, position);
+            }
+            else
+            {
+                Debug.LogWarning($"[Data Duplication] ConstructedBuildingPositions에 중복된 building_id '{position.building_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
+            }
+        }
+
+        int updateCount = 0;
+        foreach (var building in ConstructedBuildings)
+        {
+            if (positionDict.TryGetValue(building.Id, out var position))
+            {
+                // 변경사항이 있는지 확인하고 업데이트
+                bool hasChanges = false;
+
+                if (position.pos != building.Position)
+                {
+                    position.pos = building.Position;
+                    hasChanges = true;
+                }
+
+                if (position.rotation != building.Rotation)
+                {
+                    position.rotation = building.Rotation;
+                    hasChanges = true;
+                }
+
+                if (hasChanges)
+                {
+                    updateCount++;
+                    Debug.Log($"건물 ID {building.Id}의 위치 데이터를 업데이트했습니다. Position: {building.Position}, Rotation: {building.Rotation}");
+                }
+            }
+        }
+
+        if (updateCount > 0)
+        {
+            Debug.Log($"ConstructedBuildingPositions {updateCount}개의 데이터를 업데이트했습니다.");
+        }
     }
 
     /// <summary>

@@ -517,7 +517,7 @@ public class DragDropController : MonoBehaviour
             ClearMarkers();
 
             // 원래 위치에 마커 복구
-            PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize);
+            PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize, markerOffset);
 
             // 드래그 모드 취소
             isDraggingSprite = false;
@@ -723,19 +723,13 @@ public class DragDropController : MonoBehaviour
                 isDraggingSprite = false;
                 onEdit = false;
 
-                // BuildingFactory를 통해 실제 건물 생성
+                // BuildingFactory를 통해 실제 건물 생성 (BuildingFactory 내부에서 AddConstructedBuilding 자동 호출)
                 GameObject realBuilding = BuildingFactory.CreateBuilding(buildingData, worldPos);
 
                 if (realBuilding != null)
                 {
                     // 타일맵에 마커 배치
-                    PlaceTilemapMarkers(dropCell, editBuildingTileSize);
-
-                    // ConstructedBuildingProduction 데이터 생성 및 저장
-                    if (DataManager.Instance.GetConstructedBuildingById(buildingData.building_id) == null)
-                    {
-                        //SaveNewConstructedBuilding(buildingData);
-                    }
+                    PlaceTilemapMarkers(dropCell, editBuildingTileSize, markerOffset);
                 }
 
                 return; // 배치 완료 후 바로 종료
@@ -748,7 +742,19 @@ public class DragDropController : MonoBehaviour
                 if (draggedSpriteRenderer != null)
                     draggedSpriteRenderer.color = originalSpriteColor;
 
-                PlaceTilemapMarkers(dropCell, editBuildingTileSize);
+                PlaceTilemapMarkers(dropCell, editBuildingTileSize, markerOffset);
+
+                // ConstructedBuilding의 Position 업데이트
+                BuildingBase buildingBase = draggedSpriteObject.GetComponent<BuildingBase>();
+                if (buildingBase != null && DataManager.Instance != null)
+                {
+                    ConstructedBuilding building = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
+                    if (building != null)
+                    {
+                        building.Position = dropCell;
+                        Debug.Log($"건물 ID {building.Id}의 위치를 {dropCell}로 업데이트했습니다.");
+                    }
+                }
 
                 // 기존 건물 배치 완료 - 드래그 상태만 초기화 (편집 모드는 유지)
                 isDraggingSprite = false;
@@ -770,7 +776,7 @@ public class DragDropController : MonoBehaviour
 
     // 타일맵에 마커(건물이 차지하는 영역 표시) 배치
     // 기존 건물의 마커는 ExistingTilemap에 저장됨
-    public void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize)
+    public void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset)
     {
         // ExistingTilemap에 기존 건물 마커 배치
         if (ExistingTilemap != null && markerTile != null)
@@ -787,7 +793,7 @@ public class DragDropController : MonoBehaviour
                     Vector3 worldPos = grid.CellToWorld(tilePos);
 
                     // 오프셋 적용
-                    worldPos.y += markerOffset;
+                    worldPos.y += customOffset;
 
                     Vector3Int placeCell = grid.WorldToCell(worldPos);
                     placeCell.z = startCell.z;
