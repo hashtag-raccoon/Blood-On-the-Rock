@@ -141,7 +141,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
         if (currentConstructedBuilding == null) return;
 
         List<BuildingProductionInfo> productionInfos =
-            DataManager.Instance.GetBuildingProductionInfoByType(currentConstructedBuilding.Name);
+            BuildingRepository.Instance.GetProductionInfosForBuildingType(currentConstructedBuilding.Type);
 
         foreach (var productionInfo in productionInfos)
         {
@@ -159,7 +159,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
             createButton = itemObj.AddComponent<ProductionCreateButton>();
         }
 
-        ResourceData resourceData = DataManager.Instance.GetResourceById(productionData.resource_id);
+        ResourceData resourceData = ResourceRepository.Instance.GetResourceById(productionData.resource_id);
 
         createButton.Initialize(productionData, resourceData, currentBuildingLevel);
 

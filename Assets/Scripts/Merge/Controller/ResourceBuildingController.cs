@@ -51,7 +51,7 @@ public class ResourceBuildingController : BuildingBase
 
         // ResourceBuildingController 클래스 초기화
         InitializeProductionSlots();
-        
+
         // 재시작 시, 전 게임에서 저장된 생산 정보를 현 에 복원
         //RestoreProductionFromSave();
     }
@@ -79,7 +79,7 @@ public class ResourceBuildingController : BuildingBase
             return;
         }
         UpdateAllProductions();
-        
+
         // 현재 생산 정보(생산 중인 자원들 정보)를 ConstructedBuilding에 동기화
         if(this.constructedBuilding != null)
         {
@@ -294,6 +294,37 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
+    public bool StartProduction(BuildingProductionInfo productionData, ResourceData resourceData)
+    {
+        int emptySlotIndex = FindEmptySlotIndex();
+
+        if (emptySlotIndex == -1)
+        {
+            return false;
+        }
+
+        // 재화 소비
+        ResourceData consumeResource = ResourceRepository.Instance.GetResourceByName(productionData.consume_resource_type);
+        if (consumeResource.current_amount < productionData.consume_amount)
+        {
+            return false;
+        }
+
+        consumeResource.current_amount -= productionData.consume_amount;
+
+        // 생산 시작
+        ProductionInfo newProduction = new ProductionInfo(productionData, resourceData, emptySlotIndex);
+        activeProductions[emptySlotIndex] = newProduction;
+
+        // UI 업데이트
+        if (ResourceBuildingUIManager.Instance != null)
+        {
+            ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
+        }
+
+        return true;
+    }
+
     public void CancelProduction(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= activeProductions.Count)
@@ -304,7 +335,7 @@ public class ResourceBuildingController : BuildingBase
 
         // 재화 반환
         ProductionInfo production = activeProductions[slotIndex];
-        ResourceData consumeResource = DataManager.Instance.GetResourceByName(production.productionData.consume_resource_type);
+        ResourceData consumeResource = ResourceRepository.Instance.GetResourceByName(production.productionData.consume_resource_type);
         consumeResource.current_amount += production.productionData.consume_amount;
 
         activeProductions[slotIndex] = null;

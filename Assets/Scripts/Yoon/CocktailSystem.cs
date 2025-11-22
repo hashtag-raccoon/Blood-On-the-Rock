@@ -26,8 +26,26 @@ public class CocktailSystem : MonoBehaviour
     public void CheckCocktailToRecipe()
     {
         float Percent = 0.0f;
-        cocktailData = _dataManager.GetCocktailDataById(1);
-        recipeData = _dataManager.GetCocktailRecipeByCocktailId(1);
+        cocktailData = CocktailRepository.Instance.GetCocktailDataById(1);
+        recipeData = CocktailRepository.Instance.GetCocktailRecipeByCocktailId(1);
+        foreach (var item in recipeData.Recipedict)
+        {
+            if (Ingridiants.ContainsKey(int.Parse(item.Key)))
+            {
+
+            }
+        }
+
+    }
+    /// <summary>
+    /// 선택한 재료를 Ingridiants Dictionary에 추가
+    /// </summary>
+    /// <param name="ingridiantsId"></param>
+    /// <param name="volume"></param>
+    public void UpdateIngridiants(int ingridiantsId, int volume)
+    {
+        Ingridiants.Add(ingridiantsId, volume);
+
     }
     #endregion
 

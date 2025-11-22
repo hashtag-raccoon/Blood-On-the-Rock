@@ -101,7 +101,25 @@ public static class BuildingFactory
         // Reflection을 사용하여 private/protected 필드 할당
         var type = typeof(BuildingBase);
 
-        BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id);
+        // 이미 존재하는 건물인지 확인 (게임 시작 시 로드된 건물인 경우)
+        bool buildingExists = DataManager.Instance != null &&
+                              DataManager.Instance.GetConstructedBuildingById(buildingData.building_id) != null;
+
+        // 새 건물인 경우에만 데이터 추가
+        if (!buildingExists)
+        {
+            // 건물의 현재 위치를 grid cell position으로 변환
+            Grid grid = UnityEngine.Object.FindObjectOfType<Grid>();
+            Vector3Int cellPosition = Vector3Int.zero;
+            if (grid != null)
+            {
+                Vector3 worldPos = buildingBase.transform.position;
+                worldPos.z = 0;
+                cellPosition = grid.WorldToCell(worldPos);
+            }
+
+            BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id, cellPosition);
+        }
 
         // constructedBuildingId를 조회하여 할당
         int constructedBuildingId = GetConstructedBuildingId(buildingData.building_id);

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class BuildScrollUI : BaseScrollUI<BuildingData, BuildBuildingButtonUI>
 {
     private DataManager dataManager;
+    private BuildingRepository Buildinginstance;
     [Header("IslandManager 할당/연결")]
     [SerializeField] private IslandManager islandManager;
     [Header("UI 애니메이션 설정")]
@@ -24,8 +25,9 @@ public class BuildScrollUI : BaseScrollUI<BuildingData, BuildBuildingButtonUI>
     private void Start()
     {
         dataManager = DataManager.Instance;
+        Buildinginstance = BuildingRepository.Instance;
 
-        GenerateItems(dataManager.BuildingDatas);
+        GenerateItems(Buildinginstance.GetAllBuildingData());
     }
 
     protected override void OnItemClicked(IScrollItemUI clickedItem)
@@ -86,7 +88,7 @@ public class BuildScrollUI : BaseScrollUI<BuildingData, BuildBuildingButtonUI>
 
         yield return new WaitForSeconds(duration);
     }
-    
+
     // isOpen이 true면<열기 애니메이션>, false면<닫기 애니메이션>
     // <열기 애니메이션> - isLeft가 true면 왼쪽에서 화면 밖으로 슬라이드, false면 오른쪽에서 화면 밖으로 슬라이드,
     // <닫기 애니메이션> - isLeft가 true면 화면 밖에서 오른쪽으로 슬라이드, false면 화면 밖에서 왼쪽으로 슬라이드

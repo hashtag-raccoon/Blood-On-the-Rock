@@ -986,6 +986,50 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ae9b3438b449bc9499c4c89c57b7d9b8, type: 3}
+--- !u!1 &175442385
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 175442386}
+  - component: {fileID: 175442387}
+  m_Layer: 0
+  m_Name: ResourceRepository
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &175442386
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175442385}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 675181389}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &175442387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175442385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 362d275d9cd46dd4287b581ba7d30e74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &197581658
 GameObject:
   m_ObjectHideFlags: 0
@@ -31118,6 +31162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56992d026bc4fe543b52cb3a6658db8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buildingDataSO: {fileID: 11400000, guid: 9fc70487ce8bd804aa658d37f60b1192, type: 2}
+  buildingProductionInfoSO: {fileID: 11400000, guid: 506aba939074ddf41ac9b036998565c0, type: 2}
 --- !u!1 &398167749
 GameObject:
   m_ObjectHideFlags: 0
@@ -32055,6 +32101,7 @@ Transform:
   - {fileID: 996104524}
   - {fileID: 373021537}
   - {fileID: 1675048606}
+  - {fileID: 175442386}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &687171646 stripped
@@ -33858,6 +33905,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a496111eaec6a0f46a78542bda07da2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
 --- !u!224 &996990605 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6595235659272945825, guid: ae9b3438b449bc9499c4c89c57b7d9b8, type: 3}
@@ -34331,7 +34379,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!61 &1121466437
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -35461,15 +35509,7 @@ MonoBehaviour:
   personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
   buildingDataSO: {fileID: 11400000, guid: 9fc70487ce8bd804aa658d37f60b1192, type: 2}
   buildingProductionInfoSO: {fileID: 11400000, guid: 506aba939074ddf41ac9b036998565c0, type: 2}
-  BuildingDatas: []
-  BuildingProductionInfos: []
-  BuildingUpgradeDatas: []
   ConstructedBuildingProductions: []
-  arbeitDatas: []
-  personalities: []
-  goodsDatas:
-  - {fileID: 11400000, guid: 73b72c595d6481644b264c0add64b084, type: 2}
-  - {fileID: 11400000, guid: 9e1cf8a609e62ff469018fcc3ee0625c, type: 2}
   npcs: []
   ConstructedBuildings: []
   cocktails: []
@@ -36508,7 +36548,7 @@ Transform:
   m_GameObject: {fileID: 1608802864}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.16339362, y: -1.1994781, z: 0.4020996}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -36799,7 +36839,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cb9a5d49ef8a83428165abfcda268db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allCocktails: []
+  cocktailDataSO: {fileID: 0}
+  cocktailRecipeSO: {fileID: 0}
 --- !u!1 &1690356411
 GameObject:
   m_ObjectHideFlags: 0
@@ -37375,7 +37416,7 @@ Transform:
   m_GameObject: {fileID: 1765066512}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.16339362, y: 1.1994781, z: -0.4020417}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -18,7 +18,18 @@ using UnityEngine.UI;
 /// </summary>
 public class DragDropController : MonoBehaviour
 {
-    public static DragDropController instance;
+    private static DragDropController _instance;
+    public static DragDropController Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<DragDropController>();
+            }
+            return _instance;
+        }
+    }
 
     [Header("타일맵 설정")]
     [SerializeField] private Grid grid;
@@ -81,9 +92,11 @@ public class DragDropController : MonoBehaviour
         // 싱글톤 패턴 초기화, 추후 싱글톤이 아닌 방법으로 변경할 예정
         if (instance == null)
         {
-            instance = this;
+            _instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
-        else if (instance != this)
+        else if (_instance != this)
         {
             Destroy(gameObject);
         }
@@ -96,6 +109,16 @@ public class DragDropController : MonoBehaviour
     {
         if (mainCamera == null)
             mainCamera = Camera.main;
+
+        // Grid 자동 찾기
+        if (grid == null)
+        {
+            grid = FindObjectOfType<Grid>();
+            if (grid == null)
+            {
+                Debug.LogError("[DragDropController] Scene에서 Grid를 찾을 수 없습니다!");
+            }
+        }
 
         // 카메라 투명도 정렬축을 Y 축으로 설정
         // 필요한 이유 = 2D 타일맵에서 Y 축 기준으로 오브젝트가 앞뒤로 겹쳐질 때 올바르게 정렬하기 위함
@@ -532,8 +555,8 @@ public class DragDropController : MonoBehaviour
             ClearMarkers();
             
             // 원래 위치에 마커 복구
-            PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize);
-            
+            PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize, markerOffset);
+
             // 드래그 모드 취소
             isDraggingSprite = false;
             draggedSpriteObject = null;
@@ -590,9 +613,10 @@ public class DragDropController : MonoBehaviour
             if (DataManager.Instance != null && DataManager.Instance.ConstructedBuildings != null)
             {
                 ConstructedBuilding constructedBuilding = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
-                if (constructedBuilding != null && DataManager.Instance.BuildingDatas != null)
+                if (constructedBuilding != null && BuildingRepository.Instance != null)
                 {
-                    BuildingData buildingData = DataManager.Instance.BuildingDatas.Find(data => data.building_id == constructedBuilding.Id);
+                    BuildingData buildingData = BuildingRepository.Instance.GetAllBuildingData()
+                        .Find(data => data.building_id == constructedBuilding.Id);
                     if (buildingData != null)
                     {
                         markerOffset = buildingData.MarkerPositionOffset;
@@ -608,7 +632,9 @@ public class DragDropController : MonoBehaviour
         // 기존 건물의 원래 위치 저장 및 마커 제거
         if (editTargetObject != null)
         {
-            originalBuildingCell = grid.WorldToCell(editTargetObject.transform.position);
+            Vector3 buildingPos = editTargetObject.transform.position;
+            buildingPos.z = 0; // Z값을 0으로 고정
+            originalBuildingCell = grid.WorldToCell(buildingPos);
             originalBuildingTileSize = editBuildingTileSize;
             
             // 기존 건물 마커만 제거
@@ -771,9 +797,21 @@ public class DragDropController : MonoBehaviour
                 
                 if (draggedSpriteRenderer != null)
                     draggedSpriteRenderer.color = originalSpriteColor;
-                
-                PlaceTilemapMarkers(dropCell, editBuildingTileSize);
-                
+
+                PlaceTilemapMarkers(dropCell, editBuildingTileSize, markerOffset);
+
+                // ConstructedBuilding의 Position 업데이트
+                BuildingBase buildingBase = draggedSpriteObject.GetComponent<BuildingBase>();
+                if (buildingBase != null && DataManager.Instance != null)
+                {
+                    ConstructedBuilding building = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
+                    if (building != null)
+                    {
+                        building.Position = dropCell;
+                        Debug.Log($"건물 ID {building.Id}의 위치를 {dropCell}로 업데이트했습니다.");
+                    }
+                }
+
                 // 기존 건물 배치 완료 - 드래그 상태만 초기화 (편집 모드는 유지)
                 isDraggingSprite = false;
                 draggedSpriteObject = null;
@@ -794,7 +832,7 @@ public class DragDropController : MonoBehaviour
     
     // 타일맵에 마커(건물이 차지하는 영역 표시) 배치
     // 기존 건물의 마커는 ExistingTilemap에 저장됨
-    private void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize)
+    public void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset)
     {
         // ExistingTilemap에 기존 건물 마커 배치
         if (ExistingTilemap != null && markerTile != null)
@@ -811,8 +849,8 @@ public class DragDropController : MonoBehaviour
                     Vector3 worldPos = grid.CellToWorld(tilePos);
                     
                     // 오프셋 적용
-                    worldPos.y += markerOffset;
-                    
+                    worldPos.y += customOffset;
+
                     Vector3Int placeCell = grid.WorldToCell(worldPos);
                     placeCell.z = startCell.z; 
                     
