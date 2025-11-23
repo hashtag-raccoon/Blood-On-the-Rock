@@ -19,6 +19,15 @@ public class DataManager : MonoBehaviour
     private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
     #endregion
 
+    #region NPC Prefab Path Settings
+    [Header("NPC Prefab 경로 설정")]
+    [Tooltip("Resources 폴더 사용 여부 (false면 Assets/Prefab/Character 같은 절대 경로 사용)")]
+    [SerializeField] private bool useResourcesFolder = true;
+    
+    [Tooltip("Resources 폴더 기준 NPC Prefab 경로 (예: 'Prefab/Character')\n또는 Assets 폴더 기준 절대 경로 (예: 'Prefab/Character')")]
+    [SerializeField] private string npcPrefabPath = "Prefab/Character";
+    #endregion
+
     #region Data Sources (ScriptableObject)
     [Header("데이터 에셋")]
     [Tooltip("NPC의 고정 특성(성격, 기본 능력치 등)을 담고 있는 ScriptableObject")]
@@ -64,6 +73,10 @@ public class DataManager : MonoBehaviour
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
+    
+    // NPC Prefab 매핑: prefab_name -> GameObject prefab
+    [Header("NPC Prefab 매핑")]
+    public Dictionary<string, GameObject> npcPrefabDict = new Dictionary<string, GameObject>();
     #endregion
 
     #region Game Resources
@@ -142,6 +155,7 @@ public class DataManager : MonoBehaviour
     // NPC의 상태 데이터(레벨, 경험치 등)를 JSON 파일에서 로드합니다.
     {
         arbeitDatas = jsonDataHandler.LoadArbeitData();
+        Debug.Log($"ArbeitData 로드 완료: {arbeitDatas.Count}개");
     }
 
     private void LoadPersonalityData()
@@ -360,6 +374,185 @@ public class DataManager : MonoBehaviour
     public CocktailRecipeJson GetCocktailRecipeByCocktailId(int cocktailId)
     {
         return recipes.Find(data => data.CocktailId == cocktailId);
+    }
+
+    #endregion
+
+    #region NPC Prefab Mapping Methods
+
+    /// <summary>
+    /// prefab_name을 기준으로 prefab과 npcs 리스트를 매핑합니다.
+    /// prefab_name 형식: "[종족]_[npc_id]" (예: "오크_1", "인간_5")
+    /// </summary>
+    public void MapNpcPrefabs()
+    {
+        if (arbeitDatas == null)
+        {
+            Debug.LogWarning("arbeitDatas가 초기화되지 않았습니다.");
+            return;
+        }
+        
+        // npcs는 null일 수 있음 (손님 데이터의 경우 employment_state가 false)
+        // npcs가 null이어도 prefab은 로드할 수 있어야 함
+
+        npcPrefabDict.Clear();
+        
+        Debug.Log($"[MapNpcPrefabs] 시작: arbeitDatas {arbeitDatas.Count}개, useResourcesFolder: {useResourcesFolder}, 경로: {npcPrefabPath}");
+
+        foreach (var arbeitData in arbeitDatas)
+        {
+            if (string.IsNullOrEmpty(arbeitData.prefab_name))
+            {
+                Debug.LogWarning($"ArbeitData ID {arbeitData.part_timer_id}의 prefab_name이 비어있습니다.");
+                continue;
+            }
+
+            // prefab_name을 "_"로 분리하여 race와 part_timer_id 추출
+            string[] parts = arbeitData.prefab_name.Split('_');
+            if (parts.Length < 2)
+            {
+                Debug.LogWarning($"ArbeitData ID {arbeitData.part_timer_id}의 prefab_name 형식이 올바르지 않습니다: {arbeitData.prefab_name}");
+                continue;
+            }
+
+            string raceFromPrefabName = parts[0];
+            if (!int.TryParse(parts[1], out int npcIdFromPrefabName))
+            {
+                Debug.LogWarning($"ArbeitData ID {arbeitData.part_timer_id}의 prefab_name에서 ID를 파싱할 수 없습니다: {arbeitData.prefab_name}");
+                continue;
+            }
+
+            // race와 part_timer_id로 npc 찾기
+            npc matchedNpc = npcs.Find(n => n.race == raceFromPrefabName && n.part_timer_id == npcIdFromPrefabName);
+            if (matchedNpc == null)
+            {
+                // npcs 리스트에 없어도 prefab은 로드할 수 있음 (손님 데이터의 경우)
+                Debug.Log($"NPC (race: {raceFromPrefabName}, id: {npcIdFromPrefabName})를 npcs 리스트에서 찾을 수 없습니다. prefab만 로드합니다.");
+            }
+
+            // Prefab 로드
+            GameObject prefab = null;
+            string prefabPath = "";
+            string actualPrefabName = "";
+            
+            // prefab_name을 실제 파일명으로 변환 (Human_1 -> Human1, Vampire_3 -> Vam3)
+            actualPrefabName = ConvertPrefabNameToFileName(arbeitData.prefab_name);
+            Debug.Log($"[MapNpcPrefabs] ID {arbeitData.part_timer_id}: prefab_name '{arbeitData.prefab_name}' -> 파일명 '{actualPrefabName}' 변환");
+            
+            if (useResourcesFolder)
+            {
+                // Resources 폴더에서 로드
+                prefabPath = $"{npcPrefabPath}/{actualPrefabName}";
+                prefab = Resources.Load<GameObject>(prefabPath);
+                Debug.Log($"[MapNpcPrefabs] Resources.Load 시도: {prefabPath}");
+            }
+            else
+            {
+                // Assets 폴더 기준 절대 경로에서 로드 (에디터 전용)
+                #if UNITY_EDITOR
+                prefabPath = $"Assets/{npcPrefabPath}/{actualPrefabName}.prefab";
+                prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                Debug.Log($"[MapNpcPrefabs] AssetDatabase.LoadAssetAtPath 시도: {prefabPath}");
+                #else
+                Debug.LogError("useResourcesFolder가 false일 때는 에디터에서만 작동합니다. 빌드 후에는 Resources 폴더를 사용해야 합니다.");
+                #endif
+            }
+
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[MapNpcPrefabs] ✗ Prefab을 찾을 수 없습니다: {prefabPath} (원본 prefab_name: {arbeitData.prefab_name}, 변환된 파일명: {actualPrefabName})");
+                continue;
+            }
+            
+            Debug.Log($"[MapNpcPrefabs] ✓ Prefab 로드 성공: {prefabPath} -> {prefab.name}");
+
+            // 딕셔너리에 추가
+            if (!npcPrefabDict.ContainsKey(arbeitData.prefab_name))
+            {
+                npcPrefabDict.Add(arbeitData.prefab_name, prefab);
+                Debug.Log($"NPC Prefab 매핑 완료: {arbeitData.prefab_name} -> {prefab.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"중복된 prefab_name이 발견되었습니다: {arbeitData.prefab_name}");
+            }
+        }
+
+        Debug.Log($"NPC Prefab 매핑 완료: 총 {npcPrefabDict.Count}개");
+    }
+
+    /// <summary>
+    /// prefab_name을 실제 파일명으로 변환합니다.
+    /// 예: Human_1 -> Human1, Vampire_3 -> Vam3, Oak_1 -> Oak1
+    /// </summary>
+    private string ConvertPrefabNameToFileName(string prefabName)
+    {
+        if (string.IsNullOrEmpty(prefabName))
+            return prefabName;
+        
+        // 언더스코어로 분리
+        string[] parts = prefabName.Split('_');
+        if (parts.Length < 2)
+            return prefabName; // 변환 불가능하면 원본 반환
+        
+        string racePart = parts[0];
+        string idPart = parts[1];
+        
+        // 종족명 변환 규칙
+        // Human -> Human (그대로)
+        // Vampire -> Vam
+        // Oak -> Oak (그대로)
+        if (racePart.Equals("Vampire", StringComparison.OrdinalIgnoreCase))
+        {
+            racePart = "Vam";
+        }
+        
+        // 숫자 부분 처리 (앞의 0 제거 등)
+        if (int.TryParse(idPart, out int id))
+        {
+            // 파일명 형식: {race}{id} (예: Human1, Vam3, Oak1)
+            return $"{racePart}{id}";
+        }
+        
+        return prefabName; // 변환 실패 시 원본 반환
+    }
+
+    /// <summary>
+    /// prefab_name으로 NPC prefab을 가져옵니다.
+    /// </summary>
+    public GameObject GetNpcPrefabByPrefabName(string prefabName)
+    {
+        if (npcPrefabDict.TryGetValue(prefabName, out GameObject prefab))
+        {
+            return prefab;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// part_timer_id로 NPC prefab을 가져옵니다.
+    /// </summary>
+    public GameObject GetNpcPrefabById(int partTimerId)
+    {
+        var arbeitData = arbeitDatas.Find(a => a.part_timer_id == partTimerId);
+        if (arbeitData != null && !string.IsNullOrEmpty(arbeitData.prefab_name))
+        {
+            return GetNpcPrefabByPrefabName(arbeitData.prefab_name);
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// race와 part_timer_id로 NPC prefab을 가져옵니다.
+    /// </summary>
+    public GameObject GetNpcPrefabByRaceAndId(string race, int partTimerId)
+    {
+        var arbeitData = arbeitDatas.Find(a => a.race == race && a.part_timer_id == partTimerId);
+        if (arbeitData != null && !string.IsNullOrEmpty(arbeitData.prefab_name))
+        {
+            return GetNpcPrefabByPrefabName(arbeitData.prefab_name);
+        }
+        return null;
     }
 
     #endregion

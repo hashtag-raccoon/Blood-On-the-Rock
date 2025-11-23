@@ -15,9 +15,13 @@ public class InteriorScrollUI : BaseScrollUI<InteriorData, BuildInteriorButtonUI
     [SerializeField] private IslandManager islandManager;
     [Header("UI 애니메이션 설정")]
     [SerializeField] float duration = 1f; // UI 팝업/종료 애니메이션 지속 시간
+    [Header("Interior 버튼 설정")]
+    [SerializeField] private GameObject interiorButtonObject; // Interior 버튼 GameObject (InteriorScrollOpenButton이 있는 GameObject)
+    [SerializeField] private bool isInteriorButtonOnLeft = true; // Interior 버튼이 왼쪽에 있는지 여부
 
     // ui들 원래 위치 담을 딕셔너리, 키: ui 오브젝트, 값: 원래 위치, OpenButton 누를 시 저장 및 초기화
     private Dictionary<GameObject, Vector2> UIoriginPos = new Dictionary<GameObject, Vector2>();
+    private DragDropController dragDropController;
 
     protected override void Awake()
     {
@@ -27,6 +31,13 @@ public class InteriorScrollUI : BaseScrollUI<InteriorData, BuildInteriorButtonUI
     private void Start()
     {
         dataManager = DataManager.Instance;
+        dragDropController = DragDropController.instance;
+        
+        // Interior 버튼을 자동으로 찾기 (할당되지 않은 경우)
+        if (interiorButtonObject == null && openButton != null)
+        {
+            interiorButtonObject = openButton.gameObject;
+        }
         
         // DataManager에 InteriorDatas가 있다면 사용, 없다면 빈 리스트
         if (dataManager.InteriorDatas != null && dataManager.InteriorDatas.Count > 0)
@@ -36,6 +47,16 @@ public class InteriorScrollUI : BaseScrollUI<InteriorData, BuildInteriorButtonUI
         else
         {
             Debug.LogWarning("InteriorDatas가 DataManager에 없습니다. DataManager에 InteriorDatas 리스트를 추가하거나, 직접 InteriorData 리스트를 할당하세요.");
+        }
+    }
+
+    private void Update()
+    {
+        // 작업 중일 때 Interior 버튼 비활성화
+        if (interiorButtonObject != null && openButton != null)
+        {
+            bool shouldDisable = dragDropController != null && dragDropController.IsEditMode;
+            openButton.interactable = !shouldDisable;
         }
     }
 
@@ -69,6 +90,7 @@ public class InteriorScrollUI : BaseScrollUI<InteriorData, BuildInteriorButtonUI
     {
         if (islandManager == null) yield break;
         
+        // 다른 버튼들 슬라이드
         foreach (var ui in islandManager.leftUI)
         {
             if (!UIoriginPos.ContainsKey(ui))
@@ -89,6 +111,17 @@ public class InteriorScrollUI : BaseScrollUI<InteriorData, BuildInteriorButtonUI
             StartCoroutine(SlideUICoroutine(ui, false, true));
         }
 
+        // Interior 버튼도 슬라이드
+        if (interiorButtonObject != null)
+        {
+            if (!UIoriginPos.ContainsKey(interiorButtonObject))
+            {
+                // 딕셔너리에 ui 원래 위치 저장
+                UIoriginPos[interiorButtonObject] = interiorButtonObject.GetComponent<RectTransform>().anchoredPosition;
+            }
+            StartCoroutine(SlideUICoroutine(interiorButtonObject, isInteriorButtonOnLeft, true));
+        }
+
         yield return new WaitForSeconds(duration);
     }
 
@@ -96,6 +129,7 @@ public class InteriorScrollUI : BaseScrollUI<InteriorData, BuildInteriorButtonUI
     {
         if (islandManager == null) yield break;
         
+        // 다른 버튼들 슬라이드
         foreach (var ui in islandManager.leftUI)
         {
             StartCoroutine(SlideUICoroutine(ui, true, false));
@@ -104,6 +138,12 @@ public class InteriorScrollUI : BaseScrollUI<InteriorData, BuildInteriorButtonUI
         foreach (var ui in islandManager.rightUI)
         {
             StartCoroutine(SlideUICoroutine(ui, false, false));
+        }
+
+        // Interior 버튼도 슬라이드
+        if (interiorButtonObject != null)
+        {
+            StartCoroutine(SlideUICoroutine(interiorButtonObject, isInteriorButtonOnLeft, false));
         }
 
         yield return new WaitForSeconds(duration);

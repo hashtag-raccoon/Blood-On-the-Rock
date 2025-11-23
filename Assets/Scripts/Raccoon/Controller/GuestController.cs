@@ -18,6 +18,21 @@ public class GuestController : MonoBehaviour
     private List<Vector3Int> currentPath;
     private int currentPathIndex;
     private bool isMoving = false;
+    
+    #region 애니메이션 제어를 위한 Public 프로퍼티 (추가됨)
+    /// <summary>
+    /// [수정됨] NPC의 현재 이동 상태를 반환하는 public 프로퍼티
+    /// CharacterAnimationController에서 IsWalking 파라미터를 제어하기 위해 추가됨
+    /// </summary>
+    public bool IsMoving => isMoving;
+    
+    /// <summary>
+    /// [수정됨] NPC의 현재 이동 속도 벡터를 반환하는 public 프로퍼티
+    /// CharacterAnimationController에서 MoveY 파라미터를 제어하기 위해 추가됨
+    /// 매 프레임마다 MoveAlongPath()에서 계산되어 업데이트됨
+    /// </summary>
+    public Vector3 CurrentVelocity { get; private set; }
+    #endregion
     private GameObject assignedTable;
     private bool isWaiting = false;
     private int myWaitingPosition = -1;
@@ -27,6 +42,9 @@ public class GuestController : MonoBehaviour
 
     void Start()
     {
+        // [수정됨] CurrentVelocity 초기화
+        // 게임 시작 시 속도를 0으로 설정하여 애니메이션이 올바르게 시작되도록 함
+        CurrentVelocity = Vector3.zero;
         if (pathfinder == null)
         {
             return;
@@ -36,8 +54,11 @@ public class GuestController : MonoBehaviour
 
     void Update()
     {
+        // [수정됨] pathfinder가 없거나 앉아있는 상태일 때 속도를 0으로 설정
+        // CharacterAnimationController가 정지 상태를 올바르게 감지할 수 있도록 함
         if (pathfinder == null || isSeated)
         {
+            CurrentVelocity = Vector3.zero;
             return;
         }
 
@@ -50,8 +71,11 @@ public class GuestController : MonoBehaviour
         {
             DetermineTarget();
         }
+        // [수정됨] Target이 없을 때 속도를 0으로 설정
+        // 목표가 없으면 이동하지 않으므로 애니메이션도 정지 상태로 설정
         if (Target == null)
         {
+            CurrentVelocity = Vector3.zero;
             return;
         }
 
@@ -69,11 +93,23 @@ public class GuestController : MonoBehaviour
                 currentPathIndex = 0;
                 isMoving = true;
             }
+            else
+            {
+                // [수정됨] 경로를 찾을 수 없을 때 속도를 0으로 설정
+                // 경로가 없으면 이동할 수 없으므로 애니메이션도 정지 상태로 설정
+                CurrentVelocity = Vector3.zero;
+            }
         }
 
         if (isMoving && currentPath != null)
         {
             MoveAlongPath();
+        }
+        else if (!isMoving)
+        {
+            // [수정됨] 이동하지 않을 때 속도를 0으로 설정
+            // isMoving이 false일 때 애니메이션이 정지 상태로 전환되도록 함
+            CurrentVelocity = Vector3.zero;
         }
     }
 
@@ -271,12 +307,24 @@ public class GuestController : MonoBehaviour
         if (currentPathIndex >= currentPath.Count)
         {
             isMoving = false;
+            // [수정됨] 목적지에 도달했을 때 속도를 0으로 설정
+            // 도착 시 애니메이션이 정지 상태로 전환되도록 함
+            CurrentVelocity = Vector3.zero;
             OnReachedDestination();
             return;
         }
 
+        // [수정됨] 이동 전 위치를 저장 (속도 계산을 위해)
+        // 이전 프레임의 위치와 현재 프레임의 위치 차이로 속도를 계산
+        Vector3 previousPosition = this.transform.position;
         Vector3 targetPos = pathfinder.CellToWorld(currentPath[currentPathIndex]);
         this.transform.position = Vector3.MoveTowards(this.transform.position, targetPos, moveSpeed * Time.deltaTime);
+        
+        // [수정됨] 현재 속도 계산 (애니메이션 제어용)
+        // CharacterAnimationController에서 MoveY 파라미터를 제어하기 위해 필요
+        // 위치 변화량을 Time.deltaTime으로 나누어 초당 이동 속도 벡터를 계산
+        // 이 값의 Y 성분이 MoveY 파라미터로 사용되어 위/아래 이동 애니메이션을 제어함
+        CurrentVelocity = (this.transform.position - previousPosition) / Time.deltaTime;
 
         if (Vector3.Distance(this.transform.position, targetPos) < 0.01f)
         {

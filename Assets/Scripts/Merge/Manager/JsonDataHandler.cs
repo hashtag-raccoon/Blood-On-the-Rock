@@ -57,7 +57,39 @@ public class JsonDataHandler
 
     public List<ArbeitData> LoadArbeitData()
     {
-        return LoadData<ArbeitData>(arbeitDataPath);
+        // 먼저 persistentDataPath에서 로드 시도
+        List<ArbeitData> data = LoadData<ArbeitData>(arbeitDataPath);
+        
+        // persistentDataPath에 파일이 없거나 비어있으면 Resources에서 초기 데이터 로드
+        if (data == null || data.Count == 0)
+        {
+            Debug.Log("persistentDataPath에 ArbeitData가 없습니다. Resources에서 초기 데이터를 로드합니다.");
+            TextAsset jsonFile = Resources.Load<TextAsset>("Data/NPC/ArbeitData");
+            
+            if (jsonFile != null)
+            {
+                string jsonData = jsonFile.text;
+                data = JsonConvert.DeserializeObject<List<ArbeitData>>(jsonData);
+                Debug.Log($"Resources에서 ArbeitData {data?.Count ?? 0}개를 로드했습니다.");
+                
+                // 로드한 데이터를 persistentDataPath에 저장 (다음부터는 여기서 로드)
+                if (data != null && data.Count > 0)
+                {
+                    SaveArbeitData(data);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Resources/Data/NPC/ArbeitData.json 파일을 찾을 수 없습니다.");
+                data = new List<ArbeitData>();
+            }
+        }
+        else
+        {
+            Debug.Log($"persistentDataPath에서 ArbeitData {data.Count}개를 로드했습니다.");
+        }
+        
+        return data ?? new List<ArbeitData>();
     }
 
     public void SaveConstructedBuildingProductions(List<ConstructedBuildingProduction> productions)
