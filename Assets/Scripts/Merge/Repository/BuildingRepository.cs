@@ -219,11 +219,49 @@ public class BuildingRepository : MonoBehaviour, IRepository
     /// <returns>해당 건물 타입의 생산 정보 리스트</returns>
     public List<BuildingProductionInfo> GetProductionInfosForBuildingType(string buildingType)
     {
-        if (buildingProductionInfoSO == null || buildingProductionInfoSO.productionInfos == null)
+        if (buildingProductionInfoSO == null)
         {
+            Debug.LogError("[BuildingRepository] buildingProductionInfoSO가 null입니다. 인스펙터에서 할당해주세요.");
             return new List<BuildingProductionInfo>();
         }
-        return buildingProductionInfoSO.productionInfos.Where(info => info.building_type == buildingType).ToList();
+
+        if (buildingProductionInfoSO.productionInfos == null)
+        {
+            Debug.LogError("[BuildingRepository] buildingProductionInfoSO.productionInfos가 null입니다.");
+            return new List<BuildingProductionInfo>();
+        }
+
+        Debug.Log($"[BuildingRepository] 전체 생산 정보 개수: {buildingProductionInfoSO.productionInfos.Count}");
+        
+        foreach (var info in buildingProductionInfoSO.productionInfos)
+        {
+            Debug.Log($"[BuildingRepository] 생산 정보 - building_type: '{info.building_type}', resource_id: {info.resource_id}");
+        }
+
+        var result = buildingProductionInfoSO.productionInfos.Where(info => info.building_type == buildingType).ToList();
+        
+        Debug.Log($"[BuildingRepository] '{buildingType}' 타입에 해당하는 생산 정보: {result.Count}개");
+        
+        return result;
+    }
+
+    public List<BuildingProductionInfo> GetProductionInfosForBuildingName(string buildingName)
+    {
+        if (buildingProductionInfoSO == null)
+        {
+            Debug.LogError("[BuildingRepository] buildingProductionInfoSO가 null입니다."); // 당분간은 빼지 말아줘
+            return new List<BuildingProductionInfo>();
+        }
+
+        if (buildingProductionInfoSO.productionInfos == null)
+        {
+            Debug.LogError("[BuildingRepository] buildingProductionInfoSO.productionInfos가 null입니다."); // 당분간은 빼지 말아줘
+            return new List<BuildingProductionInfo>();
+        }
+
+        var result = buildingProductionInfoSO.productionInfos.Where(info => info.building_type == buildingName).ToList();
+        
+        return result;
     }
     /// <summary>
     /// ID를 사용하여 특정 BuildingData를 가져옵니다.
