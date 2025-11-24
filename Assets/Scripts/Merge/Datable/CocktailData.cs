@@ -36,7 +36,7 @@ public class CocktailRecipeJson
     public int Technique { get; private set; } // (0/1/2) : (build, floating, shaking)
     public string CocktailName { get; private set; }
     public string Description { get; private set; }
-    public Dictionary<string, int> Recipedict = new Dictionary<string, int>();
+    public Dictionary<int, Ingridiant> Recipedict = new Dictionary<int, Ingridiant>();
     public string RecipeOrder { get; private set; }
 
 }

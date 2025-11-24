@@ -10,10 +10,11 @@ public class CocktailSystem : MonoBehaviour
 
     private CocktailData cocktailData;
     private CocktailRecipeJson recipeData;
-    private Dictionary<int, int> Ingridiants = new Dictionary<int, int>();
+    private Dictionary<int, Ingridiant> Ingridiants = new Dictionary<int, Ingridiant>(); // 제작 시 user가 선택한 재료
 
     public void Awake()
     {
+
     }
 
 
@@ -26,27 +27,17 @@ public class CocktailSystem : MonoBehaviour
     public void CheckCocktailToRecipe()
     {
         float Percent = 0.0f;
-        cocktailData = CocktailRepository.Instance.GetCocktailDataById(1);
+        int order_id = 1;
+        cocktailData = CocktailRepository.Instance.GetCocktailDataById(order_id);
         recipeData = CocktailRepository.Instance.GetCocktailRecipeByCocktailId(1);
         foreach (var item in recipeData.Recipedict)
         {
-            if (Ingridiants.ContainsKey(int.Parse(item.Key)))
+            if (Ingridiants.ContainsKey(item.Key))
             {
 
             }
         }
 
     }
-    /// <summary>
-    /// 선택한 재료를 Ingridiants Dictionary에 추가
-    /// </summary>
-    /// <param name="ingridiantsId"></param>
-    /// <param name="volume"></param>
-    public void UpdateIngridiants(int ingridiantsId, int volume)
-    {
-        Ingridiants.Add(ingridiantsId, volume);
-
-    }
     #endregion
-
 }
