@@ -36535,12 +36535,6 @@ MonoBehaviour:
   mainCamera: {fileID: 1732335579}
   editModeProgressBar: {fileID: 1103797415}
   editScrollUI: {fileID: 931631654}
-<<<<<<< Updated upstream
-=======
-  markerOffset: -3
-  onEdit: 0
-  isUI: 0
->>>>>>> Stashed changes
   EditMode_Time: 1
   maxPositionDrift: 0.3
   onEdit: 0
