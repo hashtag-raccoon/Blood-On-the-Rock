@@ -83,7 +83,18 @@ public class JsonDataHandler
 
     public List<ConstructedBuildingProduction> LoadConstructedBuildingProductions()
     {
-        return LoadData<ConstructedBuildingProduction>(constructedBuildingProductionPath);
+        var productions = LoadData<ConstructedBuildingProduction>(constructedBuildingProductionPath);
+
+        // 기존 데이터 호환성 처리 (production_slots가 null인 경우)
+        foreach (var production in productions)
+        {
+            if (production.production_slots == null)
+            {
+                production.production_slots = new List<ProductionSlotData>();
+            }
+        }
+
+        return productions;
     }
 
     public void SaveBuildingPosition(List<ConstructedBuildingPos> positions)

@@ -43,6 +43,19 @@ public class BuildingData : ScriptableObject, IScrollItemData
 }
 
 /// <summary>
+/// 생산 슬롯의 저장 데이터
+/// </summary>
+[Serializable]
+public class ProductionSlotData
+{
+    public int slot_index;              // 슬롯 인덱스 (0-3)
+    public int resource_id;             // 생산 중인 자원 ID
+    public string building_type;        // 건물 타입 (BuildingProductionInfo 조회용)
+    public float time_remaining;        // 남은 시간 (초)
+    public float total_production_time; // 전체 생산 시간 (초)
+}
+
+/// <summary>
 /// CONSTRUCTED_BUILDING_PRODUCTION 테이블: 건설된 건물의 생산 현황을 관리하는 클래스
 /// </summary>
 [Serializable]
@@ -52,6 +65,13 @@ public class ConstructedBuildingProduction
     public DateTime last_production_time; // 마지막 생산 시간
     public DateTime next_production_time; // 다음 생산 완료 시간
     public bool is_producing; // 생산 중 여부
+    public List<ProductionSlotData> production_slots; // 생산 슬롯 정보 (최대 4개)
+
+    // 기본 생성자 (기존 JSON과의 호환성을 위해 production_slots를 빈 리스트로 초기화)
+    public ConstructedBuildingProduction()
+    {
+        production_slots = new List<ProductionSlotData>();
+    }
 }
 
 [Serializable]

@@ -36539,7 +36539,7 @@ MonoBehaviour:
   maxPositionDrift: 0.3
   onEdit: 0
   markerOffset: -2
-  newBuildingCompleteUI: {fileID: 0}
+  newBuildingCompleteUI: {fileID: 8656005401561145268, guid: a1134f0938f693844a190211089d5554, type: 3}
   newBuildingCompleteSize: {x: 100, y: 100}
   isUI: 0
 --- !u!4 &1608802866

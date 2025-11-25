@@ -234,6 +234,45 @@ public class DataManager : MonoBehaviour
                     hasChanges = true;
                 }
 
+                // 생산 슬롯 정보 저장
+                if (building.IsProducing)
+                {
+                    ResourceBuildingController controller = FindResourceBuildingControllerByInstanceId(building.InstanceId);
+                    if (controller != null)
+                    {
+                        List<ProductionSlotData> slotDataList = new List<ProductionSlotData>();
+                        List<ResourceBuildingController.ProductionInfo> activeProds = controller.GetActiveProductions();
+
+                        foreach (var prod in activeProds)
+                        {
+                            if (prod != null)
+                            {
+                                ProductionSlotData slotData = new ProductionSlotData
+                                {
+                                    slot_index = prod.slotIndex,
+                                    resource_id = prod.productionData.resource_id,
+                                    building_type = prod.productionData.building_type,
+                                    time_remaining = prod.timeRemaining,
+                                    total_production_time = prod.totalProductionTime
+                                };
+                                slotDataList.Add(slotData);
+                            }
+                        }
+
+                        production.production_slots = slotDataList;
+                        hasChanges = true;
+                    }
+                }
+                else
+                {
+                    // 생산 중이 아니면 슬롯 정보 클리어
+                    if (production.production_slots != null && production.production_slots.Count > 0)
+                    {
+                        production.production_slots.Clear();
+                        hasChanges = true;
+                    }
+                }
+
                 if (hasChanges)
                 {
                     updateCount++;
@@ -424,6 +463,23 @@ public class DataManager : MonoBehaviour
     public List<ConstructedBuilding> GetProducingBuildings()
     {
         return ConstructedBuildings.FindAll(b => b.IsProducing);
+    }
+
+    /// <summary>
+    /// Scene에서 특정 instance_id를 가진 ResourceBuildingController를 찾습니다.
+    /// </summary>
+    private ResourceBuildingController FindResourceBuildingControllerByInstanceId(long instanceId)
+    {
+        ResourceBuildingController[] controllers = FindObjectsOfType<ResourceBuildingController>();
+        foreach (var controller in controllers)
+        {
+            if (controller.GetConstructedBuilding() != null &&
+                controller.GetConstructedBuilding().InstanceId == instanceId)
+            {
+                return controller;
+            }
+        }
+        return null;
     }
     #endregion
 }
