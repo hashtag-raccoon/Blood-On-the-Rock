@@ -58,5 +58,6 @@
     },
     "cloudcode.beta.forceOobLogin": true,
     "dotnet.defaultSolution": "Blood-On-the-Rock.sln",
-    "CodeGPT.apiKey": "Gemini CLI"
+    "CodeGPT.apiKey": "Gemini CLI",
+    "dotrush.roslyn.projectOrSolutionFiles": []
 }

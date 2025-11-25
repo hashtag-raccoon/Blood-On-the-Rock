@@ -15,17 +15,21 @@ public class ArbeitController : MonoBehaviour
     private int currentPathIndex;
     private bool isMoving = false;
     [HideInInspector]
-    public bool isSelected = false;
+    public bool isSelected = false; // 선택되었는지, OrderingManager가 바꿈, 알바생 중 단 한명만 True 가능
+
+    [Header("업무 관리")]
+    [SerializeField] private List<TaskInfo> taskQueue = new List<TaskInfo>(); // 업무 큐 (최대 3개)
+    private const int MAX_TASKS = 3; // 최대 업무 갯수, 상수인데 필요 시 스크립트에서 설정
+    // 기획단계에서 바꾸는거 아니면 절대 건들면 안됨 !!
+    private TaskInfo currentTask = null; // 현재 수행 중인 업무
+    [SerializeField] private float taskUI_Y_Offset = 1.5f; // 알바생 위 UI 오프셋
+    private List<GameObject> taskUIObjects = new List<GameObject>(); // 알바생에게 표시되는 업무 UI 리스트
 
     private Camera mainCamera;
 
     private void Awake()
     {
         mainCamera = Camera.main;
-        if (mainCamera == null)
-        {
-            Debug.LogError("Main Camera를 찾을 수 없습니다. 카메라에 'MainCamera' 태그가 있는지 확인해주세요.");
-        }
     }
 
     #region Initialization
@@ -36,7 +40,7 @@ public class ArbeitController : MonoBehaviour
     public void Initialize(npc npcData)
     {
         this.myNpcData = npcData;
-        // 이동 속도 보정 등이 필요할 경우 여기에 추가할 것
+        // 후에 이동 속도 보정 등, 필요한 경우 여기에 추가할 것
         // ex: moveSpeed += npcData.serving_ability * 0.1f;
     }
     #endregion
@@ -129,6 +133,7 @@ public class ArbeitController : MonoBehaviour
         Vector3 targetPos = pathfinder.CellToWorld(currentPath[currentPathIndex]);
         // IsometricPathfinder의 CellToWorld가 타일 중심을 반환한다면 정상 작동하는 코드
         // 만약 아니라면 오프셋 조정이 필요하거나 다른 방식으로 목표 위치를 계산해야 할 수 있음
+        // 우선 이렇게 작업을 하나, 만약 문제가 생긴다면,,, 이거 만든 놈한테 연락주길 바람,,,,,,,
         
         // 현재 위치에서 목표 위치로 이동
         this.transform.position = Vector3.MoveTowards(this.transform.position, targetPos, moveSpeed * Time.deltaTime);
@@ -147,10 +152,283 @@ public class ArbeitController : MonoBehaviour
     /// 목적지에 도착했을 때 호출되는 메소드
     /// </summary>
     void OnReachedDestination()
-    {
-        // 목적지 도착 시 로직
-        // 목적지 도착 시 처리할 추가 로직이 있으면 여기에 작성할 것
-        Debug.Log($"Arbeit {myNpcData?.part_timer_name} reached destination.");
+    {        
+        // 현재 업무가 있으면
+        if (currentTask != null)
+        {
+            ProcessTask(currentTask); // 해당 업무 진행
+        }
     }
+    #endregion
+
+    #region 업무 관리
+    /// <summary>
+    /// 업무 추가 (최대 3개까지)
+    /// </summary>
+    public bool AddTask(TaskInfo task)
+    {
+        if (taskQueue.Count >= MAX_TASKS) // 가득차면 업무 추가 불가능
+        {
+            return false;
+        }
+
+        taskQueue.Add(task); // 업무 큐에 추가
+        
+        UpdateTaskUI(); // UI 업데이트
+        
+        // 현재 수행 중인 업무가 없으면
+        if (currentTask == null && !isMoving)
+        {
+            StartNextTask(); // 현재 있는 첫번째 업무를 바로 수행함
+        }
+        
+        return true;
+    }
+
+    /// <summary>
+    /// 다음 업무 시작하는 메소드
+    /// </summary>
+    private void StartNextTask()
+    {
+        if (taskQueue.Count == 0)
+        {
+            currentTask = null;
+            return;
+        }
+
+        // 알바생의 첫 번째 업무를 가져옴
+        currentTask = taskQueue[0];
+        taskQueue.RemoveAt(0);
+        
+        Debug.Log($"{myNpcData?.part_timer_name} 업무 시작: {currentTask.taskType}");
+        
+        // 업무 대상 위치로 이동
+        if (currentTask.targetObject != null)
+        {
+            SetTarget(currentTask.targetObject.transform);
+        }
+        
+        UpdateTaskUI(); // UI 업데이트
+    }
+
+    /// <summary>
+    /// 업무 처리
+    /// </summary>
+    private void ProcessTask(TaskInfo task)
+    {
+        if (task == null)
+        {
+            Debug.Log("현재 처리할 업무가 없음");
+            return;
+        }
+
+        switch (task.taskType) // 업무 유형에 따라 업무 처리해야 함
+        {
+            case TaskType.TakeOrder:
+                // 칵테일 주문 받기 업무 처리
+                ProcessTakeOrder(task);
+                break;
+                
+            case TaskType.ServeOrder:
+                // 서빙 업무 처리
+                ProcessServeOrder(task);
+                break;
+                
+            case TaskType.CleanTable:
+                // 테이블 청소 업무 처리
+                ProcessCleanTable(task);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 주문 받기 업무 처리
+    /// </summary>
+    private void ProcessTakeOrder(TaskInfo task)
+    {
+        // 업무 UI 제거 (도착 시 UI 사라짐)
+        if (task.taskUI != null)
+        {
+            Destroy(task.taskUI);
+        }
+        
+        // 추후 대화창 여는 로직 구현해야 함
+    }
+
+    /// <summary>
+    /// 서빙 업무 처리
+    /// </summary>
+    private void ProcessServeOrder(TaskInfo task)
+    {
+        // 여기서 추가로 서빙할 로직을 구현해야함
+        // ex) 서빙할 칵테일 확인
+        // 서빙 중일때 애니메이션 재생 등등
+        // 우선 로직만 해놓고... 후에 해보겠음
+        
+        // 서빙 완료 처리
+        CompleteCurrentTask();
+    }
+
+    /// <summary>
+    /// 청소 업무 처리
+    /// </summary>
+    private void ProcessCleanTable(TaskInfo task)
+    {
+        // 여기서 추가할 청소를 하는 로직을 구현해야함
+        // ex) 청소 애니메이션 재생 등등
+        // 우선 로직만 해놓고... 후에 해보겠음
+        CompleteCurrentTask();
+    }
+
+    /// <summary>
+    /// 현재 업무 완료 처리
+    /// </summary>
+    public void CompleteCurrentTask()
+    {
+        if (currentTask != null)
+        {
+            // OrderingManager에서 업무 제거
+            OrderingManager.Instance.RemoveTask(currentTask);
+            
+            currentTask = null;
+            isMoving = false;
+
+            // 다음 업무 시작
+            StartNextTask();
+        }
+    }
+
+    /// <summary>
+    /// 현재 업무 취소 처리
+    /// </summary>
+    public void CancelCurrentTask()
+    {
+        if (currentTask != null)
+        {
+            // OrderingManager에서 업무 제거
+            OrderingManager.Instance.RemoveTask(currentTask);
+            
+            currentTask = null;
+            isMoving = false;
+            
+            // 다음 업무 시작
+            StartNextTask();
+        }
+    }
+
+    /// <summary>
+    /// 특정 업무 큐에서 제거
+    /// </summary>
+    public void RemoveTaskFromQueue(TaskInfo task)
+    {
+        if (taskQueue.Contains(task))
+        {
+            taskQueue.Remove(task);
+            UpdateTaskUI();
+        }
+    }
+
+    /// <summary>
+    /// 다른 알바생이 먼저 처리한 경우
+    /// 완료된 업무와 일치하는 업무를 큐에서 제거 
+    /// </summary>
+    public void RemoveTaskIfMatch(TaskInfo completedTask)
+    {
+        if (completedTask == null) return;
+
+        // 현재 수행 중인 업무가 완료된 업무와 동일한 타겟이면 취소
+        if (currentTask != null && 
+            currentTask.targetObject == completedTask.targetObject &&
+            currentTask.taskType == completedTask.taskType)
+        {
+            CancelCurrentTask();
+            return;
+        }
+
+        // 큐에 있는 업무 중 일치하는 것 제거
+        TaskInfo matchingTask = taskQueue.Find(t => 
+            t.targetObject == completedTask.targetObject && 
+            t.taskType == completedTask.taskType);
+        
+        if (matchingTask != null)
+        {
+            taskQueue.Remove(matchingTask);
+            UpdateTaskUI();
+        }
+    }
+    #endregion
+
+    #region 업무 UI 관리
+    /// <summary>
+    /// 업무 UI 업데이트 (ㅁ) => (ㅁ ㅁ) => (ㅁ ㅁ ㅁ) 이렇게 가로로 확장됨
+    /// </summary>
+    private void UpdateTaskUI()
+    {
+        // 기존 UI 모두 제거
+        foreach (var uiObj in taskUIObjects)
+        {
+            if (uiObj != null)
+            {
+                Destroy(uiObj);
+            }
+        }
+        taskUIObjects.Clear();
+        
+        int totalTasks = taskQueue.Count;
+        if (currentTask != null) totalTasks++;
+
+        // 업무 개수만큼 UI 생성
+        for (int i = 0; i < totalTasks; i++)
+        {
+            // 첫 번째는 현재 업무
+            TaskInfo task;
+            if (i == 0 && currentTask != null)
+            {
+                task = currentTask; // 현재 수행 중인 업무
+            }
+            else // 나머지는 큐에서 2,3번째 업무를 가져옴
+            {
+                int queueIndex = (currentTask != null) ? i - 1 : i;
+                task = taskQueue[queueIndex]; // 큐의 대기 업무
+            }
+            
+            // 알바생 머리 위에 업무 UI 생성
+            GameObject taskUI = OrderingManager.Instance.TaskUIInstantiate(this.gameObject, task, taskUI_Y_Offset, i);
+            if (taskUI != null)
+            {
+                taskUIObjects.Add(taskUI);
+            }
+        }
+    }
+
+    #endregion
+
+    #region 업무 상태 확인 메소드
+    /// <summary>
+    /// 현재 업무 큐 상태 확인, OrderingManager에서 사용
+    /// </summary>
+    public bool CanAddTask()
+    {
+        return taskQueue.Count < MAX_TASKS;
+    }
+
+    /// <summary>
+    /// 현재 업무 개수 반환
+    /// </summary>
+    public int GetTaskCount()
+    {
+        int count = taskQueue.Count;
+        if (currentTask != null) count++;
+        return count;
+    }
+
+    /// <summary>
+    /// 현재 수행 중인 업무 반환
+    /// </summary>
+    public TaskInfo GetCurrentTask()
+    {
+        return currentTask;
+    }
+
     #endregion
 }
