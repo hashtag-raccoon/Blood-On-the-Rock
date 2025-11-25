@@ -31,6 +31,10 @@ public class DragDropController : MonoBehaviour
     [SerializeField] private Tilemap ExistingInteriorTilemap; // 기존 인테리어들의 타일맵
     [SerializeField] private TileBase interiorMarkerTile; // 인테리어 배치 시 나오는 프리뷰 타일 (옵션, markerTile 재사용 가능)
 
+    [Header("호감도 조건")]
+    [SerializeField] private Tilemap favorCheckTilemap; // 호감도 체크에 사용할 타일맵 (미지정 시 groundTilemap 사용)
+    [SerializeField] private TileBase[] favorRewardTiles; // 호감도 상승이 허용된 타일 목록
+
     [Header("드래그 설정")]
     [SerializeField] private Camera mainCamera;
     
@@ -71,6 +75,7 @@ public class DragDropController : MonoBehaviour
     // 건물 배치 이동 시 잠시 활성화, 반대로 배치 종료 시 비활성화
     private TilemapRenderer previewTilemapRenderer;
     private TilemapRenderer ExistingTilemapRenderer;
+    private TilemapRenderer ExistingInteriorTilemapRenderer;
 
     #region Initialization
 
@@ -133,6 +138,15 @@ public class DragDropController : MonoBehaviour
             if (ExistingTilemapRenderer != null)
             {
                 ExistingTilemapRenderer.enabled = false;
+            }
+        }
+
+        if (ExistingInteriorTilemap != null)
+        {
+            ExistingInteriorTilemapRenderer = ExistingInteriorTilemap.GetComponent<TilemapRenderer>();
+            if (ExistingInteriorTilemapRenderer != null)
+            {
+                ExistingInteriorTilemapRenderer.enabled = false;
             }
         }
     }
@@ -606,8 +620,15 @@ public class DragDropController : MonoBehaviour
         else if (interiorBase != null)
         {
             editBuildingTileSize = interiorBase.TileSize;
-            // InteriorData에서 MarkerPositionOffset 가져오기 (필요시 구현)
-            // 현재는 기본 markerOffset 사용
+
+            if (DataManager.Instance != null && DataManager.Instance.InteriorDatas != null)
+            {
+                InteriorData interiorData = DataManager.Instance.InteriorDatas.Find(data => data.interior_id == interiorBase.InteriorId);
+                if (interiorData != null)
+                {
+                    markerOffset = interiorData.MarkerPositionOffset;
+                }
+            }
         }
         else
         {
@@ -768,6 +789,40 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
+    /// 인테리어 배치 영역 중 하나라도 호감도용 타일 위에 있는지 확인
+    /// </summary>
+    private bool IsInteriorPlacedOnFavorTile(Vector3Int startCell, Vector2Int tileSize)
+    {
+        Tilemap checkTilemap = favorCheckTilemap != null ? favorCheckTilemap : groundTilemap;
+
+        if (grid == null || checkTilemap == null || favorRewardTiles == null || favorRewardTiles.Length == 0)
+        {
+            return false;
+        }
+
+        for (int x = 0; x < tileSize.x; x++)
+        {
+            for (int y = 0; y < tileSize.y; y++)
+            {
+                Vector3Int tilePos = new Vector3Int(startCell.x + x, startCell.y + y, startCell.z);
+                Vector3 worldPos = grid.CellToWorld(tilePos);
+                worldPos.y += markerOffset;
+
+                Vector3Int targetCell = grid.WorldToCell(worldPos);
+                targetCell.z = 0;
+
+                TileBase tile = checkTilemap.GetTile(targetCell);
+                if (tile != null && System.Array.IndexOf(favorRewardTiles, tile) >= 0)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// 편집 모드 - 배치 종료
     /// 새 건물 배치 시: 프리뷰 오브젝트를 삭제하고 BuildingFactory로 실제 건물 생성
     /// 기존 건물 편집 시: 위치만 변경
@@ -842,8 +897,15 @@ public class DragDropController : MonoBehaviour
                     // 타일맵에 마커 배치 (인테리어)
                     PlaceTilemapMarkers(dropCell, editBuildingTileSize, true);
 
-                    // 호감도 상승 처리
-                    InteriorFavorManager.AddFavorFromPlacement(5);
+                    // 호감도 상승 처리: 지정된 타일 위에 있을 때만 증가
+                    if (IsInteriorPlacedOnFavorTile(dropCell, editBuildingTileSize))
+                    {
+                        InteriorFavorManager.AddFavorFromPlacement(5);
+                    }
+                    else
+                    {
+                        Debug.Log("[DragDropController] 호감도 조건을 충족하지 않아 보상이 지급되지 않습니다.");
+                    }
                 }
 
                 return; // 배치 완료 후 바로 종료
@@ -1032,6 +1094,10 @@ public class DragDropController : MonoBehaviour
         {
             ExistingTilemapRenderer.enabled = true;
         }
+        if (ExistingInteriorTilemapRenderer != null)
+        {
+            ExistingInteriorTilemapRenderer.enabled = true;
+        }
     }
 
     /// <summary>
@@ -1046,6 +1112,10 @@ public class DragDropController : MonoBehaviour
         if (ExistingTilemapRenderer != null)
         {
             ExistingTilemapRenderer.enabled = false;
+        }
+        if (ExistingInteriorTilemapRenderer != null)
+        {
+            ExistingInteriorTilemapRenderer.enabled = false;
         }
     }
     #endregion
