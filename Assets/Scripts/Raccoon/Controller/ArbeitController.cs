@@ -14,6 +14,19 @@ public class ArbeitController : MonoBehaviour
     private List<Vector3Int> currentPath;
     private int currentPathIndex;
     private bool isMoving = false;
+    [HideInInspector]
+    public bool isSelected = false;
+
+    private Camera mainCamera;
+
+    private void Awake()
+    {
+        mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main Camera를 찾을 수 없습니다. 카메라에 'MainCamera' 태그가 있는지 확인해주세요.");
+        }
+    }
 
     #region Initialization
     /// <summary>
@@ -28,13 +41,13 @@ public class ArbeitController : MonoBehaviour
     }
     #endregion
 
-    #region Pathfinding and Movement
+    #region 이동 및 길찾기
     /// <summary>
     /// Target 설정, IsometricPathfinder를 통해 경로 계산 시작
     /// 만약 IsometricPathfinder가 null이면 작동을 하지않으니 참고바람
     /// </summary>
     public void SetTarget(Transform newTarget)
-    {
+    {   
         currentTarget = newTarget;
         CalculatePath();
     }
@@ -53,7 +66,7 @@ public class ArbeitController : MonoBehaviour
         Vector3Int startCell = pathfinder.WorldToCell(startPos);
 
         // 시작점에서 목표점까지의 경로 계산
-        currentPath = pathfinder.FindPath(startCell, targetCell); 
+        currentPath = pathfinder.FindPath(startCell, targetCell, 1, 1); 
 
         // 경로가 유효한지 확인 후 이동 시작
         // A* 알고리즘을 통해 경로를 반환하고, 최소 이동 가능한 노드값이 0 이상이면 이동시작
@@ -66,12 +79,32 @@ public class ArbeitController : MonoBehaviour
         else
         {
             isMoving = false;
-            Debug.Log("ArbeitController: Path not found or already at destination.");
+            Debug.Log("경로를 찾을 수 없습니다.");
         }
     }
 
     void Update()
     {
+        /// <summary>
+        /// 마우스 클릭 감지 및 알바 선택 처리
+        /// </summary>
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 pos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            
+            // ignoreLayerMask를 반전시켜서 해당 레이어를 제외하고 Raycast
+            int layerMask = ~CameraManager.instance.ignoreLayerMask.value;
+            RaycastHit2D hitCollider = Physics2D.Raycast(pos, Vector2.zero, 0, layerMask);
+
+            if (hitCollider.collider != null)
+            {
+                if (hitCollider.transform == this.transform)
+                {
+                    OrderingManager.Instance.ToggleSelected(this.gameObject);
+                }
+            }
+        }
+
         // 매 프레임마다 이동 가능한 노드값이 Null 이 아니고, 이동 중이면 이동 처리
         if (isMoving && currentPath != null)
         {
@@ -109,7 +142,7 @@ public class ArbeitController : MonoBehaviour
     }
     #endregion
 
-    #region Destination Reached
+    #region 목적지 도착
     /// <summary>
     /// 목적지에 도착했을 때 호출되는 메소드
     /// </summary>

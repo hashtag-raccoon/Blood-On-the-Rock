@@ -27,6 +27,7 @@ public class GuestController : MonoBehaviour
     private GameObject waitingTargetObject;
     private bool isSeated = false;
     private Transform assignedSeat; 
+    [SerializeField] private float UIDelay = 3.0f; // Task UI 생성 지연 시간
 
     void Start()
     {
@@ -381,58 +382,72 @@ public class GuestController : MonoBehaviour
     #endregion
 
     #region 도착 처리
+    /// <summary>
+    /// 목적지에 도착했을 때 호출되는 메서드
+    /// 이동 중, 테이블/좌석에 도착했을 때 or 대기열에 도착했을때 호출됨
+    /// 테이블/좌석에 도착했을때, 만약 이미 예약 or 좌석이 꽉 찬 상태면은 다른 좌석을 재탐색함
+    /// </summary>
     void OnReachedDestination() // 목적지 도착 처리
     {
+        // 1. 테이블과 좌석이 할당된 상태로 도착했을 경우 (식사하러 옴)
         if (assignedTable != null && assignedSeat != null)
         {
             TableClass tableComp = assignedTable.GetComponent<TableClass>();
+            // 도착했더니 좌석이 이미 좌석 수용량을 넘은 상태라면? 즉 좌석이 꽉 찼다면 !
             if (tableComp.Seated_Customer.Count >= tableComp.MAX_Capacity)
             {
-                Debug.LogWarning($" 테이블이 이미 가득 참");
+                tableComp.ReleaseSeat(this.gameObject); // 좌석에 이 오브젝트 앉아있다는 걸 해제
 
-                tableComp.ReleaseSeat(this.gameObject);
-
-                tableManager.CancelReservation(assignedTable, this.gameObject);
+                tableManager.CancelReservation(assignedTable, this.gameObject); // 해당 좌석에 이 오브젝트의 예약 취소
 
                 assignedTable = null;
                 assignedSeat = null;
                 Target = null;
                 isMoving = false;
-                DetermineTarget();
+                DetermineTarget(); // 다시 타겟 재탐색
                 return;
             }
 
+            // 도착했더니 좌석이 다른 손님에게 이미 할당된 상태라면
             if (!tableComp.IsSeatAssignedToGuest(assignedSeat, this.gameObject))
             {
-                Debug.LogWarning($"좌석이 다른 손님에게 배정됨");
-
-                tableManager.CancelReservation(assignedTable, this.gameObject);
+                tableManager.CancelReservation(assignedTable, this.gameObject); // 해당 좌석에 이 오브젝트의 예약 취소
 
                 assignedTable = null;
                 assignedSeat = null;
                 Target = null;
                 isMoving = false;
-                DetermineTarget();
+                DetermineTarget(); // 다시 타겟 재탐색
                 return;
             }
 
+            // 좌석에 손님이 앉기가 충분한 상태(좌석 수용량이 남아있는 상태, 예약으로 좌석이 꽉 찬 상태 X) 라면
+            // 손님을 좌석에 앉힘
             if (!tableComp.Seated_Customer.Contains(this.gameObject))
             {
-                tableComp.Seated_Customer.Add(this.gameObject);
-                tableComp.isCustomerSeated = true;
+                tableComp.Seated_Customer.Add(this.gameObject); // 좌석 - 손님 리스트에 해당 손님 추가
+                tableComp.isCustomerSeated = true; // 테이블에 손님이 앉아있음을 표시
 
-                tableManager.CancelReservation(assignedTable, this.gameObject);
+                tableManager.CancelReservation(assignedTable, this.gameObject); // 예약 취소 (앉았으니 예약은 필요 없음)
 
-                transform.position = assignedSeat.position;
+                transform.position = assignedSeat.position; // 손님 위치를 좌석 위치로 고정
 
-                isSeated = true;
-            }
+                isSeated = true; // 손님이 앉았음을 표시
+
+                ///<summary>
+                /// 손님이 좌석에 앉았을 때 추가 로직 작성 가능
+                /// </summary>
+                
+                // 착석 후 몇 초 뒤에 Task UI 생성
+                StartCoroutine(ShowTaskUIAfterDelay(UIDelay));
+            } 
         }
+        // 2. 대기열에 있는 상태로 도착했을 경우
         else if (myWaitingPosition != -1)
         {
             if (!isWaiting)
             {
-                isWaiting = true;
+                isWaiting = true; // 대기 상태로 설정
             }
         }
     }
@@ -472,6 +487,23 @@ public class GuestController : MonoBehaviour
         else // 파트너가 없으면?
         {
             tableManager.AddToPartnerWaitingList(gameObject); // 파트너 대기열에만 추가하고 다음 2인 손님 대기
+        }
+    }
+    #endregion
+
+    #region 업무 UI 생성
+    /// <summary>
+    /// 착석 후 지정된 시간이 지나면 Task UI를 생성하는 코루틴
+    /// </summary>
+    /// <param name="delay">코루틴 대기 시간 (초)</param>
+    private IEnumerator ShowTaskUIAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // 손님이 착석한 상태라면 Task UI 생성
+        if (assignedTable != null && isSeated && OrderingManager.Instance != null)
+        {
+            OrderingManager.Instance.TaskUIInstantiate(this.gameObject);
         }
     }
     #endregion

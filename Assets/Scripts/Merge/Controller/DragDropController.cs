@@ -1263,7 +1263,7 @@ public class DragDropController : MonoBehaviour
             Vector3 screenPos = mainCamera.WorldToScreenPoint(worldPos);
             
             // 줌 비율 계산 = 현재 줌 / 초기 줌
-            float zoomRatio = initialOrthoSize / mainCamera.orthographicSize;
+            float zoomRatio = (CameraManager.instance.MaxZoomIn / 10) / mainCamera.orthographicSize;
             
             // UI 크기를 줌 비율에 맞춰 조정, 줌 인 => UI 커짐, 줌 아웃 => UI 작아짐
             Vector2 scaledSize = newBuildingCompleteSize * zoomRatio;

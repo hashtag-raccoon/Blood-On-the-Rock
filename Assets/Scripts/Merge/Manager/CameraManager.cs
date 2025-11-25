@@ -34,13 +34,15 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private float DampingValue = 0.2f;
 
     [Header("섬 씬/최대 줌아웃 값")]
-    [SerializeField] private float MaxZoomIn = 50;
+    public float MaxZoomIn = 50;
 
     [Header("섬 씬/최소 줌인 값")]
-    [SerializeField] private float MinZoomOut = 1;
+    public float MinZoomOut = 1;
 
     [Header("섬 씬/줌 속도")]
     [SerializeField] private float ZoomSpeed = 2f;
+    [Header("오브젝트 클릭 시 무시할 레이어")]
+    public LayerMask ignoreLayerMask; // CameraBoundary 등
 
     private Vector3 _tmpClickPos;
     private Vector3 _tmpCameraPos;
@@ -82,7 +84,7 @@ public class CameraManager : MonoBehaviour
             if (mouseScreenPos.x >= 0 && mouseScreenPos.x <= Screen.width && 
                 mouseScreenPos.y >= 0 && mouseScreenPos.y <= Screen.height)
             {
-                // Orthographic 카메라용: 카메라부터 평면까지의 거리
+                // 카메라부터 평면까지의 거리
                 mouseScreenPos.z = Camera.main.nearClipPlane + 1f;
                 
                 Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
