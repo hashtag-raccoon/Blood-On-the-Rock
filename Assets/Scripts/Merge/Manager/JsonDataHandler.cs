@@ -117,13 +117,24 @@ public class JsonDataHandler
         if (oldData == null || newData == null) return true;
         if (oldData.Count != newData.Count) return true;
 
-        // building_id로 딕셔너리 생성
-        var oldDict = oldData.ToDictionary(p => p.building_id);
+        // instance_id로 딕셔너리 생성 (중복 처리)
+        var oldDict = new Dictionary<long, ConstructedBuildingProduction>();
+        foreach (var item in oldData)
+        {
+            if (!oldDict.ContainsKey(item.instance_id))
+            {
+                oldDict.Add(item.instance_id, item);
+            }
+            else
+            {
+                Debug.LogWarning($"[HasProductionChanges] 중복된 instance_id '{item.instance_id}'가 oldData에 있습니다. 첫 번째 항목만 사용됩니다.");
+            }
+        }
 
         foreach (var newItem in newData)
         {
             // 새로운 건물이 추가되었는지 확인
-            if (!oldDict.TryGetValue(newItem.building_id, out var oldItem))
+            if (!oldDict.TryGetValue(newItem.instance_id, out var oldItem))
             {
                 return true;
             }
@@ -149,13 +160,24 @@ public class JsonDataHandler
         if (oldData == null || newData == null) return true;
         if (oldData.Count != newData.Count) return true;
 
-        // building_id로 딕셔너리 생성
-        var oldDict = oldData.ToDictionary(p => p.building_id);
+        // instance_id로 딕셔너리 생성 (중복 처리)
+        var oldDict = new Dictionary<long, ConstructedBuildingPos>();
+        foreach (var item in oldData)
+        {
+            if (!oldDict.ContainsKey(item.instance_id))
+            {
+                oldDict.Add(item.instance_id, item);
+            }
+            else
+            {
+                Debug.LogWarning($"[HasPositionChanges] 중복된 instance_id '{item.instance_id}'가 oldData에 있습니다. 첫 번째 항목만 사용됩니다.");
+            }
+        }
 
         foreach (var newItem in newData)
         {
             // 새로운 건물이 추가되었는지 확인
-            if (!oldDict.TryGetValue(newItem.building_id, out var oldItem))
+            if (!oldDict.TryGetValue(newItem.instance_id, out var oldItem))
             {
                 return true;
             }

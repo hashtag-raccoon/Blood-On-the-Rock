@@ -195,23 +195,23 @@ public class DataManager : MonoBehaviour
     {
         if (ConstructedBuildings == null || ConstructedBuildingProductions == null) return;
 
-        var productionDict = new Dictionary<int, ConstructedBuildingProduction>();
+        var productionDict = new Dictionary<long, ConstructedBuildingProduction>();
         foreach (var production in ConstructedBuildingProductions)
         {
-            if (!productionDict.ContainsKey(production.building_id))
+            if (!productionDict.ContainsKey(production.instance_id))
             {
-                productionDict.Add(production.building_id, production);
+                productionDict.Add(production.instance_id, production);
             }
             else
             {
-                Debug.LogWarning($"[Data Duplication] ConstructedBuildingProductions에 중복된 building_id '{production.building_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
+                Debug.LogWarning($"[Data Duplication] ConstructedBuildingProductions에 중복된 instance_id '{production.instance_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
             }
         }
 
         int updateCount = 0;
         foreach (var building in ConstructedBuildings)
         {
-            if (productionDict.TryGetValue(building.Id, out var production))
+            if (productionDict.TryGetValue(building.InstanceId, out var production))
             {
                 // 변경사항이 있는지 확인하고 업데이트
                 bool hasChanges = false;
@@ -255,23 +255,23 @@ public class DataManager : MonoBehaviour
     {
         if (ConstructedBuildings == null || ConstructedBuildingPositions == null) return;
 
-        var positionDict = new Dictionary<int, ConstructedBuildingPos>();
+        var positionDict = new Dictionary<long, ConstructedBuildingPos>();
         foreach (var position in ConstructedBuildingPositions)
         {
-            if (!positionDict.ContainsKey(position.building_id))
+            if (!positionDict.ContainsKey(position.instance_id))
             {
-                positionDict.Add(position.building_id, position);
+                positionDict.Add(position.instance_id, position);
             }
             else
             {
-                Debug.LogWarning($"[Data Duplication] ConstructedBuildingPositions에 중복된 building_id '{position.building_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
+                Debug.LogWarning($"[Data Duplication] ConstructedBuildingPositions에 중복된 instance_id '{position.instance_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
             }
         }
 
         int updateCount = 0;
         foreach (var building in ConstructedBuildings)
         {
-            if (positionDict.TryGetValue(building.Id, out var position))
+            if (positionDict.TryGetValue(building.InstanceId, out var position))
             {
                 // 변경사항이 있는지 확인하고 업데이트
                 bool hasChanges = false;
@@ -291,7 +291,7 @@ public class DataManager : MonoBehaviour
                 if (hasChanges)
                 {
                     updateCount++;
-                    Debug.Log($"건물 ID {building.Id}의 위치 데이터를 업데이트했습니다. Position: {building.Position}, Rotation: {building.Rotation}");
+                    Debug.Log($"건물 인스턴스 ID {building.InstanceId}의 위치 데이터를 업데이트했습니다. Position: {building.Position}, Rotation: {building.Rotation}");
                 }
             }
         }
@@ -330,17 +330,17 @@ public class DataManager : MonoBehaviour
     }
     #endregion
 
-    public void UpgradeBuildingLevel(int buildingId)
+    public void UpgradeBuildingLevel(long instanceId)
     {
-        ConstructedBuilding building = GetConstructedBuildingById(buildingId);
+        ConstructedBuilding building = GetConstructedBuildingByInstanceId(instanceId);
         if (building != null)
         {
             building.Level += 1;
-            Debug.Log($"건물 ID:{buildingId} '{building.Name}' 레벨 업그레이드: {building.Level}");
+            Debug.Log($"건물 인스턴스 ID:{instanceId} '{building.Name}' 레벨 업그레이드: {building.Level}");
         }
         else
         {
-            Debug.LogError($"건물 ID:{buildingId}를 찾을 수 없습니다.");
+            Debug.LogError($"건물 인스턴스 ID:{instanceId}를 찾을 수 없습니다.");
         }
     }
 
@@ -351,9 +351,9 @@ public class DataManager : MonoBehaviour
         return ConstructedBuildings.Find(data => data.Name == buildingType);
     }
 
-    public ConstructedBuilding GetConstructedBuildingById(int buildingId)
+    public ConstructedBuilding GetConstructedBuildingByInstanceId(long instanceId)
     {
-        return ConstructedBuildings.Find(data => data.Id == buildingId);
+        return ConstructedBuildings.Find(data => data.InstanceId == instanceId);
     }
 
     #endregion
@@ -377,17 +377,17 @@ public class DataManager : MonoBehaviour
     /// <summary>
     /// 건물의 인벤토리 상태를 업데이트합니다.
     /// </summary>
-    public void UpdateBuildingInventoryStatus(int buildingId, bool isInInventory)
+    public void UpdateBuildingInventoryStatus(long instanceId, bool isInInventory)
     {
-        var building = ConstructedBuildings.Find(b => b.Id == buildingId);
+        var building = ConstructedBuildings.Find(b => b.InstanceId == instanceId);
         if (building != null)
         {
             building.IsEditInventory = isInInventory;
-            Debug.Log($"건물 ID '{buildingId}'의 인벤토리 상태를 업데이트했습니다: {isInInventory}");
+            Debug.Log($"건물 인스턴스 ID '{instanceId}'의 인벤토리 상태를 업데이트했습니다: {isInInventory}");
         }
         else
         {
-            Debug.LogWarning($"건물 ID '{buildingId}'를 찾을 수 없습니다.");
+            Debug.LogWarning($"건물 인스턴스 ID '{instanceId}'를 찾을 수 없습니다.");
         }
     }
 
@@ -406,7 +406,7 @@ public class DataManager : MonoBehaviour
 
         // 특정 섬에 속한 건물만 필터링
         return ConstructedBuildings.Where(b =>
-            BuildingRepository.Instance.GetBuildingDataById(b.Id)?.island_id == mainIslandId
+            BuildingRepository.Instance.GetBuildingDataByTypeId(b.Id)?.island_id == mainIslandId
         ).ToList();
     }
 
