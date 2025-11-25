@@ -19,24 +19,9 @@ public class CocktailData
     public int production_time { get; private set; } // 제조시간(분)
     public string description { get; private set; } // 설명
     public string production_steps { get; private set; } // 제조단계 순서[Json]
-    public float similarity_threadhold { get; private set; } = 70.0f; // 유사성 비교기준(70% 고정)
+    public float similarity_threadhold { get; private set; } = 80.0f; // 유사성 비교기준(80% 고정)
     public string unlock_condition { get; private set; } // 해금조건[Json]
     public int sell_price { get; private set; } // 판매가격
     public int production_cost { get; private set; } // 제작원가
     public int glass_id { get; private set; } // 잔 종류(외래키)
-}
-
-/// <summary>
-/// 칵테일 레시피 데이터
-/// </summary>
-public class CocktailRecipeJson
-{
-    public int RecipeId { get; private set; }
-    public int CocktailId { get; private set; }
-    public int Technique { get; private set; } // (0/1/2) : (build, floating, shaking)
-    public string CocktailName { get; private set; }
-    public string Description { get; private set; }
-    public Dictionary<string, int> Recipedict = new Dictionary<string, int>();
-    public string RecipeOrder { get; private set; }
-
 }

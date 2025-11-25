@@ -58,5 +58,9 @@
     },
     "cloudcode.beta.forceOobLogin": true,
     "dotnet.defaultSolution": "Blood-On-the-Rock.sln",
-    "CodeGPT.apiKey": "Gemini CLI"
+    "CodeGPT.apiKey": "Gemini CLI",
+    "dotrush.roslyn.projectOrSolutionFiles": [
+        "c:\\Users\\장현우\\Documents\\GitHub\\Blood-On-the-Rock\\Blood-On-the-Rock.sln",
+        "c:\\Users\\장현우\\Documents\\GitHub\\Blood-On-the-Rock\\Blood-On-the-Rock.slnx"
+    ]
 }

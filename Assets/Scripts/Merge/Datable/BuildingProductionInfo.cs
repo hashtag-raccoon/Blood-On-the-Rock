@@ -13,4 +13,7 @@ public class BuildingProductionInfo : ScriptableObject
     public float base_production_time_minutes;
     public int consume_amount;
     public string consume_resource_type;
+
+    public bool isInInventory;
+    
 }
