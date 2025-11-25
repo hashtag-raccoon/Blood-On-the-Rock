@@ -4,5 +4,5 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CocktailRecipeSO", menuName = "ScriptableObject/CocktailRecipeSO")]
 public class CocktailRecipeSO : ScriptableObject
 {
-    public List<CocktailRecipeScript> recipes;
+    public List<CocktailRecipeJson> recipes;
 }
