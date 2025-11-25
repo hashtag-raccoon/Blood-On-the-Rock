@@ -2,19 +2,68 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 
+// ì´ê±° ë¬¸ìê°€ ê¹¨ì ¸ìˆì–´ì„œ ìš°ì„  Gemini ì´ìš©í•´ì„œ ì£¼ì„ì´ë‘ ì„œë¨¸ë¦¬ ì‘ì„±í•¨,,,!!
+// ì¶”í›„ ë‹¤ì‹œ ì‘ì„±í• ì˜ˆì •,,
+
+/// <summary>
+/// ìœ ë‹ˆí‹° íƒ€ì¼ë§µ ì‹œìŠ¤í…œì—ì„œ A* ì•Œê³ ë¦¬ì¦˜ì„ ì‚¬ìš©í•˜ì—¬ ê¸¸ì°¾ê¸°ë¥¼ ìˆ˜í–‰í•˜ëŠ” í´ë˜ìŠ¤ì…ë‹ˆë‹¤.
+/// ì•„ì´ì†Œë©”íŠ¸ë¦­(Isometric) ë° ì¼ë°˜ ê·¸ë¦¬ë“œ ë§µì—ì„œ ëª¨ë‘ ì‚¬ìš©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
+/// </summary>
 public class IsometricPathfinder : MonoBehaviour
 {
-    [SerializeField] private Tilemap tilemap; // Å¸ÀÏ¸Ê ¿ÀºêÁ§Æ®(ÀÎ½ºÆåÅÍ¿¡¼­ ¹Ş¾Æ¾ßÇÔ)
-    [SerializeField] private TileBase walkableTile; // ÀÌµ¿ °¡´ÉÇÑ Å¸ÀÏ (nullÀÌ¸é ¸ğµç Å¸ÀÏÀÌ ÀÌµ¿ °¡´É), Å¸ÀÏº£ÀÌ½º¸¦ »ó¼Ó¹ŞÀº ¸ğµç Å¸ÀÏ °¡´É
+    #region ë³€ìˆ˜ ë° ì„¤ì • (Variables & Settings)
 
-    private Dictionary<Vector3Int, Node> nodes = new Dictionary<Vector3Int, Node>(); // Å½»öµÈ ³ëµå¸¦ ÀúÀåÇÒ µñ¼Å³Ê¸®
+    [Header("Map Settings")]
+    /// <summary>
+    /// ì—¬ëŸ¬ íƒ€ì¼ë§µì„ ê´€ë¦¬í•˜ëŠ” ë°°ì—´ì…ë‹ˆë‹¤. íŠ¹ì • íƒ€ì¼ë§µì—ì„œ ê¸¸ì°¾ê¸°ë¥¼ ìˆ˜í–‰í•  ë•Œ ì‚¬ìš©í•©ë‹ˆë‹¤.
+    /// </summary>
+    [SerializeField] private Tilemap[] tilemaps;
 
-    private class Node // A* ¾Ë°í¸®Áò¿¡¼­ »ç¿ëÇÒ ³ëµå Å¬·¡½º
+    /// <summary>
+    /// ì´ë™ ê°€ëŠ¥í•œ íƒ€ì¼ì˜ ì¢…ë¥˜ë¥¼ ì§€ì •í•©ë‹ˆë‹¤. 
+    /// <para>nullì¼ ê²½ìš° íƒ€ì¼ì´ ì¡´ì¬í•˜ëŠ” ëª¨ë“  ê³³ì„ ì´ë™ ê°€ëŠ¥ìœ¼ë¡œ ê°„ì£¼í•˜ë©°, íŠ¹ì • íƒ€ì¼(ì˜ˆ: ë•…)ì„ ì§€ì •í•˜ë©´ ê·¸ íƒ€ì¼ ìœ„ë¡œë§Œ ì´ë™í•©ë‹ˆë‹¤.</para>
+    /// </summary>
+    [SerializeField] private TileBase[] walkableTile;
+    
+
+    /// <summary>
+    /// í˜„ì¬ ê¸¸ì°¾ê¸° ì—°ì‚° ì¤‘ì— ìƒì„±ëœ ë…¸ë“œë“¤ì„ ê´€ë¦¬í•˜ëŠ” ë”•ì…”ë„ˆë¦¬ì…ë‹ˆë‹¤.
+    /// <para>Key: íƒ€ì¼ ì¢Œí‘œ(Vector3Int), Value: í•´ë‹¹ ìœ„ì¹˜ì˜ ë…¸ë“œ ê°ì²´</para>
+    /// </summary>
+    private Dictionary<Vector3Int, Node> nodes = new Dictionary<Vector3Int, Node>();
+
+    #endregion
+
+    #region ë‚´ë¶€ í´ë˜ìŠ¤ (Inner Classes)
+
+    /// <summary>
+    /// A* ì•Œê³ ë¦¬ì¦˜ ì—°ì‚°ì„ ìœ„í•´ ê° íƒ€ì¼ ìœ„ì¹˜ì˜ ì •ë³´ë¥¼ ë‹´ëŠ” ë…¸ë“œ í´ë˜ìŠ¤ì…ë‹ˆë‹¤.
+    /// </summary>
+    private class Node
     {
+        /// <summary>
+        /// ê·¸ë¦¬ë“œ ìƒì˜ ì¢Œí‘œì…ë‹ˆë‹¤.
+        /// </summary>
         public Vector3Int position;
+
+        /// <summary>
+        /// ê¸¸ì°¾ê¸° ê²½ë¡œìƒì—ì„œ ì´ ë…¸ë“œì˜ ë°”ë¡œ ì´ì „ ë…¸ë“œ(ë¶€ëª¨)ì…ë‹ˆë‹¤. ê²½ë¡œ ì—­ì¶”ì ì— ì‚¬ìš©ë©ë‹ˆë‹¤.
+        /// </summary>
         public Node parent;
-        public float gCost; // ½ÃÀÛÁ¡À¸·ÎºÎÅÍÀÇ °Å¸®
-        public float hCost; // ¸ñÇ¥Á¡±îÁöÀÇ ÃßÁ¤ °Å¸®
+
+        /// <summary>
+        /// ì‹œì‘ ì§€ì ë¶€í„° í˜„ì¬ ë…¸ë“œê¹Œì§€ ì´ë™í•˜ëŠ” ë° ë“œëŠ” ë¹„ìš©(Cost)ì…ë‹ˆë‹¤.
+        /// </summary>
+        public float gCost;
+
+        /// <summary>
+        /// í˜„ì¬ ë…¸ë“œì—ì„œ ëª©í‘œ ì§€ì ê¹Œì§€ì˜ ì˜ˆìƒ ë¹„ìš©(Heuristic)ì…ë‹ˆë‹¤.
+        /// </summary>
+        public float hCost;
+
+        /// <summary>
+        /// G ë¹„ìš©ê³¼ H ë¹„ìš©ì˜ í•©ìœ¼ë¡œ, ê²½ë¡œ íƒìƒ‰ì˜ ìš°ì„ ìˆœìœ„ë¥¼ ê²°ì •í•˜ëŠ” ìµœì¢… ì ìˆ˜ì…ë‹ˆë‹¤.
+        /// </summary>
         public float fCost => gCost + hCost;
 
         public Node(Vector3Int pos)
@@ -23,187 +72,331 @@ public class IsometricPathfinder : MonoBehaviour
         }
     }
 
-    // A* ¾Ë°í¸®ÁòÀ» »ç¿ëÇÑ °æ·Î Ã£±â
-    public List<Vector3Int> FindPath(Vector3Int start, Vector3Int target) // ½ÃÀÛ ³ëµåºÎÅÍ ¸ñÇ¥ ³ëµå±îÁöÀÇ °æ·Î ¹İÈ¯
+    #endregion
+
+    #region í•µì‹¬ ê¸¸ì°¾ê¸° ë¡œì§ (Core Pathfinding Logic)
+
+    // FindPath ë©”ì„œë“œ ì˜¤ë²„ë¡œë“œí•´ì„œ êµ¬í˜„ì„ í–ˆìŒ
+    // 3ë²ˆì§¸ ë§¤ê°œë³€ìˆ˜ë¡œ íŠ¹ì • íƒ€ì¼ë§µì„ ë„£ì–´ì£¼ë©´ í•´ë‹¹ íƒ€ì¼ë§µì—ì„œ ê¸¸ì°¾ê¸°ë¥¼ ìˆ˜í–‰í•¨
+    // ë§Œì•½ ì‹œì‘ì ê³¼ ëì ë§Œ ë„£ì–´ì£¼ë©´ ê¸°ë³¸ íƒ€ì¼ë§µì—ì„œ ê¸¸ì°¾ê¸°ë¥¼ ìˆ˜í–‰í•¨
+
+    /// <summary>
+    /// A* ì•Œê³ ë¦¬ì¦˜ì„ ì‚¬ìš©í•˜ì—¬ ì‹œì‘ ìœ„ì¹˜ì—ì„œ ëª©í‘œ ìœ„ì¹˜ê¹Œì§€ì˜ ìµœë‹¨ ê²½ë¡œë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="start">ì‹œì‘ íƒ€ì¼ ì¢Œí‘œ (Grid ì¢Œí‘œ)</param>
+    /// <param name="target">ëª©í‘œ íƒ€ì¼ ì¢Œí‘œ (Grid ì¢Œí‘œ)</param>
+    /// <returns>ê²½ë¡œë¥¼ êµ¬ì„±í•˜ëŠ” íƒ€ì¼ ì¢Œí‘œë“¤ì˜ ë¦¬ìŠ¤íŠ¸ (ê²½ë¡œê°€ ì—†ìœ¼ë©´ null ë°˜í™˜)</returns>
+    public List<Vector3Int> FindPath(Vector3Int start, Vector3Int target)
     {
+        return FindPath(start, target, 0, 0);
+    }
+
+    /// <summary>
+    /// A* ì•Œê³ ë¦¬ì¦˜ì„ ì‚¬ìš©í•˜ì—¬ íŠ¹ì • íƒ€ì¼ë§µì—ì„œ ì‹œì‘ ìœ„ì¹˜ì—ì„œ ëª©í‘œ ìœ„ì¹˜ê¹Œì§€ì˜ ìµœë‹¨ ê²½ë¡œë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="start">ì‹œì‘ íƒ€ì¼ ì¢Œí‘œ (Grid ì¢Œí‘œ)</param>
+    /// <param name="target">ëª©í‘œ íƒ€ì¼ ì¢Œí‘œ (Grid ì¢Œí‘œ)</param>
+    /// <param name="Tilemap_index">ê¸¸ì°¾ê¸°ë¥¼ ìˆ˜í–‰í•  íƒ€ì¼ë§µ ì¸ë±ìŠ¤</param>
+    /// <param name="targetTilemap_index">walkableTile ë°°ì—´ì˜ ì¸ë±ìŠ¤</param>
+    /// <returns>ê²½ë¡œë¥¼ êµ¬ì„±í•˜ëŠ” íƒ€ì¼ ì¢Œí‘œë“¤ì˜ ë¦¬ìŠ¤íŠ¸ (ê²½ë¡œê°€ ì—†ìœ¼ë©´ null ë°˜í™˜)</returns>
+    public List<Vector3Int> FindPath(Vector3Int start, Vector3Int target, int Tilemap_index, int targetTilemap_index)
+    {
+        Tilemap targetTilemap = tilemaps[Tilemap_index];
+        if (targetTilemap == null)
+        {
+            Debug.LogError("[Pathfinder] íƒ€ì¼ë§µì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+            return null;
+        }
+
+        // 1. ìœ íš¨ì„± ê²€ì‚¬: ì‹œì‘ì ì´ë‚˜ ëª©í‘œì ì´ ì´ë™ ë¶ˆê°€ëŠ¥í•œ ê³³ì¸ì§€ í™•ì¸
+        if (!IsWalkable(start, targetTilemap, targetTilemap_index))
+        {
+            Debug.LogWarning($"[Pathfinder] ì‹œì‘ ìœ„ì¹˜ê°€ ì´ë™ ë¶ˆê°€ëŠ¥í•œ íƒ€ì¼ì…ë‹ˆë‹¤: {start}");
+            return null;
+        }
+        if (!IsWalkable(target, targetTilemap, targetTilemap_index))
+        {
+            Debug.LogWarning($"[Pathfinder] ëª©í‘œ ìœ„ì¹˜ê°€ ì´ë™ ë¶ˆê°€ëŠ¥í•œ íƒ€ì¼ì…ë‹ˆë‹¤: {target}");
+            return null;
+        }
+
+        // 2. ì´ˆê¸°í™”
+        nodes.Clear();                                  // ì´ì „ íƒìƒ‰ ë°ì´í„° ì´ˆê¸°í™”
+        List<Node> openSet = new List<Node>();          // íƒìƒ‰í•  ë…¸ë“œ ëª©ë¡ (Open List)
+        HashSet<Vector3Int> closedSet = new HashSet<Vector3Int>(); // ì´ë¯¸ íƒìƒ‰ì„ ë§ˆì¹œ ë…¸ë“œ ëª©ë¡ (Closed List)
+
+        // ì‹œì‘ ë…¸ë“œ ì„¤ì •
+        Node startNode = new Node(start);
+        startNode.gCost = 0;
+        startNode.hCost = GetDistance(start, target);
         
-        // Å¸ÀÏÀÌ À¯È¿ÇÑÁö È®ÀÎ
-        if (!IsWalkable(start))
-        {
-            Debug.LogWarning("½ÃÀÛÁ¡ÀÌ ÀÌµ¿ ºÒ°¡´ÉÇÑ Å¸ÀÏÀÔ´Ï´Ù. ÇöÀç ½ÃÀÛ À§Ä¡´Â [" + start + "] ÀÔ´Ï´Ù");
-            return null;
-        }
-        if (!IsWalkable(target))
-        {
-            Debug.LogWarning("¸ñÇ¥Á¡ÀÌ ÀÌµ¿ ºÒ°¡´ÉÇÑ Å¸ÀÏÀÔ´Ï´Ù. ÇöÀç ¸ñÇ¥ À§Ä¡´Â [" + target +"] ÀÔ´Ï´Ù");
-            return null;
-        }
+        openSet.Add(startNode);
+        nodes[start] = startNode;
 
-        nodes.Clear(); // ÀÌÀü Å½»ö °á°ú ÃÊ±âÈ­
-        List<Node> openSet = new List<Node>(); // Å½»öÇÒ ³ëµå ¸®½ºÆ®
-        HashSet<Vector3Int> closedSet = new HashSet<Vector3Int>(); // Å½»ö ¿Ï·áµÈ ³ëµå ÁıÇÕ
-
-        Node startNode = new Node(start); // ½ÃÀÛ ³ëµå ÃÊ±âÈ­
-        startNode.gCost = 0;// ½ÃÀÛ ³ëµåÀÇ gCost´Â 0
-        startNode.hCost = GetDistance(start, target); // ½ÃÀÛ ³ëµåÀÇ hCost °è»ê
-        openSet.Add(startNode); // ½ÃÀÛ ³ëµå¸¦ ¿ÀÇÂ ¼Â¿¡ Ãß°¡
-        nodes[start] = startNode; // µñ¼Å³Ê¸®¿¡ ½ÃÀÛ ³ëµå Ãß°¡
-
-        while (openSet.Count > 0) // ¿ÀÇÂ ¼Â¿¡ ³ëµå°¡ ³²¾ÆÀÖ´Â µ¿¾È ¹İº¹
+        // 3. íƒìƒ‰ ë£¨í”„ (Open Setì´ ë¹Œ ë•Œê¹Œì§€ ë°˜ë³µ)
+        while (openSet.Count > 0)
         {
-            // fCost°¡ °¡Àå ³·Àº ³ëµå Ã£±â
-            Node currentNode = openSet[0]; // ÀÓ½Ã·Î Ã¹ ¹øÂ° ³ëµå·Î ¼³Á¤
-            for (int i = 1; i < openSet.Count; i++) // ³ª¸ÓÁö ³ëµåµé°ú ºñ±³
+            // 3-1. Open Setì—ì„œ F Costê°€ ê°€ì¥ ë‚®ì€(ê°€ì¥ ìœ ë§í•œ) ë…¸ë“œ ì„ íƒ
+            Node currentNode = openSet[0];
+            for (int i = 1; i < openSet.Count; i++)
             {
-                if (openSet[i].fCost < currentNode.fCost || // fCost°¡ ´õ ³·°Å³ª
-                    (openSet[i].fCost == currentNode.fCost && openSet[i].hCost < currentNode.hCost)) // fCost°¡ °°À¸¸é hCost°¡ ´õ ³·Àº ³ëµå ¼±ÅÃ
+                // F Costê°€ ì‘ê±°ë‚˜, F Costê°€ ê°™ë‹¤ë©´ H Cost(ëª©í‘œê¹Œì§€ ë‚¨ì€ ê±°ë¦¬)ê°€ ì‘ì€ ê²ƒì„ ì„ íƒ
+                if (openSet[i].fCost < currentNode.fCost ||
+                    (openSet[i].fCost == currentNode.fCost && openSet[i].hCost < currentNode.hCost))
                 {
-                    currentNode = openSet[i]; // ÇöÀç ³ëµå °»½Å
+                    currentNode = openSet[i];
                 }
             }
 
-            openSet.Remove(currentNode); // ÇöÀç ³ëµå¸¦ ¿ÀÇÂ ¼Â¿¡¼­ Á¦°Å
-            closedSet.Add(currentNode.position); // ÇöÀç ³ëµå¸¦ Å¬·ÎÁîµå ¼Â¿¡ Ãß°¡
+            openSet.Remove(currentNode);       // ì²˜ë¦¬ ì¤‘ì¸ ë…¸ë“œëŠ” Open Setì—ì„œ ì œê±°
+            closedSet.Add(currentNode.position); // Closed Setì— ì¶”ê°€ (ì¬ë°©ë¬¸ ë°©ì§€)
 
-            // ¸ñÇ¥ µµ´Ş
-            if (currentNode.position == target) // ¸ñÇ¥ ³ëµå¿¡ µµ´ŞÇßÀ¸¸é
+            // 3-2. ëª©í‘œ ë„ë‹¬ í™•ì¸
+            if (currentNode.position == target)
             {
-                return RetracePath(startNode, currentNode); // °æ·Î ¿ªÃßÀûÇÏ¿© ¹İÈ¯
+                return RetracePath(startNode, currentNode); // ê²½ë¡œ ìƒì„± í›„ ë°˜í™˜
             }
 
-            // ÀÌ¿ô ³ëµå Å½»ö
-            foreach (Vector3Int neighbor in GetNeighbors(currentNode.position)) // 4¹æÇâ ÀÌ¿ô ³ëµå °¡Á®¿À±â
+            // 3-3. ì£¼ë³€ ì´ì›ƒ ë…¸ë“œ íƒìƒ‰
+            foreach (Vector3Int neighborPos in GetNeighbors(currentNode.position))
             {
-                if (!IsWalkable(neighbor) || closedSet.Contains(neighbor)) // ÀÌµ¿ ºÒ°¡´ÉÇÏ°Å³ª ÀÌ¹Ì Å½»öµÈ ³ëµå¸é ¹«½Ã
-                    continue; // ´ÙÀ½ ÀÌ¿ô ³ëµå·Î
+                // ì´ë™ ë¶ˆê°€ëŠ¥í•˜ê±°ë‚˜ ì´ë¯¸ ë‹«íŒ ëª©ë¡ì— ìˆë‹¤ë©´ ìŠ¤í‚µ
+                if (!IsWalkable(neighborPos, targetTilemap, targetTilemap_index) || closedSet.Contains(neighborPos))
+                    continue;
 
-                float newGCost = currentNode.gCost + GetDistance(currentNode.position, neighbor); // ÇöÀç ³ëµå¿¡¼­ ÀÌ¿ô ³ëµå±îÁöÀÇ °Å¸® °è»ê
+                // G Cost ê³„ì‚°: í˜„ì¬ê¹Œì§€ì˜ ê±°ë¦¬ + ì´ì›ƒê¹Œì§€ì˜ ê±°ë¦¬ (ì—¬ê¸°ì„  ì¸ì ‘í•˜ë¯€ë¡œ ê±°ë¦¬ëŠ” ë³´í†µ 1)
+                float newGCost = currentNode.gCost + GetDistance(currentNode.position, neighborPos);
 
-                if (!nodes.ContainsKey(neighbor)) // ÀÌ¿ô ³ëµå°¡ µñ¼Å³Ê¸®¿¡ ¾øÀ¸¸é »õ·Î »ı¼º
+                // ë…¸ë“œ ìºì‹± í™•ì¸ ë° ìƒì„±
+                if (!nodes.ContainsKey(neighborPos))
                 {
-                    nodes[neighbor] = new Node(neighbor); // »õ ³ëµå »ı¼º ¹× µñ¼Å³Ê¸®¿¡ Ãß°¡
+                    nodes[neighborPos] = new Node(neighborPos);
                 }
+                Node neighborNode = nodes[neighborPos];
 
-                Node neighborNode = nodes[neighbor]; // ÀÌ¿ô ³ëµå °¡Á®¿À±â
-
-                if (newGCost < neighborNode.gCost || !openSet.Contains(neighborNode)) // ´õ ÂªÀº °æ·Î¸¦ Ã£¾Ò°Å³ª ¿ÀÇÂ ¼Â¿¡ ¾øÀ¸¸é
+                // ë” ì§§ì€ ê²½ë¡œë¥¼ ë°œê²¬í–ˆê±°ë‚˜, ì•„ì§ Open Setì— ì—†ëŠ” ê²½ìš° ì—…ë°ì´íŠ¸
+                if (newGCost < neighborNode.gCost || !openSet.Contains(neighborNode))
                 {
-                    neighborNode.gCost = newGCost; // gCost °»½Å
-                    neighborNode.hCost = GetDistance(neighbor, target); // hCost °»½Å
-                    neighborNode.parent = currentNode; // ºÎ¸ğ ³ëµå °»½Å
+                    neighborNode.gCost = newGCost;
+                    neighborNode.hCost = GetDistance(neighborPos, target); // íœ´ë¦¬ìŠ¤í‹± ì¬ê³„ì‚°
+                    neighborNode.parent = currentNode; // ë¶€ëª¨ ë…¸ë“œ ì„¤ì • (ê²½ë¡œ ì¶”ì ìš©)
 
-                    if (!openSet.Contains(neighborNode)) // ¿ÀÇÂ ¼Â¿¡ ¾øÀ¸¸é Ãß°¡
+                    if (!openSet.Contains(neighborNode))
                     {
-                        openSet.Add(neighborNode); // ¿ÀÇÂ ¼Â¿¡ Ãß°¡
+                        openSet.Add(neighborNode);
                     }
                 }
             }
         }
 
-        // °æ·Î¸¦ Ã£Áö ¸øÇÔ
+        // ë£¨í”„ë¥¼ ë¹ ì ¸ë‚˜ì™”ë‹¤ë©´ ê²½ë¡œë¥¼ ì°¾ì§€ ëª»í•œ ê²ƒì„
         return null;
     }
 
-    // Isometric Å¸ÀÏÀÇ 4¹æÇâ ÀÌ¿ô °¡Á®¿À±â
-    private List<Vector3Int> GetNeighbors(Vector3Int pos) // 4¹æÇâ ÀÌ¿ô ³ëµå ¹İÈ¯
+    /// <summary>
+    /// ëª©í‘œ ë…¸ë“œì—ì„œ ì‹œì‘ ë…¸ë“œê¹Œì§€ ë¶€ëª¨ë¥¼ ë”°ë¼ ì—­ì¶”ì í•˜ì—¬ ìµœì¢… ê²½ë¡œ ë¦¬ìŠ¤íŠ¸ë¥¼ ìƒì„±í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="startNode">ê²½ë¡œì˜ ì‹œì‘ ë…¸ë“œ</param>
+    /// <param name="endNode">ê²½ë¡œì˜ ë ë…¸ë“œ</param>
+    /// <returns>ì‹œì‘ì ë¶€í„° ëì ê¹Œì§€ ìˆœì„œëŒ€ë¡œ ì •ë ¬ëœ ì¢Œí‘œ ë¦¬ìŠ¤íŠ¸</returns>
+    private List<Vector3Int> RetracePath(Node startNode, Node endNode)
     {
-        List<Vector3Int> neighbors = new List<Vector3Int> // 4¹æÇâ ÀÌ¿ô ³ëµå ¸®½ºÆ®
-        {
-            pos + new Vector3Int(1, 0, 0),   // ¿ìÃø
-            pos + new Vector3Int(-1, 0, 0),  // ÁÂÃø
-            pos + new Vector3Int(0, 1, 0),   // À§ÂÊ
-            pos + new Vector3Int(0, -1, 0)   // ¾Æ·¡ÂÊ
-        };
+        List<Vector3Int> path = new List<Vector3Int>();
+        Node currentNode = endNode;
 
-        return neighbors; // ÀÌ¿ô ³ëµå ¸®½ºÆ® ¹İÈ¯
+        // ëª©í‘œ ì§€ì ë¶€í„° ì‹œì‘ ì§€ì ê¹Œì§€ ê±°ìŠ¬ëŸ¬ ì˜¬ë¼ê°
+        while (currentNode != startNode)
+        {
+            path.Add(currentNode.position);
+            currentNode = currentNode.parent;
+        }
+
+        path.Reverse(); // ì—­ìˆœìœ¼ë¡œ ë‹´ê²¼ìœ¼ë¯€ë¡œ ë’¤ì§‘ì–´ì„œ [ì‹œì‘ -> ë] ìˆœì„œë¡œ ë³€ê²½
+        return path;
     }
 
-    /*
-    // Isometric Å¸ÀÏÀÇ 8¹æÇâ ÀÌ¿ô °¡Á®¿À±â (´ë°¢¼± Æ÷ÇÔ)
-    private List<Vector3Int> GetNeighbors8(Vector3Int pos)
+    #endregion
+
+    #region í—¬í¼ ë©”ì„œë“œ (Helper Methods: Distance, Neighbor, Walkable)
+
+    /// <summary>
+    /// ì£¼ì–´ì§„ ìœ„ì¹˜ ê¸°ì¤€ ìƒí•˜ì¢Œìš° 4ë°©í–¥ì˜ ì´ì›ƒ ì¢Œí‘œë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
+    /// <para>ì•„ì´ì†Œë©”íŠ¸ë¦­ ë·°ì—ì„œë„ ê·¸ë¦¬ë“œ ë…¼ë¦¬ ì¢Œí‘œëŠ” ì§êµ ì¢Œí‘œê³„ì™€ ë™ì¼í•˜ê²Œ ì‘ë™í•©ë‹ˆë‹¤.</para>
+    /// </summary>
+    /// <param name="pos">ì¤‘ì‹¬ ì¢Œí‘œ</param>
+    /// <returns>ì´ì›ƒ ì¢Œí‘œ ë¦¬ìŠ¤íŠ¸</returns>
+    private List<Vector3Int> GetNeighbors(Vector3Int pos)
     {
         List<Vector3Int> neighbors = new List<Vector3Int>
         {
-            pos + new Vector3Int(1, 0, 0),   // ¿ìÃø
-            pos + new Vector3Int(-1, 0, 0),  // ÁÂÃø
-            pos + new Vector3Int(0, 1, 0),   // À§ÂÊ
-            pos + new Vector3Int(0, -1, 0),  // ¾Æ·¡ÂÊ
-            pos + new Vector3Int(1, 1, 0),   // ¿ì»ó´Ü
-            pos + new Vector3Int(1, -1, 0),  // ¿ìÇÏ´Ü
-            pos + new Vector3Int(-1, 1, 0),  // ÁÂ»ó´Ü
-            pos + new Vector3Int(-1, -1, 0)  // ÁÂÇÏ´Ü
+            pos + new Vector3Int(1, 0, 0),   // ìš°
+            pos + new Vector3Int(-1, 0, 0),  // ì¢Œ
+            pos + new Vector3Int(0, 1, 0),   // ìƒ
+            pos + new Vector3Int(0, -1, 0)   // í•˜
         };
 
         return neighbors;
     }
-    */
 
-    // µÎ Å¸ÀÏ °£ÀÇ °Å¸® °è»ê (¸ÇÇØÆ° °Å¸®)
-    private float GetDistance(Vector3Int a, Vector3Int b) // µÎ Å¸ÀÏ °£ÀÇ °Å¸® °è»ê
+    /// <summary>
+    /// ë‘ íƒ€ì¼ ì‚¬ì´ì˜ ê±°ë¦¬ë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤ (Heuristic).
+    /// <para>4ë°©í–¥ ì´ë™ì„ ê¸°ì¤€ìœ¼ë¡œ í•˜ë¯€ë¡œ ë§¨í•´íŠ¼ ê±°ë¦¬(Manhattan Distance) ê³µì‹ì„ ì‚¬ìš©í•©ë‹ˆë‹¤.</para>
+    /// </summary>
+    /// <param name="a">ì¢Œí‘œ A</param>
+    /// <param name="b">ì¢Œí‘œ B</param>
+    /// <returns>ì˜ˆìƒ ê±°ë¦¬ ë¹„ìš©</returns>
+    private float GetDistance(Vector3Int a, Vector3Int b)
     {
-        int dx = Mathf.Abs(a.x - b.x); // x ÁÂÇ¥ Â÷ÀÌ
-        int dy = Mathf.Abs(a.y - b.y); // y ÁÂÇ¥ Â÷ÀÌ
+        int dx = Mathf.Abs(a.x - b.x);
+        int dy = Mathf.Abs(a.y - b.y);
 
-        // ´ë°¢¼± ÀÌµ¿À» Çã¿ëÇÏ´Â °æ¿ì Ã¼ºñ¼ÎÇÁ °Å¸® »ç¿ë
+        // 4ë°©í–¥ ì´ë™ ì‹œì—ëŠ” ëŒ€ê°ì„  ì´ë™ì´ ë¶ˆê°€ëŠ¥í•˜ë¯€ë¡œ ê°€ë¡œ+ì„¸ë¡œ ê±°ë¦¬ë¥¼ í•©ì‚°í•¨ (ë§¨í•´íŠ¼ ê±°ë¦¬)
+        return dx + dy;
+        
+        // ë§Œì•½ 8ë°©í–¥(ëŒ€ê°ì„ ) ì´ë™ì„ í—ˆìš©í•œë‹¤ë©´ ì•„ë˜  Chebyshev ê±°ë¦¬ ë“±ì„ ê³ ë ¤í•´ì•¼ í•¨
         // return Mathf.Max(dx, dy);
-
-        // 4¹æÇâ¸¸ Çã¿ëÇÏ´Â °æ¿ì ¸ÇÇØÆ° °Å¸® »ç¿ë
-        return dx + dy; // ¸ÇÇØÆ° °Å¸® ¹İÈ¯
     }
 
-    // Å¸ÀÏÀÌ ÀÌµ¿ °¡´ÉÇÑÁö È®ÀÎ
-    private bool IsWalkable(Vector3Int pos) // Å¸ÀÏÀÌ ÀÌµ¿ °¡´ÉÇÑÁö È®ÀÎ
+    /// <summary>
+    /// í•´ë‹¹ ì¢Œí‘œì˜ íƒ€ì¼ì´ ì´ë™ ê°€ëŠ¥í•œì§€ í™•ì¸í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="pos">í™•ì¸í•  ì¢Œí‘œ</param>
+    /// <returns>ì´ë™ ê°€ëŠ¥ ì—¬ë¶€</returns>
+    private bool IsWalkable(Vector3Int pos)
     {
-        TileBase tile = tilemap.GetTile(pos); // ÇØ´ç À§Ä¡ÀÇ Å¸ÀÏ °¡Á®¿À±â
+        return IsWalkable(pos, tilemaps != null && tilemaps.Length > 0 ? tilemaps[0] : null, 0);
+    }
 
-        // nullÀÌ ¾Æ´Ï°í walkableTile°ú °°À¸¸é ÀÌµ¿ °¡´É
-        // walkableTileÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò´Ù¸é nullÀÌ ¾Æ´Ñ ¸ğµç Å¸ÀÏÀÌ ÀÌµ¿ °¡´É
-        if (walkableTile != null) // Æ¯Á¤ Å¸ÀÏ¸¸ ÀÌµ¿ °¡´ÉÇÏµµ·Ï ¼³Á¤µÈ °æ¿ì
+    /// <summary>
+    /// íŠ¹ì • íƒ€ì¼ë§µì—ì„œ í•´ë‹¹ ì¢Œí‘œì˜ íƒ€ì¼ì´ ì´ë™ ê°€ëŠ¥í•œì§€ í™•ì¸í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="pos">í™•ì¸í•  ì¢Œí‘œ</param>
+    /// <param name="targetTilemap">ê²€ì‚¬í•  íƒ€ì¼ë§µ</param>
+    /// <param name="targetTilemap_index">walkableTile ë°°ì—´ì˜ ì¸ë±ìŠ¤</param>
+    /// <returns>ì´ë™ ê°€ëŠ¥ ì—¬ë¶€</returns>
+    private bool IsWalkable(Vector3Int pos, Tilemap targetTilemap, int targetTilemap_index)
+    {
+        if (targetTilemap == null)
         {
-            return tile == walkableTile; // ÇØ´ç Å¸ÀÏÀÌ ÀÌµ¿ °¡´ÉÇÑ Å¸ÀÏÀÎÁö È®ÀÎ
+            return false;
         }
 
-        return tile != null; // nullÀÌ ¾Æ´Ñ ¸ğµç Å¸ÀÏÀÌ ÀÌµ¿ °¡´É
-    }
+        TileBase tile = targetTilemap.GetTile(pos);
 
-    // °æ·Î ¿ªÃßÀû
-    private List<Vector3Int> RetracePath(Node startNode, Node endNode) // °æ·Î ¿ªÃßÀûÇÏ¿© ¸®½ºÆ®·Î ¹İÈ¯
-    {
-        List<Vector3Int> path = new List<Vector3Int>(); // °æ·Î ¸®½ºÆ®
-        Node currentNode = endNode; // ÇöÀç ³ëµå¸¦ ¸ñÇ¥ ³ëµå·Î ¼³Á¤
-
-        while (currentNode != startNode) // ½ÃÀÛ ³ëµå¿¡ µµ´ŞÇÒ ¶§±îÁö ¹İº¹
+        // walkableTile ë°°ì—´ì´ ì„¤ì •ë˜ì–´ ìˆê³ , ì¸ë±ìŠ¤ê°€ ìœ íš¨í•˜ë‹¤ë©´ í•´ë‹¹ íƒ€ì¼ê³¼ ì¼ì¹˜í•´ì•¼ë§Œ ì´ë™ ê°€ëŠ¥
+        if (walkableTile != null && targetTilemap_index >= 0 && targetTilemap_index < walkableTile.Length && walkableTile[targetTilemap_index] != null)
         {
-            path.Add(currentNode.position); // ÇöÀç ³ëµå À§Ä¡¸¦ °æ·Î¿¡ Ãß°¡
-            currentNode = currentNode.parent; // ºÎ¸ğ ³ëµå·Î ÀÌµ¿
+            return tile == walkableTile[targetTilemap_index];
         }
 
-        path.Reverse(); // °æ·Î¸¦ ½ÃÀÛÁ¡¿¡¼­ ¸ñÇ¥Á¡ ¼ø¼­·Î µÚÁı±â
-        return path; // °æ·Î ¹İÈ¯
+        // walkableTileì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ë‹¤ë©´, íƒ€ì¼ì´ ì¡´ì¬í•˜ê¸°ë§Œ í•˜ë©´ ì´ë™ ê°€ëŠ¥ (ë¹ˆ ê³µê°„ì€ ì´ë™ ë¶ˆê°€)
+        return tile != null;
     }
 
-    // ¿ùµå ÁÂÇ¥¸¦ Å¸ÀÏ¸Ê ¼¿ ÁÂÇ¥·Î º¯È¯
-    public Vector3Int WorldToCell(Vector3 worldPosition) // ¿ùµå ÁÂÇ¥¸¦ ¼¿ ÁÂÇ¥·Î º¯È¯
+    #endregion
+
+    #region ìœ í‹¸ë¦¬í‹° & ë””ë²„ê·¸ (Utilities & Debug)
+
+    /// <summary>
+    /// íƒ€ì¼ë§µ ë°°ì—´ì—ì„œ ì¸ë±ìŠ¤ë¡œ íƒ€ì¼ë§µì„ ê°€ì ¸ì˜µë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="index">íƒ€ì¼ë§µ ë°°ì—´ì˜ ì¸ë±ìŠ¤</param>
+    /// <returns>í•´ë‹¹ ì¸ë±ìŠ¤ì˜ íƒ€ì¼ë§µ (ì—†ìœ¼ë©´ null)</returns>
+    public Tilemap GetTilemapByIndex(int index)
     {
-        return tilemap.WorldToCell(worldPosition); // Å¸ÀÏ¸ÊÀÇ ¿ùµåToCell ¸Ş¼­µå »ç¿ë
+        if (tilemaps == null || index < 0 || index >= tilemaps.Length)
+        {
+            Debug.LogWarning($"[Pathfinder] ìœ íš¨í•˜ì§€ ì•Šì€ íƒ€ì¼ë§µ ì¸ë±ìŠ¤: {index}");
+            return null;
+        }
+        return tilemaps[index];
     }
 
-    // Å¸ÀÏ¸Ê ¼¿ ÁÂÇ¥¸¦ ¿ùµå ÁÂÇ¥·Î º¯È¯
-    public Vector3 CellToWorld(Vector3Int cellPosition) // ¼¿ ÁÂÇ¥¸¦ ¿ùµå ÁÂÇ¥·Î º¯È¯
+    /// <summary>
+    /// ì›”ë“œ ì¢Œí‘œ(Vector3)ë¥¼ ê·¸ë¦¬ë“œ ì…€ ì¢Œí‘œ(Vector3Int)ë¡œ ë³€í™˜í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="worldPosition">ì›”ë“œ ìƒì˜ ìœ„ì¹˜</param>
+    /// <returns>í•´ë‹¹ ìœ„ì¹˜ì˜ ê·¸ë¦¬ë“œ ì¢Œí‘œ</returns>
+    public Vector3Int WorldToCell(Vector3 worldPosition)
     {
-        return tilemap.CellToWorld(cellPosition); // Å¸ÀÏ¸ÊÀÇ CellToWorld ¸Ş¼­µå »ç¿ë
+        return tilemaps != null && tilemaps.Length > 0 ? tilemaps[0].WorldToCell(worldPosition) : Vector3Int.zero;
     }
 
-    // °æ·Î ½Ã°¢È­ (µğ¹ö±×¿ë)
-    public void DrawPath(List<Vector3Int> path) // °æ·Î¸¦ µğ¹ö±× ¶óÀÎÀ¸·Î ½Ã°¢È­
+    /// <summary>
+    /// íŠ¹ì • íƒ€ì¼ë§µì—ì„œ ì›”ë“œ ì¢Œí‘œ(Vector3)ë¥¼ ê·¸ë¦¬ë“œ ì…€ ì¢Œí‘œ(Vector3Int)ë¡œ ë³€í™˜í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="worldPosition">ì›”ë“œ ìƒì˜ ìœ„ì¹˜</param>
+    /// <param name="targetTilemap">ë³€í™˜í•  íƒ€ì¼ë§µ</param>
+    /// <returns>í•´ë‹¹ ìœ„ì¹˜ì˜ ê·¸ë¦¬ë“œ ì¢Œí‘œ</returns>
+    public Vector3Int WorldToCell(Vector3 worldPosition, Tilemap targetTilemap)
+    {
+        if (targetTilemap == null)
+        {
+            Debug.LogWarning("[Pathfinder] íƒ€ì¼ë§µì´ nullì…ë‹ˆë‹¤. ê¸°ë³¸ íƒ€ì¼ë§µì„ ì‚¬ìš©í•©ë‹ˆë‹¤.");
+            return tilemaps != null && tilemaps.Length > 0 ? tilemaps[0].WorldToCell(worldPosition) : Vector3Int.zero;
+        }
+        return targetTilemap.WorldToCell(worldPosition);
+    }
+
+    /// <summary>
+    /// ê·¸ë¦¬ë“œ ì…€ ì¢Œí‘œ(Vector3Int)ë¥¼ ì›”ë“œ ì¢Œí‘œ(Vector3)ë¡œ ë³€í™˜í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="cellPosition">ê·¸ë¦¬ë“œ ì¢Œí‘œ</param>
+    /// <returns>í•´ë‹¹ ê·¸ë¦¬ë“œì˜ ì›”ë“œ ì¤‘ì‹¬ ì¢Œí‘œ</returns>
+    public Vector3 CellToWorld(Vector3Int cellPosition)
+    {
+        return tilemaps != null && tilemaps.Length > 0 ? tilemaps[0].CellToWorld(cellPosition) : Vector3.zero;
+    }
+
+    /// <summary>
+    /// íŠ¹ì • íƒ€ì¼ë§µì—ì„œ ê·¸ë¦¬ë“œ ì…€ ì¢Œí‘œ(Vector3Int)ë¥¼ ì›”ë“œ ì¢Œí‘œ(Vector3)ë¡œ ë³€í™˜í•©ë‹ˆë‹¤.
+    /// </summary>
+    /// <param name="cellPosition">ê·¸ë¦¬ë“œ ì¢Œí‘œ</param>
+    /// <param name="targetTilemap">ë³€í™˜í•  íƒ€ì¼ë§µ</param>
+    /// <returns>í•´ë‹¹ ê·¸ë¦¬ë“œì˜ ì›”ë“œ ì¤‘ì‹¬ ì¢Œí‘œ</returns>
+    public Vector3 CellToWorld(Vector3Int cellPosition, Tilemap targetTilemap)
+    {
+        if (targetTilemap == null)
+        {
+            Debug.LogWarning("[Pathfinder] íƒ€ì¼ë§µì´ nullì…ë‹ˆë‹¤. ê¸°ë³¸ íƒ€ì¼ë§µì„ ì‚¬ìš©í•©ë‹ˆë‹¤.");
+            return tilemaps != null && tilemaps.Length > 0 ? tilemaps[0].CellToWorld(cellPosition) : Vector3.zero;
+        }
+        return targetTilemap.CellToWorld(cellPosition);
+    }
+
+    /// <summary>
+    /// ê³„ì‚°ëœ ê²½ë¡œë¥¼ ì”¬ ë·°(Scene View)ì— ì„ ìœ¼ë¡œ ê·¸ë ¤ ì‹œê°í™”í•©ë‹ˆë‹¤. (ë””ë²„ê¹…ìš©)
+    /// </summary>
+    /// <param name="path">ê·¸ë¦´ ê²½ë¡œ ë¦¬ìŠ¤íŠ¸</param>
+    public void DrawPath(List<Vector3Int> path)
+    {
+        DrawPath(path, tilemaps != null && tilemaps.Length > 0 ? tilemaps[0] : null);
+    }
+
+    /// <summary>
+    /// íŠ¹ì • íƒ€ì¼ë§µì—ì„œ ê³„ì‚°ëœ ê²½ë¡œë¥¼ ì”¬ ë·°(Scene View)ì— ì„ ìœ¼ë¡œ ê·¸ë ¤ ì‹œê°í™”í•©ë‹ˆë‹¤. (ë””ë²„ê¹…ìš©)
+    /// </summary>
+    /// <param name="path">ê·¸ë¦´ ê²½ë¡œ ë¦¬ìŠ¤íŠ¸</param>
+    /// <param name="targetTilemap">ê²½ë¡œë¥¼ ê·¸ë¦´ íƒ€ì¼ë§µ</param>
+    public void DrawPath(List<Vector3Int> path, Tilemap targetTilemap)
     {
         if (path == null || path.Count == 0) return;
+        if (targetTilemap == null)
+        {
+            Debug.LogWarning("[Pathfinder] íƒ€ì¼ë§µì´ nullì…ë‹ˆë‹¤.");
+            return;
+        }
 
         for (int i = 0; i < path.Count - 1; i++)
         {
-            Vector3 start = tilemap.GetCellCenterWorld(path[i]);
-            Vector3 end = tilemap.GetCellCenterWorld(path[i + 1]);
-            Debug.DrawLine(start, end, Color.green, 2f); // 2ÃÊ µ¿¾È ÃÊ·Ï»ö ¶óÀÎÀ¸·Î Ç¥½Ã
+            // ê²½ë¡œì˜ ê° ì§€ì ì„ ì›”ë“œ ì¢Œí‘œë¡œ ë³€í™˜í•˜ì—¬ ì„ ì„ ê·¸ë¦¼
+            Vector3 start = targetTilemap.GetCellCenterWorld(path[i]);
+            Vector3 end = targetTilemap.GetCellCenterWorld(path[i + 1]);
+            
+            // ë…¹ìƒ‰ ì„ ì„ 2ì´ˆê°„ í‘œì‹œ
+            Debug.DrawLine(start, end, Color.green, 2f);
         }
     }
+
+    #endregion
 }

@@ -2,59 +2,87 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Unity.VisualScripting;
 using System;
 
-public class ArbeitRepository : MonoBehaviour
+public class ArbeitRepository : MonoBehaviour, IRepository
 {
-    public static ArbeitRepository Instance { get; private set; }
+    private static ArbeitRepository _instance;
+    public static ArbeitRepository Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<ArbeitRepository>();
+            }
+            return _instance;
+        }
+    }
+    public bool IsInitialized { get; private set; } = false;
 
-    private DataManager _dataManager;
+    private JsonDataHandler _jsonDataHandler;
+
+    [Header("데이터 에셋 (SO)")]
+    [Tooltip("NPC의 고정 특성(성격, 기본 능력치 등)을 담고 있는 ScriptableObject")]
+    [SerializeField] private PersonalityDataSO personalityDataSO;
+
+    private List<ArbeitData> _arbeitDatas = new List<ArbeitData>();
+    private List<npc> _npcs = new List<npc>();
     private readonly Dictionary<int, Personality> _personalityDict = new Dictionary<int, Personality>();
 
     private void Awake()
     {
-        if (Instance == null)
+        if (_instance == null)
         {
-            Instance = this;
+            _instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
+        _jsonDataHandler = new JsonDataHandler();
     }
 
     private void Start()
     {
-        // DataManager 인스턴스를 가져옵니다.
-        _dataManager = DataManager.Instance;
-        StartCoroutine(WaitForDataAndInitialize());
+        // DataManager가 초기화를 요청할 때까지 대기합니다.
+        DataManager.Instance.RegisterRepository(this);
     }
 
-    private IEnumerator WaitForDataAndInitialize()
+    public void Initialize()
     {
-        // DataManager가 NPC 생성에 필요한 모든 데이터를 로드할 때까지 대기합니다.
-        yield return new WaitUntil(() =>
-            _dataManager != null &&
-            _dataManager.personalities != null && _dataManager.personalities.Count > 0 &&
-            _dataManager.arbeitDatas != null
-        );
+        LoadArbeitData();
+        LoadPersonalityData();
 
         // 데이터가 준비되면, 딕셔너리를 초기화하고 NPC 리스트를 생성합니다.
         InitializeDictionaries();
-        PopulateNpcList();
+        CreateNpcList();
+        IsInitialized = true;
+        Debug.Log("ArbeitRepository 초기화 완료.");
+    }
+
+    private void LoadArbeitData()
+    {
+        _arbeitDatas = _jsonDataHandler.LoadArbeitData();
+    }
+
+    private void LoadPersonalityData()
+    {
+        // PersonalityDataSO에서 직접 로드
     }
 
     /// <summary>
     /// DataManager로부터 받은 Personality 데이터를 딕셔너리로 변환하여 빠른 조회를 가능하게 합니다.
     /// </summary>
-    public void InitializeDictionaries()
+    private void InitializeDictionaries()
     {
-        if (_dataManager.personalities != null && _dataManager.personalities.Count > 0)
+        if (personalityDataSO != null && personalityDataSO.personalities != null)
         {
+            var personalities = personalityDataSO.personalities;
             _personalityDict.Clear();
-            foreach (var personality in _dataManager.personalities)
+            foreach (var personality in personalities)
             {
                 if (personality == null) continue;
 
@@ -77,30 +105,24 @@ public class ArbeitRepository : MonoBehaviour
     /// 로드된 원본 데이터(ArbeitData, Personality)를 조합하여 실제 게임에서 사용될 npc 객체 리스트를 생성하고,
     /// DataManager에 저장하여 다른 시스템에서 사용할 수 있도록 합니다.
     /// </summary>
-    private void PopulateNpcList()
+    private void CreateNpcList()
     {
-        _dataManager.npcs = GetNpcs();
-        Debug.Log($"고용된 npc {_dataManager.npcs.Count}명을 생성했습니다.");
-    }
+        _npcs.Clear();
 
-    public List<npc> GetNpcs()
-    {
-        List<npc> npcList = new List<npc>();
-
-        if (_dataManager.arbeitDatas == null || _personalityDict == null)
+        if (_arbeitDatas == null || _personalityDict == null)
         {
             Debug.LogError("Arbeit data or Personality data is not loaded yet.");
-            return npcList;
+            return;
         }
 
-        foreach (var arbeitData in _dataManager.arbeitDatas)
+        foreach (var arbeitData in _arbeitDatas)
         {
             if (arbeitData.employment_state) // 고용 상태가 true인 경우에만 npc 리스트에 추가
             {
                 // arbeitData의 personality_id를 사용하여 딕셔너리에서 해당 Personality 정보를 찾습니다.
                 if (_personalityDict.TryGetValue(arbeitData.personality_id, out Personality personality))
                 {
-                    npcList.Add(new npc(arbeitData, personality));
+                    _npcs.Add(new npc(arbeitData, personality));
                 }
                 else
                 {
@@ -108,8 +130,12 @@ public class ArbeitRepository : MonoBehaviour
                 }
             }
         }
-        return npcList;
+        Debug.Log($"고용된 npc {_npcs.Count}명을 생성했습니다.");
+    }
 
+    public List<npc> GetNpcs()
+    {
+        return _npcs;
     }
 
 }

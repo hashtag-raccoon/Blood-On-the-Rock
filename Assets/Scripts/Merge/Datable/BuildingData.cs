@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEditor.ShaderKeywordFilter;
+using UnityEditor;
 
 public enum CameraPositionOffset
 {
     Left,
     Center,
     Right
-}   
+}
 
 public enum BuildingType
 {
@@ -53,6 +54,14 @@ public class ConstructedBuildingProduction
     public bool is_producing; // 생산 중 여부
 }
 
+[Serializable]
+public class ConstructedBuildingPos
+{
+    public int building_id;
+    public Vector3Int pos;
+    public float rotation;
+}
+
 
 /// <summary>
 /// 게임 내에 실제로 건설된 건물의 모든 정보를 통합하여 관리하는 클래스입니다.
@@ -79,8 +88,12 @@ public class ConstructedBuilding : IScrollItemData
     public DateTime NextProductionTime { get; set; }
     public bool IsProducing { get; set; }
 
+    // constructedBuilding 에서만
+    public Vector3Int Position { get; set; }
+    public float Rotation { get; set; }
+    public bool IsEditInventory { get; set; } = false; // 인벤토리에 있는지 여부
     // 생성자: 여러 데이터 소스를 조합하여 하나의 완전한 객체를 생성.
-    public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus)
+    public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus, ConstructedBuildingPos constructedBuildingPos)
     {
         // 기본 정보
         Id = buildingData.building_id;
@@ -88,6 +101,8 @@ public class ConstructedBuilding : IScrollItemData
         Type = buildingData.building_Type;
         Level = buildingData.level;
         Icon = buildingData.icon;
+        Position = constructedBuildingPos.pos;
+        Rotation = constructedBuildingPos.rotation;
 
         // 생산 정의 정보 (생산 건물이 아닌 경우 null일 수 있음)
         if (productionInfo != null)
@@ -104,5 +119,6 @@ public class ConstructedBuilding : IScrollItemData
             NextProductionTime = productionStatus.next_production_time;
             IsProducing = productionStatus.is_producing;
         }
+        
     }
 }
