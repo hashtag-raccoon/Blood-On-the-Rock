@@ -8360,6 +8360,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 360731365}
+  - component: {fileID: 360731366}
   m_Layer: 0
   m_Name: DataManager
   m_TagString: Untagged
@@ -8382,6 +8383,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 576676508}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &360731366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360731364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2080cb266c84bb34aabd2e4f44b1e947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
+  buildingDataSO: {fileID: 11400000, guid: 9fc70487ce8bd804aa658d37f60b1192, type: 2}
+  buildingProductionInfoSO: {fileID: 11400000, guid: 506aba939074ddf41ac9b036998565c0, type: 2}
+  ConstructedBuildingProductions: []
+  ConstructedBuildingPositions: []
+  npcs: []
+  ConstructedBuildings: []
+  cocktails: []
+  EditMode_InventoryBuildings: []
+  wood: 0
+  money: 0
+  storeFavor: 100
+  barLevel: 1
 --- !u!1 &441909768
 GameObject:
   m_ObjectHideFlags: 0
