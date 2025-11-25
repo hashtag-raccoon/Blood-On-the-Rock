@@ -585,11 +585,11 @@ public class DragDropController : MonoBehaviour
             
             // 원래 위치에 마커 복구
             PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize, markerOffset);
-
-        // 드래그 모드 취소
-        isDraggingSprite = false;
-        draggedSpriteObject = null;
-        draggedSpriteRenderer = null;
+            // 드래그 모드 취소
+            isDraggingSprite = false;
+            draggedSpriteObject = null;
+            draggedSpriteRenderer = null;
+        }
     }
     #endregion
     
@@ -948,7 +948,7 @@ public class DragDropController : MonoBehaviour
                 if (realInterior != null)
                 {
                     // 타일맵에 마커 배치 (인테리어)
-                    PlaceTilemapMarkers(dropCell, editBuildingTileSize, true);
+                    PlaceTilemapMarkers(dropCell, editBuildingTileSize, markerOffset, true);
 
                     // 호감도 상승 처리: 지정된 타일 위에 있을 때만 증가
                     if (IsInteriorPlacedOnFavorTile(dropCell, editBuildingTileSize))
@@ -1007,7 +1007,7 @@ public class DragDropController : MonoBehaviour
     
     // 타일맵에 마커(건물이 차지하는 영역 표시) 배치
     // 기존 건물의 마커는 ExistingTilemap에 저장됨
-    public void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset)
+    public void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset, bool isInterior = false)
     {
         Tilemap targetTilemap = isInterior ? ExistingInteriorTilemap : ExistingTilemap;
         TileBase targetMarker = isInterior ? (interiorMarkerTile != null ? interiorMarkerTile : markerTile) : markerTile;
@@ -1125,7 +1125,7 @@ public class DragDropController : MonoBehaviour
     /// 특정 위치의 건물/인테리어 마커를 타일 크기만큼 제거하고
     /// 기존 오브젝트를 이동할 때 원래 위치의 마커를 타일맵에서 제거하는 데 사용하는 메소드
     /// </summary>
-    private void RemoveBuildingMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset = 0f)
+    private void RemoveBuildingMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset = 0f, bool isInterior = false)
     {
         Tilemap targetTilemap = isInterior ? ExistingInteriorTilemap : ExistingTilemap;
         

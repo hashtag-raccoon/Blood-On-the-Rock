@@ -118,12 +118,6 @@ public class GuestController : MonoBehaviour
                 // 경로가 없으면 이동할 수 없으므로 애니메이션도 정지 상태로 설정
                 CurrentVelocity = Vector3.zero;
             }
-            else
-            {
-                // [수정됨] 경로를 찾을 수 없을 때 속도를 0으로 설정
-                // 경로가 없으면 이동할 수 없으므로 애니메이션도 정지 상태로 설정
-                CurrentVelocity = Vector3.zero;
-            }
         }
 
         if (isMoving && currentPath != null) // 이동 중이면 경로를 따라 이동

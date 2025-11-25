@@ -31,7 +31,7 @@ public class InteriorScrollUI : BaseScrollUI<InteriorData, BuildInteriorButtonUI
     private void Start()
     {
         dataManager = DataManager.Instance;
-        dragDropController = DragDropController.instance;
+        dragDropController = DragDropController.Instance;
         
         // Interior 버튼을 자동으로 찾기 (할당되지 않은 경우)
         if (interiorButtonObject == null && openButton != null)

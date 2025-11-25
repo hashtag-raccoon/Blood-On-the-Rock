@@ -63,6 +63,8 @@ public class DataManager : MonoBehaviour
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
+    [Header("인테리어 데이터")]
+    public List<InteriorData> InteriorDatas = new List<InteriorData>();
     
     // NPC Prefab 매핑: prefab_name -> GameObject prefab
     [Header("NPC Prefab 매핑")]
@@ -380,6 +382,24 @@ public class DataManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 건물의 인벤토리 상태를 업데이트합니다.
+    /// </summary>
+    public void UpdateBuildingInventoryStatus(int buildingId, bool isInInventory)
+    {
+        var building = ConstructedBuildings.Find(b => b.Id == buildingId);
+        if (building != null)
+        {
+            building.IsEditInventory = isInInventory;
+            Debug.Log($"건물 ID '{buildingId}'의 인벤토리 상태를 업데이트했습니다: {isInInventory}");
+        }
+        else
+        {
+            Debug.LogWarning($"건물 ID '{buildingId}'를 찾을 수 없습니다.");
+        }
+    }
+
+
+    /// <summary>
     /// 편집 모드 인벤토리 리스트를 갱신합니다.
     /// </summary>
     public void RefreshEditModeInventory()
@@ -389,6 +409,11 @@ public class DataManager : MonoBehaviour
     }
 
     #endregion
+
+    public ResourceData GetResourceByName(string resourceName)
+    {
+        return ResourceRepository.Instance.GetResourceByName(resourceName);
+    }
 
     #region NPC Prefab Mapping Methods
 
@@ -569,21 +594,6 @@ public class DataManager : MonoBehaviour
 
     #endregion
 
-    #region Cleanup
-    private void CleanupResources()
-    {
-        var building = ConstructedBuildings.Find(b => b.Id == buildingId);
-        if (building != null)
-        {
-            building.IsEditInventory = isInInventory;
-            Debug.Log($"건물 ID '{buildingId}'의 인벤토리 상태를 업데이트했습니다: {isInInventory}");
-        }
-        else
-        {
-            Debug.LogWarning($"건물 ID '{buildingId}'를 찾을 수 없습니다.");
-        }
-    }
-
     /// <summary>
     /// Main_Island에 건설된 모든 건물의 통합 데이터를 가져옴
     /// </summary>
@@ -618,5 +628,4 @@ public class DataManager : MonoBehaviour
     {
         return ConstructedBuildings.FindAll(b => b.IsProducing);
     }
-    #endregion
 }

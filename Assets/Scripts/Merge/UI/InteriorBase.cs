@@ -30,7 +30,7 @@ public class InteriorBase : MonoBehaviour, IPointerDownHandler
     /// </summary>
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        if (Input.GetMouseButtonDown(0) && !DragDropController.instance.isUI)
+        if (Input.GetMouseButtonDown(0) && !DragDropController.Instance.isUI)
         {
             if (dragDropController != null && dragDropController.IsEditMode)
             {
