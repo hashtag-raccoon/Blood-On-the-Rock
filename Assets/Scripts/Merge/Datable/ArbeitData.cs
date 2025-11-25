@@ -22,6 +22,7 @@ public class ArbeitData
     public int fatigue;
     public int daily_wage;
     public bool need_rest;
+    public string prefab_name;
 }
 
 [Serializable]

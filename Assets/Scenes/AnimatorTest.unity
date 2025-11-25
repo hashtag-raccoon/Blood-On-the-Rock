@@ -9938,6 +9938,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Vam2
       objectReference: {fileID: 0}
+    - target: {fileID: 7998863298994752275, guid: 13bf4ced8f8c24a4a8f04bdbd30146e0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9995,6 +9999,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player1
       objectReference: {fileID: 0}
+    - target: {fileID: 5710752896797893790, guid: fd9f157c38327b94e84f1eafd69b91f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10011,6 +10019,10 @@ PrefabInstance:
     - target: {fileID: 6780479688809890403, guid: ade574aade52a3f46955f9bb30a93604, type: 3}
       propertyPath: m_Name
       value: Oak1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780479688809890403, guid: ade574aade52a3f46955f9bb30a93604, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9104302326772011472, guid: ade574aade52a3f46955f9bb30a93604, type: 3}
       propertyPath: m_LocalPosition.x
@@ -10109,6 +10121,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Oak2
       objectReference: {fileID: 0}
+    - target: {fileID: 973485167177090442, guid: cbcde748c218f6b41bf95dc5b979a217, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10165,6 +10181,10 @@ PrefabInstance:
     - target: {fileID: 7769332009376783945, guid: ba63e025410bfd34f9813dd4218da1fa, type: 3}
       propertyPath: m_Name
       value: Human2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7769332009376783945, guid: ba63e025410bfd34f9813dd4218da1fa, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10223,6 +10243,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Oak3
       objectReference: {fileID: 0}
+    - target: {fileID: 5552897585694388153, guid: 55e751a61e451554c8dd0199b2ef4b5b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10280,6 +10304,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Human3
       objectReference: {fileID: 0}
+    - target: {fileID: 3374620696083767277, guid: 30515cdc05c96a9469ee818cb383f587, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10296,6 +10324,10 @@ PrefabInstance:
     - target: {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
       propertyPath: m_Name
       value: Vam1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7587429788325006666, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
       propertyPath: m_LocalPosition.x
@@ -10450,6 +10482,10 @@ PrefabInstance:
     - target: {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
       propertyPath: m_Name
       value: Vam3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

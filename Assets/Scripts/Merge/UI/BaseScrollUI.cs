@@ -181,4 +181,12 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     {
         OnCloseButtonClicked();
     }
+
+    /// <summary>
+    /// 외부에서 ScrollUI를 열 때 호출
+    /// </summary>
+    public virtual void OpenUI()
+    {
+        OnOpenButtonClicked();
+    }
 }

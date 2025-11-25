@@ -23,15 +23,24 @@ public class CharacterAnimationController : MonoBehaviour
 	[SerializeField] private float moveSpeed = 3.5f;
 	[SerializeField] private float stoppingDistance = 0.05f;
 
+	[Header("Guest Controller Integration")]
+	[Tooltip("GuestController가 있으면 자동 이동을 사용합니다. 없으면 수동 이동을 사용합니다.")]
+	[SerializeField] private GuestController guestController;
+
 	private Vector3 targetPosition;
 	private bool hasTarget = false;
 	private float cameraDistanceZ;
+	private Vector3 previousPosition; // 이전 프레임 위치 (이동 방향 계산용)
 
 	private void Awake()
 	{
 		if (animator == null)
 		{
 			animator = GetComponent<Animator>();
+		}
+		if (animator == null)
+		{
+			animator = GetComponentInChildren<Animator>();
 		}
 		if (animator == null)
 		{
@@ -47,6 +56,19 @@ public class CharacterAnimationController : MonoBehaviour
 		{
 			movementRoot = this.transform;
 		}
+
+		// GuestController 자동 찾기 (Inspector에서 할당되지 않은 경우)
+		if (guestController == null)
+		{
+			guestController = GetComponent<GuestController>();
+		}
+		if (guestController == null)
+		{
+			guestController = GetComponentInParent<GuestController>();
+		}
+
+		// 이전 위치 초기화
+		previousPosition = movementRoot.position;
 	}
 
 	private void Start()
@@ -59,11 +81,21 @@ public class CharacterAnimationController : MonoBehaviour
 
 	private void Update()
 	{
-		if (enableRightClickMove)
-			HandleClickToMove();
+		// GuestController가 있으면 자동 이동 모드, 없으면 수동 이동 모드
+		if (guestController != null)
+		{
+			// GuestController를 사용한 자동 이동 모드
+			UpdateAnimationFromGuestController();
+		}
+		else
+		{
+			// 기존 수동 이동 모드
+			if (enableRightClickMove)
+				HandleClickToMove();
 
-		UpdateMovement();
-		UpdateAnimation();
+			UpdateMovement();
+			UpdateAnimation();
+		}
 	}
 
 	/// <summary>
@@ -122,7 +154,56 @@ public class CharacterAnimationController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// 애니메이션 파라미터 업데이트 (옵션)
+	/// GuestController를 사용한 애니메이션 파라미터 업데이트
+	/// </summary>
+	private void UpdateAnimationFromGuestController()
+	{
+		if (!updateAnimatorParameters || animator == null || guestController == null)
+			return;
+
+		// GuestController의 이동 상태 확인
+		bool isMoving = guestController.IsMoving;
+		
+		// Y축 이동 방향 계산
+		float directionY = 0f;
+		if (isMoving)
+		{
+			// GuestController의 CurrentVelocity 사용 (더 정확함)
+			Vector3 velocity = guestController.CurrentVelocity;
+			if (velocity.magnitude > 0.001f)
+			{
+				// 이동 방향 벡터를 정규화하여 Y축 성분 추출
+				Vector3 normalizedDirection = velocity.normalized;
+				directionY = normalizedDirection.y;
+			}
+			else
+			{
+				// CurrentVelocity가 없으면 위치 변화로 계산 (폴백)
+				Vector3 currentPosition = movementRoot.position;
+				Vector3 movementDelta = currentPosition - previousPosition;
+				
+				if (movementDelta.magnitude > 0.001f)
+				{
+					Vector3 normalizedDirection = movementDelta.normalized;
+					directionY = normalizedDirection.y;
+				}
+				
+				previousPosition = currentPosition;
+			}
+		}
+		else
+		{
+			// 이동하지 않을 때는 이전 위치 업데이트만 수행
+			previousPosition = movementRoot.position;
+		}
+
+		// Animator 파라미터 설정
+		animator.SetBool(isWalkingParameter, isMoving);
+		animator.SetFloat(moveYParameter, directionY);
+	}
+
+	/// <summary>
+	/// 애니메이션 파라미터 업데이트 (수동 이동 모드용)
 	/// </summary>
 	private void UpdateAnimation()
 	{

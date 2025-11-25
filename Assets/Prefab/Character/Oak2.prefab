@@ -420,6 +420,7 @@ GameObject:
   - component: {fileID: 464449085177853859}
   - component: {fileID: 7728234283253244757}
   - component: {fileID: 7837921632616377574}
+  - component: {fileID: 8506635870345469413}
   m_Layer: 0
   m_Name: Oak2
   m_TagString: Untagged
@@ -459,13 +460,13 @@ MonoBehaviour:
   animator: {fileID: 7837921632616377574}
   forceDisableRootMotion: 1
   updateAnimatorParameters: 1
-  speedParameter: Speed
   isWalkingParameter: IsWalking
   moveYParameter: MoveY
   movementRoot: {fileID: 464449085177853859}
   enableRightClickMove: 1
   moveSpeed: 3.5
   stoppingDistance: 0.05
+  guestController: {fileID: 0}
 --- !u!95 &7837921632616377574
 Animator:
   serializedVersion: 5
@@ -487,6 +488,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8506635870345469413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 973485167177090442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ea85d792023efb459bde0008f833bca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pathfinder: {fileID: 0}
+  moveSpeed: 5
+  tableManager: {fileID: 0}
+  desiredPartySize: 1
 --- !u!1 &1517813071430441118
 GameObject:
   m_ObjectHideFlags: 0
