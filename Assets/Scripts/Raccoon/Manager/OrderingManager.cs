@@ -37,6 +37,9 @@ public class OrderingManager : MonoBehaviour
     [Header("업무 관리")]
     [SerializeField] private List<TaskInfo> allTasks = new List<TaskInfo>(); // 모든 업무 리스트
     
+    [Header("주문 관리")]
+    [SerializeField] private List<OrderData> acceptedOrders = new List<OrderData>(); // 수락된 주문 리스트
+    private int nextOrderId = 1; // 다음 주문 ID
 
     /// <summary>
     /// 추후 구현할 대화창 전용
@@ -350,8 +353,15 @@ public class OrderingManager : MonoBehaviour
 
         Debug.Log($"주문 수락: {task.orderedCocktail.CocktailName}");
         
-        // TODO : 주문 데이터를 저장하는 로직 추가
-        // 예: 주문 테이블, 칵테일 정보, 개수 등을 별도 리스트나 딕셔너리에 저장
+        // 주문 데이터 저장
+        OrderData newOrder = new OrderData(
+            nextOrderId++,
+            task.targetObject,
+            task.orderedCocktail,
+            1 // 기본 수량 1개
+        );
+        acceptedOrders.Add(newOrder);
+        Debug.Log($"주문 저장 완료 - ID: {newOrder.orderId}, 칵테일: {newOrder.orderedCocktail.CocktailName}, 테이블: {newOrder.targetTable?.name}");
         
         // 대화창 닫기
         CloseDialog();
@@ -385,6 +395,78 @@ public class OrderingManager : MonoBehaviour
             Debug.Log($"{dialogOwner?.name}의 대화창이 닫혔습니다.");
             isDialogOpen = false;
             dialogOwner = null;
+        }
+    }
+    #endregion
+
+    #region 주문 관리 메소드
+    /// <summary>
+    /// 모든 수락된 주문 리스트 가져오기
+    /// </summary>
+    public List<OrderData> GetAllAcceptedOrders()
+    {
+        return acceptedOrders;
+    }
+
+    /// <summary>
+    /// 완료되지 않은 주문 리스트 가져오기
+    /// </summary>
+    public List<OrderData> GetPendingOrders()
+    {
+        return acceptedOrders.FindAll(order => !order.isCompleted);
+    }
+
+    /// <summary>
+    /// 특정 테이블의 주문 가져오기
+    /// </summary>
+    public OrderData GetOrderByTable(GameObject table)
+    {
+        return acceptedOrders.Find(order => order.targetTable == table && !order.isCompleted);
+    }
+
+    /// <summary>
+    /// 주문 ID로 주문 가져오기
+    /// </summary>
+    public OrderData GetOrderById(int orderId)
+    {
+        return acceptedOrders.Find(order => order.orderId == orderId);
+    }
+
+    /// <summary>
+    /// 주문 완료 처리
+    /// </summary>
+    public void CompleteOrder(int orderId)
+    {
+        OrderData order = GetOrderById(orderId);
+        if (order != null)
+        {
+            order.isCompleted = true;
+            Debug.Log($"주문 완료 - ID: {orderId}, 칵테일: {order.orderedCocktail.CocktailName}");
+        }
+    }
+
+    /// <summary>
+    /// 주문 제거
+    /// </summary>
+    public void RemoveOrder(int orderId)
+    {
+        OrderData order = GetOrderById(orderId);
+        if (order != null)
+        {
+            acceptedOrders.Remove(order);
+            Debug.Log($"주문 제거 - ID: {orderId}");
+        }
+    }
+
+    /// <summary>
+    /// 완료된 주문 일괄 제거
+    /// </summary>
+    public void ClearCompletedOrders()
+    {
+        int removedCount = acceptedOrders.RemoveAll(order => order.isCompleted);
+        if (removedCount > 0)
+        {
+            Debug.Log($"완료된 주문 {removedCount}개 제거됨");
         }
     }
     #endregion
