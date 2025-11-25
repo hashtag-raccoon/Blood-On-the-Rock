@@ -28,7 +28,6 @@ public class DataManager : MonoBehaviour
 
     #region Constants
     #endregion
-
     #region Data Sources (ScriptableObject)
     [Header("데이터 에셋")]
     [Tooltip("NPC의 고정 특성(성격, 기본 능력치 등)을 담고 있는 ScriptableObject")]

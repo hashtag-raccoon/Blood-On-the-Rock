@@ -26,7 +26,7 @@ public class CocktailRepository : MonoBehaviour, IRepository
     [SerializeField] private CocktailRecipeSO cocktailRecipeSO;
 
     private readonly Dictionary<int, CocktailData> _cocktailDataDict = new Dictionary<int, CocktailData>();
-    private readonly Dictionary<int, CocktailRecipeJson> _cocktailRecipeDict = new Dictionary<int, CocktailRecipeJson>();
+    private readonly Dictionary<int, CocktailRecipeScript> _cocktailRecipeDict = new Dictionary<int, CocktailRecipeScript>();
 
     private void Awake()
     {
@@ -88,7 +88,7 @@ public class CocktailRepository : MonoBehaviour, IRepository
         return data;
     }
 
-    public CocktailRecipeJson GetCocktailRecipeByCocktailId(int cocktailId)
+    public CocktailRecipeScript GetCocktailRecipeByCocktailId(int cocktailId)
     {
         _cocktailRecipeDict.TryGetValue(cocktailId, out var recipe);
         return recipe;
