@@ -67,7 +67,7 @@ public class BuildInteriorButtonUI : MonoBehaviour, IScrollItemUI
     /// </summary>
     public void BuyInterior()
     {
-        var interior = interiorData as InteriorData;
+       InteriorData interior = interiorData as InteriorData;
 
         if (interior == null || interior.interior_sprite == null)
         {
@@ -98,7 +98,7 @@ public class BuildInteriorButtonUI : MonoBehaviour, IScrollItemUI
         }
 
         // 편집 모드(배치 모드) 진입 - InteriorData만 전달
-        DragDropController dragDropController = FindObjectOfType<DragDropController>();
+        DragDropController dragDropController = DragDropController.Instance;
         if (dragDropController != null)
         {
             dragDropController.StartNewInteriorPlacement(interior);

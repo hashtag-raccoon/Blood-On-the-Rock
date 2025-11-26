@@ -54,6 +54,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
     [SerializeField] public List<ConstructedBuilding> EditMode_InventoryBuildings = new List<ConstructedBuilding>();
+    [SerializeField] public List<InteriorData> InteriorDatas = new List<InteriorData>();
     #endregion
 
     #region Game Resources
@@ -425,5 +426,21 @@ public class DataManager : MonoBehaviour
     {
         return ConstructedBuildings.FindAll(b => b.IsProducing);
     }
+
+    /// <summary>
+    /// 랜덤으로 칵테일 데이터를 반환
+    /// </summary>
+    /// <returns></returns> <summary>
+    public CocktailData RandomCocktail()
+    {
+        int randomIndex = UnityEngine.Random.Range(0, cocktails.Count);
+        return cocktails[randomIndex];
+    }
+
+    public ResourceData GetResourceByName(string resourceName)
+    {
+        return ResourceRepository.Instance.GetResourceByName(resourceName);
+    }
+
     #endregion
 }
