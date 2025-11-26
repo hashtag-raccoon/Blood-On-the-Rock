@@ -96,6 +96,11 @@ public class CocktailRepository : MonoBehaviour, IRepository
         return data;
     }
 
+    public int GetTotalCocktailCount()
+    {
+        return _cocktailDataDict.Count;
+    }
+
     public CocktailRecipeScript GetCocktailRecipeByCocktailId(int cocktailId)
     {
         _cocktailRecipeDict.TryGetValue(cocktailId, out var recipe);
