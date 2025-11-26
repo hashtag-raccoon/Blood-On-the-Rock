@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class JsonDataHandler
     private readonly string arbeitDataPath;
     private readonly string constructedBuildingProductionPath;
     private readonly string BuildingPositonPath;
+    private readonly string cocktailProgressPath;
 
     public JsonDataHandler()
     {
@@ -16,6 +18,7 @@ public class JsonDataHandler
         arbeitDataPath = Path.Combine(Application.persistentDataPath, "ArbeitData.json");
         constructedBuildingProductionPath = Path.Combine(Application.persistentDataPath, "ConstructedBuildingProduction.json");
         BuildingPositonPath = Path.Combine(Application.persistentDataPath, "BuildingPosition.json");
+        cocktailProgressPath = Path.Combine(Application.persistentDataPath, "CocktailProgress.json");
     }
 
     public void InitializeFiles()
@@ -23,6 +26,7 @@ public class JsonDataHandler
         CreateFileIfNotExists(arbeitDataPath);
         CreateFileIfNotExists(constructedBuildingProductionPath);
         CreateFileIfNotExists(BuildingPositonPath);
+        CreateFileIfNotExists(cocktailProgressPath);
     }
 
     private void CreateFileIfNotExists(string path)
@@ -202,4 +206,48 @@ public class JsonDataHandler
 
         return false;
     }
+
+    #region Cocktail Progress
+
+    /// <summary>
+    /// 칵테일 진행 정보를 저장
+    /// </summary>
+    public void SaveCocktailProgress(List<int> unlockedRecipeIds)
+    {
+        var progressData = new CocktailProgressData
+        {
+            unlockedRecipeIds = unlockedRecipeIds
+        };
+
+        string jsonData = JsonConvert.SerializeObject(progressData, Formatting.Indented);
+        File.WriteAllText(cocktailProgressPath, jsonData);
+        Debug.Log($"CocktailProgress 데이터를 저장했습니다. 해금 레시피: {unlockedRecipeIds.Count}개");
+    }
+
+    /// <summary>
+    /// 칵테일 진행 정보를 로드
+    /// </summary>
+    public CocktailProgressData LoadCocktailProgress()
+    {
+        if (!File.Exists(cocktailProgressPath))
+        {
+            Debug.LogWarning($"{cocktailProgressPath} 파일이 존재하지 않습니다. 기본값을 반환합니다.");
+            return new CocktailProgressData();
+        }
+
+        string jsonData = File.ReadAllText(cocktailProgressPath);
+        CocktailProgressData progressData = JsonConvert.DeserializeObject<CocktailProgressData>(jsonData);
+        return progressData ?? new CocktailProgressData();
+    }
+
+    #endregion
+}
+
+/// <summary>
+/// 칵테일 진행 정보를 저장하기 위한 데이터 클래스
+/// </summary>
+[Serializable]
+public class CocktailProgressData
+{
+    public List<int> unlockedRecipeIds = new List<int>();
 }

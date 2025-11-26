@@ -53,6 +53,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
+    [SerializeField] public List<OrderedCocktail> OrderedCocktails = new List<OrderedCocktail>();
     [SerializeField] public List<ConstructedBuilding> EditMode_InventoryBuildings = new List<ConstructedBuilding>();
     #endregion
 
@@ -112,6 +113,7 @@ public class DataManager : MonoBehaviour
         // Repository로부터 가공된 런타임 데이터를 받아옵니다.
         ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildings();
         npcs = ArbeitRepository.Instance.GetNpcs();
+        OrderedCocktails = CocktailRepository.Instance.GetOrderedCocktails();
     }
 
     private void OnApplicationQuit()
@@ -120,6 +122,7 @@ public class DataManager : MonoBehaviour
         UpdateConstructedBuildingProductionsFromConstructedBuildings();
         UpdateConstructedBuildingPositionsFromConstructedBuildings();
         UpdateAndSaveArbeitData();
+        SaveCocktailProgress();
         SaveConstructedBuildingProductions();
         SaveConstructedBuidlingPositions();
     }
@@ -366,6 +369,17 @@ public class DataManager : MonoBehaviour
 
         // 최신 상태가 반영된 arbeitDatas 리스트를 파일에 저장합니다.
         jsonDataHandler.SaveArbeitData(arbeitDict.Values.ToList());
+    }
+
+    /// <summary>
+    /// 칵테일 진행 정보(해금된 레시피)를 저장
+    /// </summary>
+    private void SaveCocktailProgress()
+    {
+        if (CocktailRepository.Instance == null) return;
+
+        List<int> unlockedRecipeIds = CocktailRepository.Instance.GetUnlockedRecipeIds();
+        jsonDataHandler.SaveCocktailProgress(unlockedRecipeIds);
     }
     #endregion
 

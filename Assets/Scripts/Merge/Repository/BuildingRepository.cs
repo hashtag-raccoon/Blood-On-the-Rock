@@ -22,7 +22,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     public bool IsInitialized { get; private set; } = false;
 
     private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
-    
+
 
     [Header("데이터 에셋 (SO)")]
     [Tooltip("건물의 고정 정보(ID, 이름, 레벨, 아이콘 등)를 담고 있는 ScriptableObject")]
@@ -57,7 +57,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
         DataManager.Instance.RegisterRepository(this);
 
         grid = FindObjectOfType<Grid>();
-        if(grid == null)
+        if (grid == null)
         {
             Debug.Log("Scene에서 Grid를 찾을 수 없음.");
         }
@@ -155,16 +155,16 @@ public class BuildingRepository : MonoBehaviour, IRepository
     {
         _constructedBuildings.Clear();
 
-        if (constructedBuildingProductions == null || _buildingDataDict == null || _productionInfoDict == null )
+        if (constructedBuildingProductions == null || _buildingDataDict == null || _productionInfoDict == null)
         {
             Debug.LogError("Building data or Production data is not loaded yet.");
             return;
         }
         //
-        foreach (var item in constructedBuildingProductions.Zip(constructedBuildingPositions, (Production, Pos) => new {production = Production, pos = Pos}))
+        foreach (var item in constructedBuildingProductions.Zip(constructedBuildingPositions, (Production, Pos) => new { production = Production, pos = Pos }))
         {
             // instance_id가 일치하는지 확인
-            if(item.production.instance_id != item.pos.instance_id)
+            if (item.production.instance_id != item.pos.instance_id)
             {
                 Debug.LogWarning($"ConstructedBuildingProduction과 ConstructedBuildingPos의 instance_id가 일치하지 않습니다. Production: {item.production.instance_id}, Pos: {item.pos.instance_id}");
                 continue;
@@ -368,7 +368,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     /// 건물의 생산 상태를 업데이트합니다.
     /// </summary>
     /// <param name="instanceId">건물 인스턴스 ID</param>
-    public void UpdateBuildingProductionStatus(long instanceId, bool isProducing, System.DateTime? nextProductionTime = null)
+    public void UpdateBuildingProductionStatus(long instanceId, bool isProducing, DateTime? nextProductionTime = null)
     {
         var production = DataManager.Instance.ConstructedBuildingProductions.Find(p => p.instance_id == instanceId);
         if (production != null)
@@ -396,7 +396,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     {
         try
         {
-           foreach(var building in _constructedBuildings)
+            foreach (var building in _constructedBuildings)
             {
                 Vector3Int gridpos = building.Position;
                 Vector3 worldPos = grid.CellToWorld(gridpos);
@@ -407,7 +407,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
                 DragDropController.Instance.PlaceTilemapMarkers(gridpos, buildingData.tileSize, buildingData.MarkerPositionOffset);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Debug.Log(ex);
             return;
