@@ -105,8 +105,6 @@ public class DataManager : MonoBehaviour
             }
         }
 
-        BuildingRepository.Instance.SpawnConstructedBuildings();
-
         // 초기화가 끝날 때까지 대기
         yield return new WaitUntil(() => _repositories.All(r => r.IsInitialized));
 
@@ -114,6 +112,7 @@ public class DataManager : MonoBehaviour
         ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildings();
         npcs = ArbeitRepository.Instance.GetNpcs();
         OrderedCocktails = CocktailRepository.Instance.GetOrderedCocktails();
+        BuildingRepository.Instance.SpawnConstructedBuildings();
     }
 
     private void OnApplicationQuit()

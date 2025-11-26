@@ -1,0 +1,162 @@
+sequenceDiagram
+    participant Unity as Unity Engine
+    participant DataManager
+    participant CocktailRepo as CocktailRepository
+    participant OrderSystem as 주문 시스템
+    participant Guest as 손님/테이블
+    participant CocktailSys as CocktailSystem
+    participant JsonHandler as JsonDataHandler
+    participant SO as ScriptableObject (SO)
+
+    Note over Unity,SO: === 초기화 Phase ===
+
+    Unity->>CocktailRepo: Awake() 호출
+    activate CocktailRepo
+    CocktailRepo->>CocktailRepo: 싱글턴(_instance) 초기화
+    deactivate CocktailRepo
+
+    Unity->>CocktailRepo: Start() 호출
+    activate CocktailRepo
+    CocktailRepo->>DataManager: RegisterRepository(this)
+    deactivate CocktailRepo
+
+    Unity->>DataManager: Start() 코루틴
+    activate DataManager
+    DataManager->>CocktailRepo: Initialize() 호출
+    activate CocktailRepo
+
+    CocktailRepo->>CocktailRepo: InitializeDictionaries()
+    CocktailRepo->>SO: CocktailDataSO 로드
+    SO-->>CocktailRepo: CocktailData 리스트
+    CocktailRepo->>SO: CocktailRecipeSO 로드
+    SO-->>CocktailRepo: CocktailRecipeScript 리스트
+
+    CocktailRepo->>CocktailRepo: CreateOrderedCocktailsList()
+    Note right of CocktailRepo: _orderedCocktails 빈 리스트 초기화
+
+    CocktailRepo->>CocktailRepo: LoadUnlockedRecipes()
+    Note right of CocktailRepo: 기본 레시피 3개 자동 해금
+
+    CocktailRepo-->>DataManager: IsInitialized = true
+    deactivate CocktailRepo
+
+    DataManager->>CocktailRepo: GetOrderedCocktails()
+    activate CocktailRepo
+    CocktailRepo-->>DataManager: _orderedCocktails 반환
+    deactivate CocktailRepo
+
+    DataManager->>DataManager: OrderedCocktails 저장
+    deactivate DataManager
+
+    Note over Unity,SO: === 주문 생성 Phase ===
+
+    Guest->>OrderSystem: 손님이 테이블에 착석
+    activate OrderSystem
+
+    OrderSystem->>CocktailRepo: GetRandomUnlockedCocktailId()
+    activate CocktailRepo
+    CocktailRepo->>CocktailRepo: _unlockedRecipeIds에서 랜덤 선택
+    CocktailRepo-->>OrderSystem: cocktailId 반환
+    deactivate CocktailRepo
+
+    OrderSystem->>CocktailRepo: AddOrderedCocktail(cocktailId, guest, table)
+    activate CocktailRepo
+
+    CocktailRepo->>CocktailRepo: 1. 해금 여부 확인
+    Note right of CocktailRepo: _unlockedRecipeIds.Contains(cocktailId)
+
+    CocktailRepo->>CocktailRepo: 2. CocktailData 조회
+    CocktailRepo->>CocktailRepo: 3. CocktailRecipeScript 조회
+
+    CocktailRepo->>CocktailRepo: 4. GlassRepository에서 Glass 조회
+    Note right of CocktailRepo: GlassRepository.Instance.GetGlassById()
+
+    CocktailRepo->>CocktailRepo: 5. GenerateOrderInstanceId()
+    Note right of CocktailRepo: 타임스탬프 기반 고유 ID 생성
+
+    CocktailRepo->>CocktailRepo: 6. OrderedCocktail 생성
+    Note right of CocktailRepo: new OrderedCocktail(<br/>CocktailData, Recipe, Glass,<br/>guest, table, DateTime.Now, orderId)
+
+    CocktailRepo->>CocktailRepo: 7. _orderedCocktails.Add()
+
+    CocktailRepo-->>OrderSystem: OrderedCocktail 반환
+    deactivate CocktailRepo
+
+    OrderSystem->>OrderSystem: UI에 주문 아이콘 표시
+    Note right of OrderSystem: order.Icon 사용
+    deactivate OrderSystem
+
+    Note over Unity,SO: === 칵테일 제조 Phase ===
+
+    Guest->>CocktailSys: 알바가 주문 받음 (OrderedCocktail 전달)
+    activate CocktailSys
+
+    CocktailSys->>CocktailSys: 사용자가 재료/잔/기법 선택
+    Note right of CocktailSys: AddIngredient(), SetSelectedGlass(),<br/>SetSelectedTechnique()
+
+    CocktailSys->>CocktailSys: CheckCocktailToRecipe(orderedCocktail)
+
+    CocktailSys->>CocktailSys: CalculateIngredientScore(order.Recipe)
+    Note right of CocktailSys: 재료 점수 계산 (최대 75점)
+
+    CocktailSys->>CocktailSys: CalculateGlassScore(order.GlassId)
+    Note right of CocktailSys: 잔 점수 계산 (2점)
+
+    CocktailSys->>CocktailSys: CalculateTechniqueScore(order.Technique)
+    Note right of CocktailSys: 기법 점수 계산 (23점)
+
+    CocktailSys->>CocktailSys: 총점과 order.SimilarityThreshold 비교
+    Note right of CocktailSys: 성공 기준: 80점 이상
+
+    CocktailSys-->>Guest: 점수 반환 (0~100)
+    deactivate CocktailSys
+
+    alt 성공 (점수 >= 80)
+        Guest->>CocktailRepo: UpdateOrderStatus(orderId, OrderStatus.Ready)
+        activate CocktailRepo
+        CocktailRepo->>CocktailRepo: order.Status = Ready
+        deactivate CocktailRepo
+
+        Guest->>Guest: 서빙
+
+        Guest->>CocktailRepo: RemoveOrderedCocktail(orderId)
+        activate CocktailRepo
+        CocktailRepo->>CocktailRepo: _orderedCocktails.Remove()
+        deactivate CocktailRepo
+    else 실패 (점수 < 80)
+        Guest->>CocktailRepo: UpdateOrderStatus(orderId, OrderStatus.Cancelled)
+        activate CocktailRepo
+        CocktailRepo->>CocktailRepo: order.Status = Cancelled
+        deactivate CocktailRepo
+    end
+
+    Note over Unity,SO: === 레시피 해금 Phase ===
+
+    Guest->>CocktailRepo: UnlockRecipe(newCocktailId)
+    activate CocktailRepo
+    CocktailRepo->>CocktailRepo: _unlockedRecipeIds.Add(newCocktailId)
+    CocktailRepo-->>Guest: 레시피 해금 완료
+    deactivate CocktailRepo
+
+    Note over Unity,SO: === 게임 종료 Phase ===
+
+    Unity->>DataManager: OnApplicationQuit() 호출
+    activate DataManager
+
+    DataManager->>DataManager: SaveCocktailProgress()
+    DataManager->>CocktailRepo: GetUnlockedRecipeIds()
+    activate CocktailRepo
+    CocktailRepo-->>DataManager: _unlockedRecipeIds 복사본 반환
+    deactivate CocktailRepo
+
+    DataManager->>JsonHandler: SaveCocktailProgress(unlockedRecipeIds)
+    activate JsonHandler
+    JsonHandler->>JsonHandler: CocktailProgressData 생성
+    JsonHandler->>JsonHandler: JSON 직렬화
+    JsonHandler->>JsonHandler: CocktailProgress.json에 저장
+    JsonHandler-->>DataManager: 저장 완료
+    deactivate JsonHandler
+
+    deactivate DataManager
+
+    Note over Unity,SO: 모든 프로세스 완료!
