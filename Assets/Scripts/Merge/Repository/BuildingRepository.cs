@@ -22,7 +22,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     public bool IsInitialized { get; private set; } = false;
 
     private const string BuildingUpgradePath = "Data/Building/BuildingUpgradeData";
-    
+
 
     [Header("데이터 에셋 (SO)")]
     [Tooltip("건물의 고정 정보(ID, 이름, 레벨, 아이콘 등)를 담고 있는 ScriptableObject")]
@@ -57,7 +57,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
         DataManager.Instance.RegisterRepository(this);
 
         grid = FindObjectOfType<Grid>();
-        if(grid == null)
+        if (grid == null)
         {
             Debug.Log("Scene에서 Grid를 찾을 수 없음.");
         }
@@ -155,18 +155,19 @@ public class BuildingRepository : MonoBehaviour, IRepository
     {
         _constructedBuildings.Clear();
 
-        if (constructedBuildingProductions == null || _buildingDataDict == null || _productionInfoDict == null )
+        if (constructedBuildingProductions == null || _buildingDataDict == null || _productionInfoDict == null)
         {
             Debug.LogError("Building data or Production data is not loaded yet.");
             return;
         }
         //
-        foreach (var item in constructedBuildingProductions.Zip(constructedBuildingPositions, (Production, Pos) => new {production = Production, pos = Pos}))
+        foreach (var item in constructedBuildingProductions.Zip(constructedBuildingPositions, (Production, Pos) => new { production = Production, pos = Pos }))
         {
             // 1. 건물의 상태(production) 데이터에서 ID를 가져와, 건물의 기본 정의(BuildingData)를 딕셔너리에서 찾습니다.
             if (_buildingDataDict.TryGetValue(item.production.building_id, out BuildingData buildingData))
             {
-                if(buildingData.building_id == item.pos.building_id) {
+                if (buildingData.building_id == item.pos.building_id)
+                {
                     // 2. 건물의 타입(building_Type)을 사용하여, 건물의 생산 정의(BuildingProductionInfo)를 딕셔너리에서 찾습니다.
                     //    생산 기능이 없는 건물일 경우 productionInfo는 null이 될 수 있습니다.
                     BuildingProductionInfo productionInfo = null;
@@ -182,7 +183,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
 
                     _constructedBuildings.Add(constructedBuilding);
                 }
-                
+
             }
             else
             {
@@ -232,16 +233,16 @@ public class BuildingRepository : MonoBehaviour, IRepository
         }
 
         Debug.Log($"[BuildingRepository] 전체 생산 정보 개수: {buildingProductionInfoSO.productionInfos.Count}");
-        
+
         foreach (var info in buildingProductionInfoSO.productionInfos)
         {
             Debug.Log($"[BuildingRepository] 생산 정보 - building_type: '{info.building_type}', resource_id: {info.resource_id}");
         }
 
         var result = buildingProductionInfoSO.productionInfos.Where(info => info.building_type == buildingType).ToList();
-        
+
         Debug.Log($"[BuildingRepository] '{buildingType}' 타입에 해당하는 생산 정보: {result.Count}개");
-        
+
         return result;
     }
 
@@ -260,7 +261,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
         }
 
         var result = buildingProductionInfoSO.productionInfos.Where(info => info.building_type == buildingName).ToList();
-        
+
         return result;
     }
     /// <summary>
@@ -406,7 +407,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     {
         try
         {
-           foreach(var building in _constructedBuildings)
+            foreach (var building in _constructedBuildings)
             {
                 Vector3Int gridpos = building.Position;
                 Vector3 worldPos = grid.CellToWorld(gridpos);
@@ -415,9 +416,9 @@ public class BuildingRepository : MonoBehaviour, IRepository
                 BuildingData buildingData = GetBuildingDataById(building.Id);
                 GameObject constructedbuilding = BuildingFactory.CreateBuilding(buildingData, worldPos);
                 DragDropController.Instance.PlaceTilemapMarkers(gridpos, buildingData.tileSize, buildingData.MarkerPositionOffset);
-            } 
+            }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Debug.Log(ex);
             return;

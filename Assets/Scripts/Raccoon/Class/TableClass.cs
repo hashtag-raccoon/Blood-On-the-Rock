@@ -34,12 +34,12 @@ public class TableClass : MonoBehaviour
     /// <summary>
     /// 생성할 좌석의 프리팹입니다.
     /// </summary>
-    public GameObject seatPrefab; 
+    public GameObject seatPrefab;
 
     /// <summary>
     /// 현재 생성된 좌석들의 Transform 리스트입니다.
     /// </summary>
-    public List<Transform> seats = new List<Transform>(); 
+    public List<Transform> seats = new List<Transform>();
 
     /// <summary>
     /// 1인 테이블 시, 앉는 좌석의 방향을 설정할 수 있음
@@ -70,9 +70,9 @@ public class TableClass : MonoBehaviour
     {
         // 테이블 매니저 리스트에 자신을 등록
         tableManager.tables.Add(this.gameObject);
-        
+
         // 초기 좌석 생성
-        GenerateSeats(); 
+        GenerateSeats();
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public class TableClass : MonoBehaviour
                 // 배정된 상태 표시 (빨간색)
                 if (seatAssignments.ContainsKey(seat) && seatAssignments[seat] != null)
                 {
-                    Gizmos.color = Color.red; 
+                    Gizmos.color = Color.red;
                     Gizmos.DrawSphere(seat.position, 0.2f);
                     Gizmos.color = Color.cyan; // 색상 초기화
                 }
@@ -135,7 +135,7 @@ public class TableClass : MonoBehaviour
 
         if (MAX_Capacity == 1)
         {
-            switch(seatingDirection)
+            switch (seatingDirection)
             {
                 case seatingDirectionSelection.Up:
                     tableGridPos += new Vector3Int(0, 1, 0);

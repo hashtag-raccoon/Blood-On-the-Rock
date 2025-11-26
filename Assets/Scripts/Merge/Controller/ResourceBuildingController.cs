@@ -56,7 +56,7 @@ public class ResourceBuildingController : BuildingBase
         RestoreProductionFromSave();
     }
 
-     private void InitializeProductionSlots()
+    private void InitializeProductionSlots()
     {
         for (int i = 0; i < maxProductionSlots; i++)
         {
@@ -81,17 +81,17 @@ public class ResourceBuildingController : BuildingBase
         UpdateAllProductions();
 
         // 현재 생산 정보(생산 중인 자원들 정보)를 ConstructedBuilding에 동기화
-        if(this.constructedBuilding != null)
+        if (this.constructedBuilding != null)
         {
             bool isProducing = GetActiveProductionCount() > 0;
-            
+
             ProductionInfo earliestProduction = GetEarliestProduction();
             if (earliestProduction != null && BuildingRepository.Instance != null)
             {
                 System.DateTime now = System.DateTime.Now;
                 System.TimeSpan timeRemaining = System.TimeSpan.FromSeconds(earliestProduction.timeRemaining);
                 System.DateTime nextProductionTime = now.Add(timeRemaining);
-                
+
                 // BuildingRepository를 통해 생산 상태 업데이트
                 BuildingRepository.Instance.UpdateBuildingProductionStatus(
                     this.constructedBuilding.Id,
@@ -126,7 +126,7 @@ public class ResourceBuildingController : BuildingBase
         base.OnUpgradeUI();
     }
 
-    
+
     private void ShowLimitUpgradeUI()
     {
         // 기존 UI가 있으면 먼저 제거하고, 후에 새로 생성함
@@ -475,7 +475,7 @@ public class ResourceBuildingController : BuildingBase
         base.CloseBuildingUI();
     }
 
-    
+
     #endregion
     // 가장 먼저 완료될 생산 정보 반환
     private ProductionInfo GetEarliestProduction()
@@ -513,5 +513,5 @@ public class ResourceBuildingController : BuildingBase
 
         ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
     }
-    
+
 }

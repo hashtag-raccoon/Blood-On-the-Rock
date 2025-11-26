@@ -119,6 +119,6 @@ public class ConstructedBuilding : IScrollItemData
             NextProductionTime = productionStatus.next_production_time;
             IsProducing = productionStatus.is_producing;
         }
-        
+
     }
 }
