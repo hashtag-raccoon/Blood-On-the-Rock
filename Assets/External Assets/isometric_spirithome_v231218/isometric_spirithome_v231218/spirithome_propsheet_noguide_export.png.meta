@@ -34,7 +34,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -43,12 +43,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -72,7 +72,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -93,35 +93,3201 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: Windows Store Apps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 218
+        width: 123
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0272bf8fbddc0a946bc009e3256a5678
+      internalID: -389075289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_1
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 261
+        width: 46
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0dc87868d91c67647b0a54712c23300c
+      internalID: -1195318588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_2
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 307
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: abf9ab84d242e56408964f7a91d13b1d
+      internalID: 52997934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_3
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 307
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa71582153c3c604996bc636ca052d86
+      internalID: -1067588954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_4
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 297
+        width: 16
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eff1cbffbc9edb84d920835916f3e7b5
+      internalID: 1237227813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_5
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 291
+        width: 26
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d09f28d6b8f43654ea8876556f8620d8
+      internalID: -996455822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_6
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 288
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d05279ca3fef3854ea0afaace6b3bb26
+      internalID: 357223394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_7
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 288
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6ccc9b0c609372049a50416c747dc5db
+      internalID: -366839542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_8
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 276
+        width: 58
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b7d7304b70a1a84e800063d9aa14b2d
+      internalID: 2069214159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_9
+      rect:
+        serializedVersion: 2
+        x: 370
+        y: 292
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbdac65e2773c8a4ab8519b7acd9eaec
+      internalID: -1133121091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_10
+      rect:
+        serializedVersion: 2
+        x: 403
+        y: 292
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 453295e42469da04183fd4d578f5e881
+      internalID: 1037237124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_11
+      rect:
+        serializedVersion: 2
+        x: 436
+        y: 292
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b47ffecca0ce2f41892fa7838758af1
+      internalID: -1898646240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_12
+      rect:
+        serializedVersion: 2
+        x: 469
+        y: 292
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fe0e3d6acd419d4bb6e076ff4d001de
+      internalID: 1158803899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_13
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 268
+        width: 36
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be3c04251c5ac9b43bed1c159b1a65ae
+      internalID: 1125534744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_14
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 242
+        width: 36
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adf79a56975c7fd489cbbcf004c3cc72
+      internalID: 416924107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_15
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 255
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8f29c15826669741b985b310c46d9d7
+      internalID: 1050303820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_16
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 255
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6cc7e71489c0e243b47c8c23dd8dcea
+      internalID: -1620155525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_17
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 250
+        width: 26
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33223a8775ceab749a404dc8d04d296b
+      internalID: 1958362456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_18
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 250
+        width: 26
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f69ee71fbd5a2f94b9f36665fef7cef4
+      internalID: 634588232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_19
+      rect:
+        serializedVersion: 2
+        x: 370
+        y: 263
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4beb68f40178fe540b91e9642da2fe42
+      internalID: 1794643158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_20
+      rect:
+        serializedVersion: 2
+        x: 403
+        y: 263
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8f83e1195e03ae34eb820ef0d0d7e8ba
+      internalID: -735071818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_21
+      rect:
+        serializedVersion: 2
+        x: 436
+        y: 263
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 934a251eaa570854983f99b8d5b27637
+      internalID: 1123298399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_22
+      rect:
+        serializedVersion: 2
+        x: 469
+        y: 263
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3dcbb7af02f26d846ab7c465a5bb37d4
+      internalID: -782818445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_23
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 238
+        width: 30
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 14433227b52e3b443997e532f256aae4
+      internalID: -2027696634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_24
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 227
+        width: 15
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a795d2d6b7e8ed4b92b55785f0f8222
+      internalID: -793610561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_25
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 216
+        width: 36
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f9123391e15beb546bc188f47336e024
+      internalID: -1614076124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_26
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 210
+        width: 29
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6916f6efe44d7b4a9bf43f8450c2823
+      internalID: -681701030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_27
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 230
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59819afa95e40dc4181a0e2750c0e6c2
+      internalID: 1683719312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_28
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 230
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19e3ddd0f039bee4a831e8a4cc427183
+      internalID: -1995630996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_29
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 203
+        width: 36
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c783805b23cb36c4cb45a60564afcd65
+      internalID: 641286996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_30
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 224
+        width: 26
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7583c84fed1287b4bb6493df14015b50
+      internalID: -1136956093
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_31
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 224
+        width: 26
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 41463d50558a84944ae08f63c8d472a3
+      internalID: 1730105321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_32
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 230
+        width: 50
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 161cbcae3c391af42af0d0baee92530a
+      internalID: 920753162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_33
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 234
+        width: 26
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e934aae34c04f5d469710d2559398144
+      internalID: 1610820425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_34
+      rect:
+        serializedVersion: 2
+        x: 443
+        y: 235
+        width: 26
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85358a2dd7864f240a7c170af3ee9052
+      internalID: -1373558446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_35
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 236
+        width: 36
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 81ba4dff97122094a83c16745604f828
+      internalID: 1126747262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_36
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 219
+        width: 32
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f3a9202e9540bf4886f4795de9e4838
+      internalID: 2015014850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_37
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 233
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b333f1062be7a44fa9eec4f14be0116
+      internalID: 483777386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_38
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 209
+        width: 36
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0346236ba0d90c4459fc46f01c22ff45
+      internalID: 770593594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_39
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 227
+        width: 4
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 47e51888482626e4db58c68a14d33112
+      internalID: -1556991112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_40
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 212
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53d54eff6889ddb4f8fba518f57efbb0
+      internalID: 397727019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_41
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 212
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f30a59a0e42dae34d8193f9732f23f56
+      internalID: -1078840857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_42
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 223
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6bbad698d3ccd84e8005cc71182fde2
+      internalID: -657928957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_43
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 219
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a92ec3715e10634facf80a04ceee2d0
+      internalID: 845688964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_44
+      rect:
+        serializedVersion: 2
+        x: 378
+        y: 213
+        width: 10
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 876c389478812d043bf85c7275643667
+      internalID: 1229414647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_45
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 210
+        width: 20
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4de800888966b5a418bfd71988c9c02e
+      internalID: 1989689921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_46
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 210
+        width: 20
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc67ec1c229970c42a7080159110bd7a
+      internalID: -1105002224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_47
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 210
+        width: 8
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 909c07b854e9a81489a5fe6215216bcf
+      internalID: 205937945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_48
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 211
+        width: 26
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9b9a63720796874a92d9892b8daa48a
+      internalID: 1869292364
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_49
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 222
+        width: 5
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d28409d1f21e6a40a3a316ef8e4dcd6
+      internalID: 1254709519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_50
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 222
+        width: 5
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6882c0dc71df6f4581988b7b2d4e178
+      internalID: 2073097322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_51
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 191
+        width: 19
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3943f59ea369b824d9a9b35f0499fe28
+      internalID: -965858652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_52
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 204
+        width: 24
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 31fcb930f2fbae448a4abd3d5e5a5cad
+      internalID: -1343827851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_53
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 201
+        width: 26
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2775929a437f717459e7b38ef408005c
+      internalID: -2014908136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_54
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 217
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a108f14b872700b4c9c21a8f84090eed
+      internalID: 2099546606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_55
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 209
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8393506d47ff8d04ea32ed98294ff9c1
+      internalID: 1878696056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_56
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 213
+        width: 6
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5503012b8b9659a469c730211fa1444b
+      internalID: 198038806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_57
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 167
+        width: 28
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b31334816d4c9b54e898bf9310ba7712
+      internalID: -1351285666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_58
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 153
+        width: 81
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 075e63f118122fd44bdf14b03bfa73c8
+      internalID: 768755590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_59
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 160
+        width: 25
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a0b739e71ef055489f7b34e6fc51f59
+      internalID: -1544808104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_60
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 199
+        width: 8
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9162d4ad98df72747945cd01634d5652
+      internalID: -2051756423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_61
+      rect:
+        serializedVersion: 2
+        x: 173
+        y: 200
+        width: 8
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4294b13d17cb58f42bc8a64c9108307f
+      internalID: -571955282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_62
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 199
+        width: 9
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 147de50fef70e3c4cb35946a827f06f2
+      internalID: 1377184263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_63
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 201
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d1addc005dc9414797b4952e96fc38f
+      internalID: -757683568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_64
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 211
+        width: 4
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f1901f1802e5954b9aee38851d0654c
+      internalID: 284944573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_65
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 202
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85decf58e00d9b642b9e1354d25af043
+      internalID: -820448527
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_66
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 194
+        width: 24
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d60c38e409761e442afaa7441b0da4c5
+      internalID: 1126879882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_67
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 198
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6056d1ced525f04eb9891e48aa0c9de
+      internalID: -1045996721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_68
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 199
+        width: 28
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a094b86dfefcbad419e481a9cc43af00
+      internalID: 1731255668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_69
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 202
+        width: 5
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f824bf99ce882d54cb454ae30eec52df
+      internalID: 1878309043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_70
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 167
+        width: 24
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cacbc04ac407f2044b85401ec9eb7708
+      internalID: 1251033128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_71
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 200
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d279b297fee47cb48918230d86052876
+      internalID: -219941994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_72
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 181
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad3ad3a06cfca6d428274cdf46f56bd3
+      internalID: -842338326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_73
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 191
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a70f5cf5a7fb2524f8b107357eaf628c
+      internalID: 829238428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_74
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 191
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d792f4207ac1364297dafa51ee7529d
+      internalID: -526066734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_75
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 173
+        width: 22
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a39f4c555f20d514ebd27055ca80f129
+      internalID: 119034637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_76
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 183
+        width: 36
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e23e2f3d0e9d8de45980c5c56ae27c0d
+      internalID: -1828037495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_77
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 186
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b12b558b4b59884a8db9d3543ba3186
+      internalID: -1459084106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_78
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 197
+        width: 5
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7e863625cf6f1f84ca4ed2338f8f5347
+      internalID: -149027405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_79
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 185
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d66eee9d448046641b910182e13376ec
+      internalID: -1830701338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_80
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 185
+        width: 22
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b55803e6babe67f40897f6c0b5ad6315
+      internalID: 1587368207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_81
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 172
+        width: 26
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e96957c48d391348a37a8839bf20923
+      internalID: -848287860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_82
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 178
+        width: 26
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c480af36afd2e1a49b00bf255d4e8483
+      internalID: -1550906306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_83
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 187
+        width: 14
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 920cc5631ef51904ba544575b591ce95
+      internalID: 304939480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_84
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 179
+        width: 17
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8075183b73badb04e925b41411ff27ee
+      internalID: 66238968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_85
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 180
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2aee22f611686fa46821d7ffce707653
+      internalID: -1279969927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_86
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 173
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1efa17c3e4ff4542bf7e85958871868
+      internalID: -1770636046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_87
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 173
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce1c5a2ca79578f45863000d6faa97c4
+      internalID: 1680637625
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_88
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 167
+        width: 32
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dcc71b9c51e89cd479369fcb98a36824
+      internalID: -6316650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_89
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 170
+        width: 14
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c814b30bde98a2e43a45cf1cfabc4c0e
+      internalID: 1255801129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_90
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 168
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69bcacd5b51ff0b4f8409ccf11a1b99a
+      internalID: 1435700903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_91
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 169
+        width: 17
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c61fdd6656670674e86b138b2f74c42f
+      internalID: -207903299
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_92
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 168
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44916a061b61ea24395272344dc5a848
+      internalID: 1711147838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_93
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 173
+        width: 4
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e19fd85b72020c941a7d834d053543c4
+      internalID: -1776861492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_94
+      rect:
+        serializedVersion: 2
+        x: 265
+        y: 161
+        width: 17
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ba573798e79738438c6b2f0f7af53cc
+      internalID: 829577611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_95
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 167
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e50b9baf79835b54d969b7ce512c3552
+      internalID: 1962976789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_96
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 172
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e8c6b6e2a3487774cbbc239aeb51c218
+      internalID: -1644480738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_97
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 168
+        width: 19
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27909023668350c40b5bc2b7a9585cff
+      internalID: -1540598522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_98
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 157
+        width: 32
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c275dd01776fe47468d8ca375355c1bd
+      internalID: 1732988544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_99
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 167
+        width: 9
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6124e23a8cdd31e43a0751f3efa15a98
+      internalID: 450802471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_100
+      rect:
+        serializedVersion: 2
+        x: 148
+        y: 167
+        width: 6
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af9ca5abc929bd648b82b33dbd3404aa
+      internalID: 57212365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_101
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 168
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b11a89af43aaea4a800d75f17feaf37
+      internalID: 1062128532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_102
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 155
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b35370ea30cbfa49bfa23a965512499
+      internalID: -1563258519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_103
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 155
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fed5e98a9b639644e823fdb6d36afbcf
+      internalID: 1116531217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_104
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 161
+        width: 7
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b66b39b60b92573409bf02cad1e7cf30
+      internalID: -1683096966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_105
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 98
+        width: 23
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 243db5cdeb8040048a926713d13618a4
+      internalID: -275767535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_106
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 98
+        width: 23
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5ac3d965a8c0df348a9e8afc59a8e6b7
+      internalID: 428525966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_107
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 98
+        width: 23
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89237e1ecf882324cb328ed6b8a01d9f
+      internalID: -816830045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_108
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 151
+        width: 22
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 14aaab96b196b53459b0bdc5469f76bf
+      internalID: -1588728789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_109
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 150
+        width: 22
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 26de6d61c7e5d7344a22395b26ba9737
+      internalID: -1699355648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_110
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 152
+        width: 22
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f8cc66c3ca3dd0243b3233a1583082b2
+      internalID: 898051029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_111
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 156
+        width: 19
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5bcc2ad51dbe2ce439b8a586af022f12
+      internalID: 1235701421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_112
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 156
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e8f1dcc97e3bcf441927b5f2c56f494f
+      internalID: -1079147200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_113
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 158
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2cb39ff55961c7240b360917afb1aeae
+      internalID: 425747693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_114
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 153
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c524893e511e56c46951be264da8beb4
+      internalID: 2072021635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_115
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 153
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b87a0bc29572fa468203f55b406b367
+      internalID: -713902919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_116
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 153
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe6ea252424a77445bedef32e22ece31
+      internalID: -1462209992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_117
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 153
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 74dac12b9b0ef1640a65ddf00acf4380
+      internalID: 1116742258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_118
+      rect:
+        serializedVersion: 2
+        x: 265
+        y: 148
+        width: 23
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f55ed927669df74418772cc989c63c8b
+      internalID: -1819533208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_119
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 145
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3bee66266052a5b4f8010f7b6cc467b2
+      internalID: 48103916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_120
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 145
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94784efdfa7bae14996cf77dac178359
+      internalID: -1933110651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_121
+      rect:
+        serializedVersion: 2
+        x: 334
+        y: 147
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 876ef8711e6e1004aba5084a7ba265d6
+      internalID: 201284132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_122
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 137
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49d2155dfab36e14ca643f08a2462de1
+      internalID: -1024593523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_123
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 137
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f811b55b25d3654da5ff739bd9eada6
+      internalID: 1198521092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_124
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 69
+        width: 36
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2f424f0325b848941abc519194f81289
+      internalID: 145148940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_125
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 69
+        width: 36
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f619936bb13e60a48998257743993bb5
+      internalID: 1379531124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_126
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 84
+        width: 23
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3712c43e9e76010478f4ee28e0f1e63c
+      internalID: -1049546973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_127
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 84
+        width: 23
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 937aa406c0eaf0d4eb6d1938d8af8f0e
+      internalID: -1801612190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_128
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 84
+        width: 23
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05534fa5771ab354faaa80ed49165bd7
+      internalID: 1219599760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_129
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 137
+        width: 22
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a64fb657b3da8b41a427d5afe791b5c
+      internalID: -89257467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_130
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 136
+        width: 22
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1074c9b893e48804aace7fbfe18909dd
+      internalID: 1112980776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_131
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 134
+        width: 22
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17fff9bf787d13940872512d32f7f774
+      internalID: 941378153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_132
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 140
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99d1d2dfd594a064eb42cb2b9dd2b2ab
+      internalID: 871212567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_133
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 143
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa94aa6a3af0e364eb7203699078f6e3
+      internalID: 1088459119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_134
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 124
+        width: 23
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6abba8fc344566647a47693aec9f5862
+      internalID: -1317406120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_135
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 123
+        width: 23
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a70851c01aa29941aa658602126bbb2
+      internalID: 1163657609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_136
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 124
+        width: 19
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09e43bc0500643647b945616d6c25da5
+      internalID: 1988057923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_137
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 132
+        width: 14
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 771e411785338c146b74f5f9347e7fc0
+      internalID: -1889606322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_138
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 116
+        width: 12
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c53f327c96ea80419468af7e8075f17
+      internalID: -353776207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_139
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 117
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bce7f7cd4b624e34f8c35d492fff21d7
+      internalID: -299252350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_140
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 99
+        width: 9
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e7e932fd4cb5d954cbe57e0f33881006
+      internalID: 31901437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_141
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 99
+        width: 9
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0bd1c85e3ea527409771d71a1dd2d58
+      internalID: 1001108086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_142
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 99
+        width: 9
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d65c9a1ac66c23488cbd19cacdd392b
+      internalID: -1801354591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_143
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 99
+        width: 9
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4964bdb0b54674d45809b27520a6bc3b
+      internalID: -1091411108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_144
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 121
+        width: 14
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3dad0a0c335ad6345839adf2d00477bc
+      internalID: -30105744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_145
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 108
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a25ca090a249a6b4f92a236f84fe50b3
+      internalID: -301316029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_146
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 108
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6e72727d5d25964cac8c969ee5d2a31
+      internalID: -1317693955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_147
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 111
+        width: 15
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0bcab9388b52224cbf70cb51b5600db
+      internalID: -1891817833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_148
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 99
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0444cea24e517045b886eb0099de06a
+      internalID: 1002219847
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_149
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 102
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b0eec7a43730374f9774f357bcb9407
+      internalID: 571572824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_150
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 102
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a9e1108c2d1caea4a9dc11d88c7e1cdd
+      internalID: -37888742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_propsheet_noguide_export_151
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 102
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1182f0b0254e5ec418e9154460ca192c
+      internalID: 1473284060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -132,7 +3298,159 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      spirithome_propsheet_noguide_export_0: -389075289
+      spirithome_propsheet_noguide_export_1: -1195318588
+      spirithome_propsheet_noguide_export_10: 1037237124
+      spirithome_propsheet_noguide_export_100: 57212365
+      spirithome_propsheet_noguide_export_101: 1062128532
+      spirithome_propsheet_noguide_export_102: -1563258519
+      spirithome_propsheet_noguide_export_103: 1116531217
+      spirithome_propsheet_noguide_export_104: -1683096966
+      spirithome_propsheet_noguide_export_105: -275767535
+      spirithome_propsheet_noguide_export_106: 428525966
+      spirithome_propsheet_noguide_export_107: -816830045
+      spirithome_propsheet_noguide_export_108: -1588728789
+      spirithome_propsheet_noguide_export_109: -1699355648
+      spirithome_propsheet_noguide_export_11: -1898646240
+      spirithome_propsheet_noguide_export_110: 898051029
+      spirithome_propsheet_noguide_export_111: 1235701421
+      spirithome_propsheet_noguide_export_112: -1079147200
+      spirithome_propsheet_noguide_export_113: 425747693
+      spirithome_propsheet_noguide_export_114: 2072021635
+      spirithome_propsheet_noguide_export_115: -713902919
+      spirithome_propsheet_noguide_export_116: -1462209992
+      spirithome_propsheet_noguide_export_117: 1116742258
+      spirithome_propsheet_noguide_export_118: -1819533208
+      spirithome_propsheet_noguide_export_119: 48103916
+      spirithome_propsheet_noguide_export_12: 1158803899
+      spirithome_propsheet_noguide_export_120: -1933110651
+      spirithome_propsheet_noguide_export_121: 201284132
+      spirithome_propsheet_noguide_export_122: -1024593523
+      spirithome_propsheet_noguide_export_123: 1198521092
+      spirithome_propsheet_noguide_export_124: 145148940
+      spirithome_propsheet_noguide_export_125: 1379531124
+      spirithome_propsheet_noguide_export_126: -1049546973
+      spirithome_propsheet_noguide_export_127: -1801612190
+      spirithome_propsheet_noguide_export_128: 1219599760
+      spirithome_propsheet_noguide_export_129: -89257467
+      spirithome_propsheet_noguide_export_13: 1125534744
+      spirithome_propsheet_noguide_export_130: 1112980776
+      spirithome_propsheet_noguide_export_131: 941378153
+      spirithome_propsheet_noguide_export_132: 871212567
+      spirithome_propsheet_noguide_export_133: 1088459119
+      spirithome_propsheet_noguide_export_134: -1317406120
+      spirithome_propsheet_noguide_export_135: 1163657609
+      spirithome_propsheet_noguide_export_136: 1988057923
+      spirithome_propsheet_noguide_export_137: -1889606322
+      spirithome_propsheet_noguide_export_138: -353776207
+      spirithome_propsheet_noguide_export_139: -299252350
+      spirithome_propsheet_noguide_export_14: 416924107
+      spirithome_propsheet_noguide_export_140: 31901437
+      spirithome_propsheet_noguide_export_141: 1001108086
+      spirithome_propsheet_noguide_export_142: -1801354591
+      spirithome_propsheet_noguide_export_143: -1091411108
+      spirithome_propsheet_noguide_export_144: -30105744
+      spirithome_propsheet_noguide_export_145: -301316029
+      spirithome_propsheet_noguide_export_146: -1317693955
+      spirithome_propsheet_noguide_export_147: -1891817833
+      spirithome_propsheet_noguide_export_148: 1002219847
+      spirithome_propsheet_noguide_export_149: 571572824
+      spirithome_propsheet_noguide_export_15: 1050303820
+      spirithome_propsheet_noguide_export_150: -37888742
+      spirithome_propsheet_noguide_export_151: 1473284060
+      spirithome_propsheet_noguide_export_16: -1620155525
+      spirithome_propsheet_noguide_export_17: 1958362456
+      spirithome_propsheet_noguide_export_18: 634588232
+      spirithome_propsheet_noguide_export_19: 1794643158
+      spirithome_propsheet_noguide_export_2: 52997934
+      spirithome_propsheet_noguide_export_20: -735071818
+      spirithome_propsheet_noguide_export_21: 1123298399
+      spirithome_propsheet_noguide_export_22: -782818445
+      spirithome_propsheet_noguide_export_23: -2027696634
+      spirithome_propsheet_noguide_export_24: -793610561
+      spirithome_propsheet_noguide_export_25: -1614076124
+      spirithome_propsheet_noguide_export_26: -681701030
+      spirithome_propsheet_noguide_export_27: 1683719312
+      spirithome_propsheet_noguide_export_28: -1995630996
+      spirithome_propsheet_noguide_export_29: 641286996
+      spirithome_propsheet_noguide_export_3: -1067588954
+      spirithome_propsheet_noguide_export_30: -1136956093
+      spirithome_propsheet_noguide_export_31: 1730105321
+      spirithome_propsheet_noguide_export_32: 920753162
+      spirithome_propsheet_noguide_export_33: 1610820425
+      spirithome_propsheet_noguide_export_34: -1373558446
+      spirithome_propsheet_noguide_export_35: 1126747262
+      spirithome_propsheet_noguide_export_36: 2015014850
+      spirithome_propsheet_noguide_export_37: 483777386
+      spirithome_propsheet_noguide_export_38: 770593594
+      spirithome_propsheet_noguide_export_39: -1556991112
+      spirithome_propsheet_noguide_export_4: 1237227813
+      spirithome_propsheet_noguide_export_40: 397727019
+      spirithome_propsheet_noguide_export_41: -1078840857
+      spirithome_propsheet_noguide_export_42: -657928957
+      spirithome_propsheet_noguide_export_43: 845688964
+      spirithome_propsheet_noguide_export_44: 1229414647
+      spirithome_propsheet_noguide_export_45: 1989689921
+      spirithome_propsheet_noguide_export_46: -1105002224
+      spirithome_propsheet_noguide_export_47: 205937945
+      spirithome_propsheet_noguide_export_48: 1869292364
+      spirithome_propsheet_noguide_export_49: 1254709519
+      spirithome_propsheet_noguide_export_5: -996455822
+      spirithome_propsheet_noguide_export_50: 2073097322
+      spirithome_propsheet_noguide_export_51: -965858652
+      spirithome_propsheet_noguide_export_52: -1343827851
+      spirithome_propsheet_noguide_export_53: -2014908136
+      spirithome_propsheet_noguide_export_54: 2099546606
+      spirithome_propsheet_noguide_export_55: 1878696056
+      spirithome_propsheet_noguide_export_56: 198038806
+      spirithome_propsheet_noguide_export_57: -1351285666
+      spirithome_propsheet_noguide_export_58: 768755590
+      spirithome_propsheet_noguide_export_59: -1544808104
+      spirithome_propsheet_noguide_export_6: 357223394
+      spirithome_propsheet_noguide_export_60: -2051756423
+      spirithome_propsheet_noguide_export_61: -571955282
+      spirithome_propsheet_noguide_export_62: 1377184263
+      spirithome_propsheet_noguide_export_63: -757683568
+      spirithome_propsheet_noguide_export_64: 284944573
+      spirithome_propsheet_noguide_export_65: -820448527
+      spirithome_propsheet_noguide_export_66: 1126879882
+      spirithome_propsheet_noguide_export_67: -1045996721
+      spirithome_propsheet_noguide_export_68: 1731255668
+      spirithome_propsheet_noguide_export_69: 1878309043
+      spirithome_propsheet_noguide_export_7: -366839542
+      spirithome_propsheet_noguide_export_70: 1251033128
+      spirithome_propsheet_noguide_export_71: -219941994
+      spirithome_propsheet_noguide_export_72: -842338326
+      spirithome_propsheet_noguide_export_73: 829238428
+      spirithome_propsheet_noguide_export_74: -526066734
+      spirithome_propsheet_noguide_export_75: 119034637
+      spirithome_propsheet_noguide_export_76: -1828037495
+      spirithome_propsheet_noguide_export_77: -1459084106
+      spirithome_propsheet_noguide_export_78: -149027405
+      spirithome_propsheet_noguide_export_79: -1830701338
+      spirithome_propsheet_noguide_export_8: 2069214159
+      spirithome_propsheet_noguide_export_80: 1587368207
+      spirithome_propsheet_noguide_export_81: -848287860
+      spirithome_propsheet_noguide_export_82: -1550906306
+      spirithome_propsheet_noguide_export_83: 304939480
+      spirithome_propsheet_noguide_export_84: 66238968
+      spirithome_propsheet_noguide_export_85: -1279969927
+      spirithome_propsheet_noguide_export_86: -1770636046
+      spirithome_propsheet_noguide_export_87: 1680637625
+      spirithome_propsheet_noguide_export_88: -6316650
+      spirithome_propsheet_noguide_export_89: 1255801129
+      spirithome_propsheet_noguide_export_9: -1133121091
+      spirithome_propsheet_noguide_export_90: 1435700903
+      spirithome_propsheet_noguide_export_91: -207903299
+      spirithome_propsheet_noguide_export_92: 1711147838
+      spirithome_propsheet_noguide_export_93: -1776861492
+      spirithome_propsheet_noguide_export_94: 829577611
+      spirithome_propsheet_noguide_export_95: 1962976789
+      spirithome_propsheet_noguide_export_96: -1644480738
+      spirithome_propsheet_noguide_export_97: -1540598522
+      spirithome_propsheet_noguide_export_98: 1732988544
+      spirithome_propsheet_noguide_export_99: 450802471
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
