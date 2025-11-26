@@ -271,7 +271,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
     }
 
     /// <summary>
-    /// 새로운 건물을 건설 목록에 추가합니다.
+    /// 새로운 건물을 건설 목록에 추가하거나, 이미 존재하면 위치만 업데이트합니다.
     /// </summary>
     /// <param name="buildingTypeId">건물 타입 ID</param>
     /// <param name="position">건물 위치</param>
@@ -404,6 +404,28 @@ public class BuildingRepository : MonoBehaviour, IRepository
                 //float rot = building.Rotation;
                 BuildingData buildingData = GetBuildingDataByTypeId(building.Id); // building.Id는 building_type_id
                 GameObject constructedbuilding = BuildingFactory.CreateBuilding(buildingData, worldPos, building.InstanceId); // instanceId 전달
+                DragDropController.Instance.PlaceTilemapMarkers(gridpos, buildingData.tileSize, buildingData.MarkerPositionOffset);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex);
+            return;
+        }
+    }
+
+    public void SpawnConstructedBuildings()
+    {
+        try
+        {
+            foreach (var building in _constructedBuildings)
+            {
+                Vector3Int gridpos = building.Position;
+                Vector3 worldPos = grid.CellToWorld(gridpos);
+                //Vector3Int worldPos = grid.CellToWorld
+                //float rot = building.Rotation;
+                BuildingData buildingData = GetBuildingDataById(building.Id);
+                GameObject constructedbuilding = BuildingFactory.CreateBuilding(buildingData, worldPos);
                 DragDropController.Instance.PlaceTilemapMarkers(gridpos, buildingData.tileSize, buildingData.MarkerPositionOffset);
             }
         }

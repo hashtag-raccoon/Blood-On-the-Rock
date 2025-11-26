@@ -82,6 +82,14 @@ public class ConstructedBuildingPos
     public float rotation;
 }
 
+[Serializable]
+public class ConstructedBuildingPos
+{
+    public int building_id;
+    public Vector3Int pos;
+    public float rotation;
+}
+
 
 /// <summary>
 /// 게임 내에 실제로 건설된 건물의 모든 정보를 통합하여 관리하는 클래스입니다.

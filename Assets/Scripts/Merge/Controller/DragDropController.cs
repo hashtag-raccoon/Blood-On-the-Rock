@@ -538,8 +538,8 @@ public class DragDropController : MonoBehaviour
                 var refundWoodData = ResourceRepository.Instance.GetResourceByName("Wood");
                 if (refundMoneyData != null)
                 {
-                    refundMoneyData.current_amount -= tempData.buildingData.construction_cost_gold;
-                    refundMoneyData.current_amount -= tempData.buildingData.construction_cost_wood;
+                    refundMoneyData.current_amount += tempData.buildingData.construction_cost_gold;
+                    refundMoneyData.current_amount += tempData.buildingData.construction_cost_wood;
                 }
             }
 
