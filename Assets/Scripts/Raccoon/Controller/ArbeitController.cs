@@ -55,6 +55,11 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     public void SetTarget(Transform newTarget)
     {   
+        if(pathfinder == null)
+        {
+            Debug.LogError("IsometricPathfinder가 할당되지 않았습니다.");
+            return;
+        }
         currentTarget = newTarget;
         CalculatePath();
     }
@@ -199,6 +204,7 @@ public class ArbeitController : MonoBehaviour
         else
         {
             currentTask = null;
+            UpdateTaskUI();
         }
     }
 
@@ -284,8 +290,18 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     public void RemoveTaskFromQueue(TaskInfo task)
     {
+        // 현재 실행 중인 업무인지 확인
+        if (currentTask != null && currentTask == task)
+        {
+            Debug.Log("Cancelling current task: " + task.taskType); // 당분간 없으면 곤란
+            CancelCurrentTask();
+            return;
+        }
+        
+        // 큐에 있는 업무인지 확인
         if (taskQueue.Contains(task))
         {
+            Debug.Log("Removing task from queue: " + task.taskType); // 당분간 없으면 곤란
             taskQueue.Remove(task);
             UpdateTaskUI();
         }
@@ -316,6 +332,18 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     private void UpdateTaskUI()
     {
+        // 업무 큐가 비어있으면 모든 UI 제거, 그 후 리턴
+        if(taskQueue == null)
+        {
+            if(taskUIObjects.Count > 0)
+            {
+                for(int i = 0; i < taskUIObjects.Count; i++)
+                {
+                    Destroy(taskUIObjects[i]);
+                }
+            }
+            return;
+        }
         // 기존 UI 제거
         foreach (var uiObj in taskUIObjects)
         {

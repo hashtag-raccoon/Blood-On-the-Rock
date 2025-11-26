@@ -14,6 +14,7 @@ public class TaskUIController : MonoBehaviour
     [SerializeField] private RectTransform rectTransform;
     [SerializeField] private UnityEngine.UI.Image taskIcon; // 업무 아이콘 Image
 
+    [SerializeField] private float customXOffset = 0.9f; // 커스텀 X 오프셋 (필요시 사용)
     private GameObject targetObject; // 타겟 오브젝트 (손님, 테이블, 알바생 등)
     private TaskInfo assignedTask; // 할당된 업무
     private bool isArbeitUI = false; // 알바생 UI인지 여부
@@ -65,7 +66,7 @@ public class TaskUIController : MonoBehaviour
     /// <summary>
     /// 알바생용 업무 UI 초기화
     /// </summary>
-    public void InitializeArbeitUI(GameObject arbeit, TaskInfo task, float yOffset, int index)
+    public void InitializeArbeitUI(GameObject arbeit, TaskInfo task, Vector2 uiSize, float yOffset, int index)
     {
         targetObject = arbeit;
         assignedTask = task;
@@ -80,13 +81,13 @@ public class TaskUIController : MonoBehaviour
         }
 
         // 로컬 좌표로 UI 위치 설정
-        float xOffset = (index - 1) * 0.3f; // 중앙 정렬
+        float xOffset = (index - 1) * customXOffset; // 중앙 정렬
         transform.localPosition = new Vector3(xOffset, yOffset, 0);
         transform.localScale = new Vector3(0.008f, 0.008f, 0.008f); // 크기 조정
 
         if (rectTransform != null)
         {
-            rectTransform.sizeDelta = new Vector2(40, 40);
+            rectTransform.sizeDelta = uiSize;
         }
 
         // 클릭 이벤트 설정 (업무 취소)

@@ -130,8 +130,10 @@ public class OrderingManager : MonoBehaviour
     #endregion
 
     #region 업무 아이콘 관리
+
     /// <summary>
     /// TaskType에 따라 아이콘 스프라이트 반환
+    /// 만약 할당 안되면 흰색 아이콘만 나오니 주의
     /// </summary>
     public Sprite GetTaskIconSprite(TaskType taskType)
     {
@@ -246,7 +248,7 @@ public class OrderingManager : MonoBehaviour
             uiController = TaskUIObj.AddComponent<TaskUIController>();
         }
 
-        uiController.InitializeArbeitUI(arbeitObj, task, yOffset, index);
+        uiController.InitializeArbeitUI(arbeitObj, task, taskPanelSize, yOffset, index);
 
         return TaskUIObj;
     }
@@ -257,18 +259,7 @@ public class OrderingManager : MonoBehaviour
     public void OnArbeitTaskUIClicked(GameObject arbeitObj, TaskInfo task)
     {
         var arbeitController = arbeitObj.GetComponent<ArbeitController>();
-
-        // 현재 수행 중인 업무인 경우
-        if (arbeitController.GetCurrentTask() == task)
-        {
-            arbeitController.CancelCurrentTask();
-        }
-        // 큐에 있는 업무인 경우
-        else
-        {
-            arbeitController.RemoveTaskFromQueue(task);
-            RemoveTask(task);
-        }
+        arbeitController.RemoveTaskFromQueue(task);
     }
 
     /// <summary>
