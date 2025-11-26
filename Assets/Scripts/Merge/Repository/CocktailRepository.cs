@@ -26,7 +26,7 @@ public class CocktailRepository : MonoBehaviour, IRepository
     [SerializeField] private CocktailRecipeSO cocktailRecipeSO;
 
     private readonly Dictionary<int, CocktailData> _cocktailDataDict = new Dictionary<int, CocktailData>();
-    private readonly Dictionary<int, CocktailRecipeScript> _cocktailRecipeDict = new Dictionary<int, CocktailRecipeScript>();
+    public readonly Dictionary<int, CocktailRecipeScript> _cocktailRecipeDict = new Dictionary<int, CocktailRecipeScript>();
 
     // 조합 데이터
     private List<OrderedCocktail> _orderedCocktails = new List<OrderedCocktail>();

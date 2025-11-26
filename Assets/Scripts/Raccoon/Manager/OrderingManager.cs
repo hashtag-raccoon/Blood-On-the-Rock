@@ -22,7 +22,7 @@ public class OrderingManager : MonoBehaviour
     [SerializeField] private Vector2 taskPanelSize; // 업무 UI 패널 크기
 
     public ArbeitController[] Arbiets;
-    
+
 
     public static OrderingManager Instance
     {
@@ -41,7 +41,7 @@ public class OrderingManager : MonoBehaviour
 
     [Header("업무 관리")]
     [SerializeField] private List<TaskInfo> allTasks = new List<TaskInfo>(); // 모든 업무 리스트
-    
+
 
     /// <summary>
     /// 추후 구현할 대화창 전용
@@ -65,11 +65,11 @@ public class OrderingManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        for(int i = 0 ; i < Arbiets.Length; i++)
+        for (int i = 0; i < Arbiets.Length; i++)
         {
             Arbiets[i].myNpcData = DataManager.Instance.npcs[i];
         }
-        
+
     }
 
     public void Update()
@@ -159,22 +159,22 @@ public class OrderingManager : MonoBehaviour
     {
         TaskInfo newTask = null;
 
-        switch(taskType)
+        switch (taskType)
         {
             case TaskType.TakeOrder:
                 // 칵테일 업무 생성 로직
                 // DataManager의 칵테일 리스트에서 랜덤하게 선택
-                if (DataManager.Instance.cocktailRecipes.Count > 0)
+                if (CocktailRepository.Instance._cocktailRecipeDict.Count > 0)
                 {
                     //int randomIndex = UnityEngine.Random.Range(0, DataManager.Instance.cocktails.Count);
                     //CocktailData randomCocktail = DataManager.Instance.cocktails[randomIndex];
-                    
-                    int randomIndex = UnityEngine.Random.Range(0, DataManager.Instance.cocktailRecipes.Count);
-                    CocktailRecipeScript randomCocktail = DataManager.Instance.cocktailRecipes[randomIndex];
+
+                    int randomIndex = UnityEngine.Random.Range(0, CocktailRepository.Instance._cocktailRecipeDict.Count);
+                    CocktailRecipeScript randomCocktail = CocktailRepository.Instance._cocktailRecipeDict[randomIndex];
 
                     newTask = new TaskInfo(TaskType.TakeOrder, TargetObj, randomCocktail);
                     allTasks.Add(newTask);
-                    
+
                     // 업무 UI 생성
                     TaskUIInstantiate(TargetObj);
                 }
@@ -183,19 +183,19 @@ public class OrderingManager : MonoBehaviour
                     Debug.LogError("칵테일 데이터가 없습니다!");
                 }
                 break;
-                
+
             case TaskType.ServeOrder:
                 // 서빙 업무 생성 로직
                 newTask = new TaskInfo(TaskType.ServeOrder, TargetObj);
                 allTasks.Add(newTask);
                 break;
-                
+
             case TaskType.CleanTable:
                 // 테이블 청소 업무 생성 로직
                 newTask = new TaskInfo(TaskType.CleanTable, TargetObj);
                 allTasks.Add(newTask);
                 break;
-                
+
             default:
                 Debug.LogWarning("알 수 없는 업무 유형입니다.");
                 break;
@@ -277,7 +277,7 @@ public class OrderingManager : MonoBehaviour
 
         // 해당 타겟에 대한 업무 찾기
         TaskInfo task = GetTaskByTarget(TargetObj);
-        
+
         if (task != null)
         {
             // 알바생에게 업무 할당
@@ -300,7 +300,7 @@ public class OrderingManager : MonoBehaviour
         {
             task.CompleteTask();
             allTasks.Remove(task);
-            
+
             // 동일한 타겟에 할당된 다른 알바생의 업무도 제거
             NotifyTaskCompleted(task);
         }
@@ -315,7 +315,7 @@ public class OrderingManager : MonoBehaviour
     {
         // 모든 알바생 찾기
         ArbeitController[] allArbeits = FindObjectsOfType<ArbeitController>();
-        
+
         foreach (var arbeit in allArbeits)
         {
             arbeit.RemoveTaskIfMatch(completedTask);
@@ -355,13 +355,13 @@ public class OrderingManager : MonoBehaviour
         }
 
         Debug.Log($"주문 수락: {task.orderedCocktail.CocktailName}");
-        
+
         // 후에 해야할 일 : 주문 데이터를 저장하는 로직 추가
         // 예: 주문 테이블, 칵테일 정보, 개수 등을 별도 리스트나 딕셔너리에 저장
-        
+
         // 대화창 닫기
         CloseDialog();
-        
+
         // 알바생의 현재 업무 완료 처리
         var arbeitController = arbeit.GetComponent<ArbeitController>();
         if (arbeitController != null)
