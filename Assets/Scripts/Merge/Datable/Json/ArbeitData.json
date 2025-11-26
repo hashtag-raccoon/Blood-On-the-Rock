@@ -14,8 +14,7 @@
     "total_ability": 12,
     "fatigue": 0,
     "daily_wage": 100,
-    "need_rest": false,
-    "prefab_name": "Human_1"
+    "need_rest": false
   },
   {
     "part_timer_id": 2,
@@ -32,8 +31,7 @@
     "total_ability": 13,
     "fatigue": 10,
     "daily_wage": 120,
-    "need_rest": false,
-    "prefab_name": "Oak_2"
+    "need_rest": false
   },
   {
     "part_timer_id": 3,
@@ -50,43 +48,6 @@
     "total_ability": 15,
     "fatigue": 0,
     "daily_wage": 110,
-    "need_rest": false,
-    "prefab_name": "Vampire_3"
-  },
-  {
-    "part_timer_id": 4,
-    "part_timer_name": "손님1",
-    "race": "오크",
-    "personality_id": 1,
-    "level": 1,
-    "exp": 0,
-    "hire_date": "0001-01-01T00:00:00",
-    "employment_state": false,
-    "serving_ability": 0,
-    "cooking_ability": 0,
-    "cleaning_ability": 0,
-    "total_ability": 0,
-    "fatigue": 0,
-    "daily_wage": 0,
-    "need_rest": false,
-    "prefab_name": "Oak_1"
-  },
-  {
-    "part_timer_id": 5,
-    "part_timer_name": "손님2",
-    "race": "인간",
-    "personality_id": 1,
-    "level": 1,
-    "exp": 0,
-    "hire_date": "0001-01-01T00:00:00",
-    "employment_state": false,
-    "serving_ability": 0,
-    "cooking_ability": 0,
-    "cleaning_ability": 0,
-    "total_ability": 0,
-    "fatigue": 0,
-    "daily_wage": 0,
-    "need_rest": false,
-    "prefab_name": "Human_2"
+    "need_rest": false
   }
 ]

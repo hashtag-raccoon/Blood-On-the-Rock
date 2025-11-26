@@ -138,26 +138,10 @@ public class ResourceBuildingUIManager : MonoBehaviour
     {
         ClearProductionList();
 
-        if (currentConstructedBuilding == null)
-        {
-            Debug.LogError("[ResourceBuildingUIManager] currentConstructedBuilding이 null입니다.");
-            return;
-        }
-
-        if (BuildingRepository.Instance == null)
-        {
-            Debug.LogError("[ResourceBuildingUIManager] BuildingRepository.Instance가 null입니다."); // 빼지 말줘
-            return;
-        }
+        if (currentConstructedBuilding == null) return;
 
         List<BuildingProductionInfo> productionInfos =
-            BuildingRepository.Instance.GetProductionInfosForBuildingName(currentConstructedBuilding.Name);
-
-        if (productionInfos == null)
-        {
-            Debug.LogError("[ResourceBuildingUIManager] productionInfos가 null입니다."); // 빼지 말아줘
-            return;
-        }
+            BuildingRepository.Instance.GetProductionInfosForBuildingType(currentConstructedBuilding.Type);
 
         foreach (var productionInfo in productionInfos)
         {

@@ -560,7 +560,5 @@ public class ResourceBuildingController : BuildingBase
         {
             ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
         }
-
-        ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
     }
 }
