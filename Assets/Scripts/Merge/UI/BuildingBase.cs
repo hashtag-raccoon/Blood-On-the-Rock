@@ -121,6 +121,17 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         if (virtualCamera == null) InitializeCamera();
 
         bool isOpening = !BuildingUI.activeSelf;
+        // 왼쪽 버튼이 아닐 경우 무시
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+
+        // dragDropController가 설정되어 있지 않다면 싱글톤 또는 씬에서 찾아서 할당
+        var dd = dragDropController ?? DragDropController.Instance ?? FindObjectOfType<DragDropController>();
+        if (dd == null) return; // 컴파일 오류 방지용, 뺴면 안됨 !!
+        if (dd.onEdit) return;  // 편집 모드 중이면 UI Open X
+
+        if (virtualCamera == null) InitializeCamera();
+
+        bool isOpening = !BuildingUI.activeSelf;
 
         if (isOpening)
         {
@@ -131,8 +142,17 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         {
             CloseBuildingUI();
             AnimateCamera(false);
+            if (isOpening)
+            {
+                OpenBuildingUI();
+                AnimateCamera(true);
+            }
+            else
+            {
+                CloseBuildingUI();
+                AnimateCamera(false);
+            }
         }
-    }
 
     public virtual void AnimateCamera(bool isOpening)
     {
@@ -146,6 +166,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     public virtual void OpenBuildingUI()
     {
         DragDropController.Instance.isUI = true;
+        DragDropController.Instance.isUI = true;
         BuildingUI?.SetActive(true);
         CameraManager.instance.isBuildingUIActive = true;
         currentActiveBuilding = this; // 현재 건물을 활성 건물로 설정
@@ -153,6 +174,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public virtual void CloseBuildingUI()
     {
+        DragDropController.Instance.isUI = false;
         DragDropController.Instance.isUI = false;
         BuildingUI?.SetActive(false);
         CameraManager.instance.isBuildingUIActive = false;
@@ -302,6 +324,8 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             upgradeScript.SetData(constructedBuilding);
 
             // 다음 레벨의 업그레이드 데이터 찾기
+            BuildingUpgradeData upgradeData = BuildingRepository.Instance.GetBuildingUpgradeDataByLevel(
+                BuildingRepository.Instance.GetBuildingUpgradeDataByType(constructedBuilding.Name),
             BuildingUpgradeData upgradeData = BuildingRepository.Instance.GetBuildingUpgradeDataByLevel(
                 BuildingRepository.Instance.GetBuildingUpgradeDataByType(constructedBuilding.Name),
                 constructedBuilding.Level + 1

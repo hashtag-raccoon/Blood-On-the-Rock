@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Merge;
 using UnityEngine.UI;
+using UnityEngine.UI;
 
 /// <summary>
 /// 오브젝트를 타일맵 위에 드래그 앤 드롭하여 배치하는 기능
@@ -15,9 +16,24 @@ using UnityEngine.UI;
 /// 건물을 샀을때에도 바로 배치모드로 들어가, 배치 시에 건물 건설을 시작함
 /// 건물 인벤토리와도 연결이 되어, 건물에 ESC + 우클릭을 하여 건물을 건물 인벤토리 내로 집어 넣을 수 있고,
 /// 건물 인벤토리(EditScroll)에서 건물을 꺼내어 배치할 수도 있음
+/// 건물을 샀을때에도 바로 배치모드로 들어가, 배치 시에 건물 건설을 시작함
+/// 건물 인벤토리와도 연결이 되어, 건물에 ESC + 우클릭을 하여 건물을 건물 인벤토리 내로 집어 넣을 수 있고,
+/// 건물 인벤토리(EditScroll)에서 건물을 꺼내어 배치할 수도 있음
 /// </summary>
 public class DragDropController : MonoBehaviour
 {
+    private static DragDropController _instance;
+    public static DragDropController Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<DragDropController>();
+            }
+            return _instance;
+        }
+    }
     private static DragDropController _instance;
     public static DragDropController Instance
     {
@@ -49,6 +65,9 @@ public class DragDropController : MonoBehaviour
     [SerializeField] private float EditMode_Time = 3f; // 편집 모드 활성화 시간(우클릭 꾹 누르면 활성화)
     [SerializeField] private float maxPositionDrift = 0.3f; // 편집 모드 활성화 중 허용되는 최대 마우스 이동 거리, 혹시 모를 손떨림을 대비하기 위함
     public bool onEdit = false; // 편집 모드 활성화 여부
+    [SerializeField] private float EditMode_Time = 3f; // 편집 모드 활성화 시간(우클릭 꾹 누르면 활성화)
+    [SerializeField] private float maxPositionDrift = 0.3f; // 편집 모드 활성화 중 허용되는 최대 마우스 이동 거리, 혹시 모를 손떨림을 대비하기 위함
+    public bool onEdit = false; // 편집 모드 활성화 여부
     [Header("건물 마커 설정/마커 타일맵의 Y 오프셋")]
     [SerializeField] private float markerOffset;
     [Header("새 건물 건설 완료 UI")]
@@ -63,6 +82,7 @@ public class DragDropController : MonoBehaviour
     private SpriteRenderer draggedSpriteRenderer = null; // 드래그 중인 오브젝트의 스프라이트 렌더러
     private Color originalSpriteColor; // 원래 스프라이트 색상 (프리뷰용)
 
+    [HideInInspector]
     [HideInInspector]
     public bool isUI = false;
 
@@ -91,15 +111,21 @@ public class DragDropController : MonoBehaviour
     {
         // 싱글톤 패턴 초기화, 추후 싱글톤이 아닌 방법으로 변경할 예정
         if (_instance == null)
-        {
-            _instance = this;
-            transform.SetParent(null);
-            DontDestroyOnLoad(gameObject);
-        }
+            // 싱글톤 패턴 초기화, 추후 싱글톤이 아닌 방법으로 변경할 예정
+            if (_instance == null)
+            {
+                _instance = this;
+                transform.SetParent(null);
+                DontDestroyOnLoad(gameObject);
+                _instance = this;
+                transform.SetParent(null);
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (_instance != this)
         else if (_instance != this)
-        {
-            Destroy(gameObject);
-        }
+                    {
+                        Destroy(gameObject);
+                    }
     }
 
     /// <summary>
@@ -109,6 +135,16 @@ public class DragDropController : MonoBehaviour
     {
         if (mainCamera == null)
             mainCamera = Camera.main;
+
+        // Grid 자동 찾기
+        if (grid == null)
+        {
+            grid = FindObjectOfType<Grid>();
+            if (grid == null)
+            {
+                Debug.LogError("[DragDropController] Scene에서 Grid를 찾을 수 없습니다!");
+            }
+        }
 
         // Grid 자동 찾기
         if (grid == null)
@@ -173,6 +209,7 @@ public class DragDropController : MonoBehaviour
 
         if (isDraggingSprite)
         {
+            // 편집 모드일 때는 편집 모드 전용 프리뷰 사용 아닐 경우 오브젝트 드래그 프리뷰를 사용
             // 편집 모드일 때는 편집 모드 전용 프리뷰 사용 아닐 경우 오브젝트 드래그 프리뷰를 사용
             if (onEdit)
             {
@@ -266,6 +303,7 @@ public class DragDropController : MonoBehaviour
         if (isHoldingRightClick && Input.GetMouseButton(1))
         {
             editModeProgressBar.Show();
+            editModeProgressBar.Show();
             // 마우스 위치 변화 체크 (편집 모드 활성화 중에만)
             if (!onEdit && editTargetObject != null)
             {
@@ -318,6 +356,7 @@ public class DragDropController : MonoBehaviour
         if (Input.GetMouseButtonUp(1))
         {
             // 편집 모드가 아닐 때만 우클릭 해제 처리
+            // 편집 모드가 아닐 때만 우클릭 해제 처리
             if (isDraggingSprite && !onEdit)
             {
                 EndSpriteDrag();
@@ -349,6 +388,8 @@ public class DragDropController : MonoBehaviour
             {
                 onEdit = false;
                 editScrollUI.ToggleScrollUI();
+                onEdit = false;
+                editScrollUI.ToggleScrollUI();
             }
 
             // 진행바 숨기기
@@ -356,6 +397,15 @@ public class DragDropController : MonoBehaviour
             {
                 editModeProgressBar.Hide();
             }
+
+            // 현재 배치되어 있는 preview 마커 삭제
+            ClearMarkers();
+        }
+
+        // Ctrl + 우클릭으로 건물을 인벤토리에 넣기
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(1))
+        {
+            TryMoveToInventory();
 
             // 현재 배치되어 있는 preview 마커 삭제
             ClearMarkers();
@@ -538,8 +588,8 @@ public class DragDropController : MonoBehaviour
                 var refundWoodData = ResourceRepository.Instance.GetResourceByName("Wood");
                 if (refundMoneyData != null)
                 {
-                    refundMoneyData.current_amount -= tempData.buildingData.construction_cost_gold;
-                    refundMoneyData.current_amount -= tempData.buildingData.construction_cost_wood;
+                    refundMoneyData.current_amount += tempData.buildingData.construction_cost_gold;
+                    refundMoneyData.current_amount += tempData.buildingData.construction_cost_wood;
                 }
             }
 
@@ -555,6 +605,7 @@ public class DragDropController : MonoBehaviour
             ClearMarkers();
 
             // 원래 위치에 마커 복구
+            PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize, markerOffset);
             PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize, markerOffset);
 
             // 드래그 모드 취소
@@ -631,6 +682,9 @@ public class DragDropController : MonoBehaviour
         // 기존 건물의 원래 위치 저장 및 마커 제거
         if (editTargetObject != null)
         {
+            Vector3 buildingPos = editTargetObject.transform.position;
+            buildingPos.z = 0; // Z값을 0으로 고정
+            originalBuildingCell = grid.WorldToCell(buildingPos);
             Vector3 buildingPos = editTargetObject.transform.position;
             buildingPos.z = 0; // Z값을 0으로 고정
             originalBuildingCell = grid.WorldToCell(buildingPos);
@@ -832,6 +886,7 @@ public class DragDropController : MonoBehaviour
     // 타일맵에 마커(건물이 차지하는 영역 표시) 배치
     // 기존 건물의 마커는 ExistingTilemap에 저장됨
     public void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset)
+    public void PlaceTilemapMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset)
     {
         // ExistingTilemap에 기존 건물 마커 배치
         if (ExistingTilemap != null && markerTile != null)
@@ -848,6 +903,7 @@ public class DragDropController : MonoBehaviour
                     Vector3 worldPos = grid.CellToWorld(tilePos);
 
                     // 오프셋 적용
+                    worldPos.y += customOffset;
                     worldPos.y += customOffset;
 
                     Vector3Int placeCell = grid.WorldToCell(worldPos);
@@ -948,9 +1004,13 @@ public class DragDropController : MonoBehaviour
     /// 기존 건물을 이동할 때 원래 위치의 마커를 ExistingTilemap에서 제거하는 데 사용하는 메소드
     /// </summary>
     private void RemoveBuildingMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset = 0f)
+    private void RemoveBuildingMarkers(Vector3Int startCell, Vector2Int tileSize, float customOffset = 0f)
     {
         if (ExistingTilemap == null)
             return;
+
+        // 실제 해당 스크립트에서 사용할 오프셋, customOffset가 0이 아니면 해당 customOffset을 사용하지만, 0이면 markerOffset 사용함
+        float offsetToUse = customOffset != 0f ? customOffset : markerOffset;
 
         // 실제 해당 스크립트에서 사용할 오프셋, customOffset가 0이 아니면 해당 customOffset을 사용하지만, 0이면 markerOffset 사용함
         float offsetToUse = customOffset != 0f ? customOffset : markerOffset;
@@ -1004,8 +1064,10 @@ public class DragDropController : MonoBehaviour
         }
     }
 
+
     #endregion
 
+    #region New Building Placement
     #region New Building Placement
     /// <summary>
     /// 새로 구매한 건물의 배치 모드를 시작함

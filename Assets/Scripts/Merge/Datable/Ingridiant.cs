@@ -13,10 +13,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Ingridiant", menuName = "Cocktail/Ingridiants", order = 0)]
 public class Ingridiant : ScriptableObject
 {
-    public int Ingridiant_id { get; private set; }
-    public string Ingridiant_name { get; private set; }
-    public string Ingridiant_type { get; private set; }
-    public string Description { get; private set; }
-    public int? Volume { get; set; } // type == Alchol,Drink -> ml(15ml,30ml..) / type == Ice, Garnish -> count(1,2,3..)
-    public Sprite Icon { get; private set; }
+    public int Ingridiant_id;
+    public string Ingridiant_name;
+    public string Ingridiant_type;
+    public string Description;
+    public int? Volume; // type == Alchol,Drink -> ml(15ml,30ml..) / type == Ice, Garnish -> count(1,2,3..)
+    public Sprite Icon;
 }

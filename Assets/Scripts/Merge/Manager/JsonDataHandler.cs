@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Linq;
 
 public class JsonDataHandler
 {
@@ -83,7 +84,21 @@ public class JsonDataHandler
         {
             Debug.Log("ConstructedBuildingProduction 데이터에 변경사항이 없어 저장을 건너뜁니다.");
         }
-    }
+        {
+            // 기존 데이터 로드
+            var existingData = LoadConstructedBuildingProductions();
+
+            // 변경사항이 있는지 확인
+            if (HasProductionChanges(existingData, productions))
+            {
+                SaveData(productions, constructedBuildingProductionPath);
+                Debug.Log($"ConstructedBuildingProduction 데이터 변경사항이 감지되어 저장했습니다.");
+            }
+            else
+            {
+                Debug.Log("ConstructedBuildingProduction 데이터에 변경사항이 없어 저장을 건너뜁니다.");
+            }
+        }
 
     public List<ConstructedBuildingProduction> LoadConstructedBuildingProductions()
     {

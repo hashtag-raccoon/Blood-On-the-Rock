@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Linq;
 
+public class CocktailRepository : MonoBehaviour, IRepository
 public class CocktailRepository : MonoBehaviour, IRepository
 {
     private static CocktailRepository _instance;
