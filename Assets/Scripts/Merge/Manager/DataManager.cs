@@ -53,7 +53,9 @@ public class DataManager : MonoBehaviour
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
+    // 현재 Inventory(편집 모드) 상태인 건물 리스트는 플래시 데이터 X
     [SerializeField] public List<ConstructedBuilding> EditMode_InventoryBuildings = new List<ConstructedBuilding>();
+    [SerializeField] public List<CocktailRecipeScript> cocktailRecipes = new List<CocktailRecipeScript>();
     #endregion
 
     #region Game Resources
@@ -81,6 +83,7 @@ public class DataManager : MonoBehaviour
         InitializeDataFiles();
         LoadAllData();
         EditMode_InventoryBuildings = GetInventoryBuildings();
+        cocktailRecipes = CocktailRepository.Instance.GetAllCocktailRecipe(); // 임시
         Debug.Log("DataManager 초기화 및 모든 데이터 로딩 완료.");
     }
 
@@ -425,5 +428,16 @@ public class DataManager : MonoBehaviour
     {
         return ConstructedBuildings.FindAll(b => b.IsProducing);
     }
+
+    /// <summary>
+    /// 랜덤으로 칵테일 데이터를 반환
+    /// </summary>
+    /// <returns></returns> <summary>
+    public CocktailData RandomCocktail()
+    {
+        int randomIndex = UnityEngine.Random.Range(0, cocktails.Count);
+        return cocktails[randomIndex];
+    }
+
     #endregion
 }

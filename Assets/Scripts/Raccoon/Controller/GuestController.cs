@@ -33,7 +33,7 @@ public class GuestController : MonoBehaviour
     {
         if (pathfinder == null)
         {
-            Debug.LogError("Pathfinder 컴포넌트가 할당되지 않았습니다."); // 없으면 곴란함!!!
+            Debug.LogError("Pathfinder 컴포넌트가 할당되지 않았습니다."); // 없으면 곤란함!!!
             return;
         }
 
@@ -73,7 +73,6 @@ public class GuestController : MonoBehaviour
         // 이동 중 X(멈춰있거나 도착한 경우) => 경로 계산 시작
         if (!isMoving)
         {
-
             Vector3 targetPos = new Vector3(Target.position.x, Target.position.y, 0);
             Vector3 startPos = new Vector3(this.transform.position.x, this.transform.position.y, 0);
             Vector3Int targetCell = pathfinder.WorldToCell(targetPos);
@@ -500,10 +499,17 @@ public class GuestController : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        // 손님이 착석한 상태라면 Task UI 생성
+        // 손님이 착석한 상태라면 업무 생성
         if (assignedTable != null && isSeated && OrderingManager.Instance != null)
         {
-            OrderingManager.Instance.TaskUIInstantiate(this.gameObject);
+            // 랜덤 칵테일 주문 업무 생성
+            TaskInfo newTask = OrderingManager.Instance.CreateTask(this.gameObject, TaskType.TakeOrder);
+            
+            if (newTask != null)
+            {
+                // 업무 UI는 OrdeeringManager에서 생성함
+                Debug.Log($"손님이 {newTask.orderedCocktail?.CocktailName} 주문 대기 중");
+            }
         }
     }
     #endregion

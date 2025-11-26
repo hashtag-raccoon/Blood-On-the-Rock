@@ -9,13 +9,20 @@ public class ArbeitController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     [Header("데이터 확인용")]
-    [SerializeField] private npc myNpcData;
+    public npc myNpcData;
     private Transform currentTarget;
     private List<Vector3Int> currentPath;
     private int currentPathIndex;
     private bool isMoving = false;
     [HideInInspector]
     public bool isSelected = false;
+
+    [Header("업무 관리")]
+    private const int MAX_TASKS = 3; // 최대 업무 개수
+    private List<TaskInfo> taskQueue = new List<TaskInfo>(); // 업무 큐
+    private TaskInfo currentTask = null; // 현재 수행 중인 업무
+    [SerializeField] private float taskUI_Y_Offset = 1.5f; // 업무 UI Y축 오프셋
+    private List<GameObject> taskUIObjects = new List<GameObject>(); // 업무 UI 오브젝트 리스트
 
     private Camera mainCamera;
 
@@ -151,6 +158,216 @@ public class ArbeitController : MonoBehaviour
         // 목적지 도착 시 로직
         // 목적지 도착 시 처리할 추가 로직이 있으면 여기에 작성할 것
         Debug.Log($"Arbeit {myNpcData?.part_timer_name} reached destination.");
+    }
+    #endregion
+
+    #region 업무 관리
+    /// <summary>
+    /// 업무 추가
+    /// </summary>
+    public bool AddTask(TaskInfo task)
+    {
+        if (task == null || taskQueue.Count >= MAX_TASKS)
+        {
+            return false;
+        }
+
+        taskQueue.Add(task);
+        UpdateTaskUI();
+
+        // 현재 업무가 없으면 바로 시작
+        if (currentTask == null)
+        {
+            StartNextTask();
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 다음 업무 시작
+    /// </summary>
+    private void StartNextTask()
+    {
+        if (taskQueue.Count > 0)
+        {
+            currentTask = taskQueue[0];
+            taskQueue.RemoveAt(0);
+            UpdateTaskUI();
+            ProcessTask(currentTask);
+        }
+        else
+        {
+            currentTask = null;
+        }
+    }
+
+    /// <summary>
+    /// 업무 처리
+    /// </summary>
+    private void ProcessTask(TaskInfo task)
+    {
+        if (task == null) return;
+
+        switch (task.taskType)
+        {
+            case TaskType.TakeOrder:
+                ProcessTakeOrder(task);
+                break;
+            case TaskType.ServeOrder:
+                ProcessServeOrder(task);
+                break;
+            case TaskType.CleanTable:
+                ProcessCleanTable(task);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 주문 받기 업무 처리
+    /// </summary>
+    private void ProcessTakeOrder(TaskInfo task)
+    {
+        Debug.Log($"{myNpcData?.part_timer_name}이(가) 주문을 받으러 갑니다.");
+        // 추후 추가할 일: 손님에게 이동 후 대화창 열기
+        SetTarget(task.targetObject.transform);
+    }
+
+    /// <summary>
+    /// 서빙 업무 처리
+    /// </summary>
+    private void ProcessServeOrder(TaskInfo task)
+    {
+        Debug.Log($"{myNpcData?.part_timer_name}이(가) 서빙을 시작합니다.");
+        // 추후 추가할 일: 칵테일 제조 후 테이블로 이동
+        CompleteCurrentTask();
+    }
+
+    /// <summary>
+    /// 청소 업무 처리
+    /// </summary>
+    private void ProcessCleanTable(TaskInfo task)
+    {
+        Debug.Log($"{myNpcData?.part_timer_name}이(가) 테이블을 청소합니다.");
+        // 추후 추가할 일: 테이블로 이동 후 청소
+        CompleteCurrentTask();
+    }
+
+    /// <summary>
+    /// 현재 업무 완료
+    /// </summary>
+    public void CompleteCurrentTask()
+    {
+        if (currentTask != null)
+        {
+            OrderingManager.Instance.RemoveTask(currentTask);
+            currentTask = null;
+            StartNextTask();
+        }
+    }
+
+    /// <summary>
+    /// 현재 업무 취소
+    /// </summary>
+    public void CancelCurrentTask()
+    {
+        if (currentTask != null)
+        {
+            OrderingManager.Instance.RemoveTask(currentTask);
+            currentTask = null;
+            StartNextTask();
+        }
+    }
+
+    /// <summary>
+    /// 큐에서 특정 업무 제거
+    /// </summary>
+    public void RemoveTaskFromQueue(TaskInfo task)
+    {
+        if (taskQueue.Contains(task))
+        {
+            taskQueue.Remove(task);
+            UpdateTaskUI();
+        }
+    }
+
+    /// <summary>
+    /// 다른 알바생이 완료한 업무와 동일한 업무 제거
+    /// </summary>
+    public void RemoveTaskIfMatch(TaskInfo completedTask)
+    {
+        // 현재 수행 중인 업무가 동일한 타겟인지 확인
+        if (currentTask != null && currentTask.targetObject == completedTask.targetObject)
+        {
+            CancelCurrentTask();
+            return;
+        }
+
+        // 큐에 있는 업무 중 동일한 타겟 제거
+        TaskInfo matchingTask = taskQueue.Find(t => t.targetObject == completedTask.targetObject);
+        if (matchingTask != null)
+        {
+            RemoveTaskFromQueue(matchingTask);
+        }
+    }
+
+    /// <summary>
+    /// 업무 UI 업데이트
+    /// </summary>
+    private void UpdateTaskUI()
+    {
+        // 기존 UI 제거
+        foreach (var uiObj in taskUIObjects)
+        {
+            if (uiObj != null)
+            {
+                Destroy(uiObj);
+            }
+        }
+        taskUIObjects.Clear();
+
+        // 현재 업무 UI 생성
+        if (currentTask != null)
+        {
+            GameObject uiObj = OrderingManager.Instance.TaskUIInstantiate(this.gameObject, currentTask, taskUI_Y_Offset, 0);
+            taskUIObjects.Add(uiObj);
+        }
+
+        // 큐의 업무들 UI 생성
+        for (int i = 0; i < taskQueue.Count; i++)
+        {
+            GameObject uiObj = OrderingManager.Instance.TaskUIInstantiate(this.gameObject, taskQueue[i], taskUI_Y_Offset, i + 1);
+            taskUIObjects.Add(uiObj);
+        }
+    }
+
+    /// <summary>
+    /// 현재 업무 가져오기
+    /// </summary>
+    public TaskInfo GetCurrentTask()
+    {
+        return currentTask;
+    }
+
+    /// <summary>
+    /// 업무 개수 가져오기
+    /// </summary>
+    public int GetTaskCount()
+    {
+        int count = taskQueue.Count;
+        if (currentTask != null)
+        {
+            count++;
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// 업무 추가 가능 여부 확인
+    /// </summary>
+    public bool CanAddTask()
+    {
+        return GetTaskCount() < MAX_TASKS;
     }
     #endregion
 }

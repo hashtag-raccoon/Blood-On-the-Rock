@@ -1,16 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-
-public enum TaskType
-{
-    None,
-    TakeOrder,
-    ServeOrder,
-    CleanTable
-}
 
 public class OrderingManager : MonoBehaviour
 {
@@ -18,8 +11,18 @@ public class OrderingManager : MonoBehaviour
     [Header("선택 시 외곽선/기본 마테리얼 할당")]
     [SerializeField] private Material selectedOutlineMaterial;
     [SerializeField] private Material DefaultMaterial;
-    [Header("업무 UI 프리팹")]
+    [Header("업무 UI 프리펜")]
     [SerializeField] private GameObject TaskUIPrefab;
+
+    [Header("업무 타입별 아이콘")]
+    [SerializeField] private Sprite takeOrderIcon; // 주문 받기 아이콘
+    [SerializeField] private Sprite serveOrderIcon; // 서빙 아이콘
+    [SerializeField] private Sprite cleanTableIcon; // 청소 아이콘
+    [Header("업무 UI 패널 크기")]
+    [SerializeField] private Vector2 taskPanelSize; // 업무 UI 패널 크기
+
+    public ArbeitController[] Arbiets;
+    
 
     public static OrderingManager Instance
     {
@@ -34,12 +37,20 @@ public class OrderingManager : MonoBehaviour
     }
 
     [HideInInspector]
-    public GameObject CurrentSelected = null;
+    public GameObject CurrentSelected = null; // 현재 선택한 알바생, 우클릭 시 null 됨
+
+    [Header("업무 관리")]
+    [SerializeField] private List<TaskInfo> allTasks = new List<TaskInfo>(); // 모든 업무 리스트
     
-    public class TaskInfo
-    {
-        public TaskType taskType;
-    }
+
+    /// <summary>
+    /// 추후 구현할 대화창 전용
+    /// </summary>
+    [Header("대화창 상태")]
+    [HideInInspector]
+    public bool isDialogOpen = false; // 대화창이 열려있는지 여부
+    [HideInInspector]
+    public GameObject dialogOwner = null; // 대화창을 연 알바생
 
     private void Awake()
     {
@@ -53,6 +64,12 @@ public class OrderingManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        for(int i = 0 ; i < Arbiets.Length; i++)
+        {
+            Arbiets[i].myNpcData = DataManager.Instance.npcs[i];
+        }
+        
     }
 
     public void Update()
@@ -64,6 +81,7 @@ public class OrderingManager : MonoBehaviour
         }
     }
 
+    #region 알바생 선택 관리
     /// <summary>
     /// 알바 선택 토글
     /// </summary>
@@ -72,6 +90,13 @@ public class OrderingManager : MonoBehaviour
         if (SelectedArbeit == null)
         {
             Debug.Log("선택된 알바가 없습니다. || 매개변수를 제대로 넣지않음");
+            return;
+        }
+
+        // 대화창이 열려있는 동안에는 다른 알바생 선택 불가
+        if (isDialogOpen && dialogOwner != SelectedArbeit)
+        {
+            Debug.LogWarning("대화창 열린 중에는 알바생 선택 불가, ESC - 대화창 종료 or 주문 완료할 것");
             return;
         }
 
@@ -102,91 +127,280 @@ public class OrderingManager : MonoBehaviour
             CurrentSelected = null;
         }
     }
+    #endregion
 
+    #region 업무 아이콘 관리
     /// <summary>
-    /// 업무 UI 생성
+    /// TaskType에 따라 아이콘 스프라이트 반환
     /// </summary>
-    public void TaskUIInstantiate(GameObject GuestObj)
+    public Sprite GetTaskIconSprite(TaskType taskType)
     {
-        if (TaskUIPrefab == null)
+        switch (taskType)
         {
-            Debug.LogError("OrderingManager: TaskUIPrefab가 할당되지 않았습니다.");
-            return;
-        }
-
-        GameObject TaskUIObj = Instantiate(TaskUIPrefab);
-
-        Canvas canvas = TaskUIObj.GetComponent<Canvas>();
-        if (canvas != null)
-        {
-            canvas.renderMode = RenderMode.WorldSpace;
-
-            // 테이블 위치 기준으로 UI 위치 설정
-            Vector3 guestPos = GuestObj.transform.position;
-            TaskUIObj.transform.position = guestPos + new Vector3(0, 1.0f, 0); // 테이블 위 1유닛
-            TaskUIObj.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f); // UI 크기 조정
-            RectTransform canvasRect = TaskUIObj.GetComponent<RectTransform>();
-            if (canvasRect != null)
-            {
-                canvasRect.sizeDelta = new Vector2(50, 50); // UI 크기 설정
-            }
-        }
-
-        // TaskUIController가 있다면 타겟 설정 (있을 경우에만)
-        var uiController = TaskUIObj.GetComponent(typeof(MonoBehaviour));
-        if (uiController != null)
-        {
-            var setMethod = uiController.GetType().GetMethod("SetTargetGuest");
-            if (setMethod != null)
-            {
-                setMethod.Invoke(uiController, new object[] { GuestObj });
-            }
-        }
-
-        // 클릭 감지
-        UnityEngine.EventSystems.EventTrigger eventTrigger = TaskUIObj.GetComponent<UnityEngine.EventSystems.EventTrigger>();
-        if (eventTrigger == null)
-        {
-            eventTrigger = TaskUIObj.AddComponent<UnityEngine.EventSystems.EventTrigger>();
-        }
-
-        UnityEngine.EventSystems.EventTrigger.Entry entry = new UnityEngine.EventSystems.EventTrigger.Entry();
-        entry.eventID = UnityEngine.EventSystems.EventTriggerType.PointerClick;
-        entry.callback.AddListener((data) => { OnTaskUIClicked(TaskUIObj, GuestObj); }); // TaskUI에 클릭 시 호출될 메서드 연결
-        eventTrigger.triggers.Add(entry); // 이벤트 트리거에 추가
-    }
-
-    /// <summary>
-    /// 업무 UI 클릭 시 처리
-    /// </summary>
-    private void OnTaskUIClicked(GameObject taskUI, GameObject GuestObj)
-    {
-        // 여기에 클릭 시 처리할 로직 추가
-        // 예: 알바를 테이블로 이동시키기, 주문 UI 표시 등
-        var selectedArbeit = CurrentSelected.GetComponent<ArbeitController>();
-        if (selectedArbeit != null)
-        {
-            selectedArbeit.SetTarget(GuestObj.transform);
+            case TaskType.TakeOrder:
+                return takeOrderIcon;
+            case TaskType.ServeOrder:
+                return serveOrderIcon;
+            case TaskType.CleanTable:
+                return cleanTableIcon;
+            default:
+                return null;
         }
     }
+    #endregion
 
-    public void CreateTask(GameObject TargetObj, TaskType taskType)
+    #region 업무 생성
+    /// <summary>
+    /// 업무 생성 메소드
+    /// </summary>
+    public TaskInfo CreateTask(GameObject TargetObj, TaskType taskType)
     {
+        TaskInfo newTask = null;
+
         switch(taskType)
         {
             case TaskType.TakeOrder:
-                // 칵테일 주문 받기 업무 생성 로직
-                Random.Range(1, CocktailRepository.Instance.GetTotalCocktailCount());
+                // 칵테일 업무 생성 로직
+                // DataManager의 칵테일 리스트에서 랜덤하게 선택
+                if (DataManager.Instance.cocktailRecipes.Count > 0)
+                {
+                    //int randomIndex = UnityEngine.Random.Range(0, DataManager.Instance.cocktails.Count);
+                    //CocktailData randomCocktail = DataManager.Instance.cocktails[randomIndex];
+                    
+                    int randomIndex = UnityEngine.Random.Range(0, DataManager.Instance.cocktailRecipes.Count);
+                    CocktailRecipeScript randomCocktail = DataManager.Instance.cocktailRecipes[randomIndex];
+
+                    newTask = new TaskInfo(TaskType.TakeOrder, TargetObj, randomCocktail);
+                    allTasks.Add(newTask);
+                    
+                    // 업무 UI 생성
+                    TaskUIInstantiate(TargetObj);
+                }
+                else
+                {
+                    Debug.LogError("칵테일 데이터가 없습니다!");
+                }
                 break;
+                
             case TaskType.ServeOrder:
                 // 서빙 업무 생성 로직
+                newTask = new TaskInfo(TaskType.ServeOrder, TargetObj);
+                allTasks.Add(newTask);
                 break;
+                
             case TaskType.CleanTable:
                 // 테이블 청소 업무 생성 로직
+                newTask = new TaskInfo(TaskType.CleanTable, TargetObj);
+                allTasks.Add(newTask);
                 break;
+                
             default:
                 Debug.LogWarning("알 수 없는 업무 유형입니다.");
                 break;
         }
+
+        return newTask;
     }
+    #endregion
+
+    #region 업무 UI 관리
+    /// <summary>
+    /// 업무 UI 생성 (손님/테이블 등 타겟 오브젝트용)
+    /// ex) 손님 위에 주문 UI 띄우기
+    /// ex) 테이블 위에 청소 UI 띄우기
+    /// </summary>
+    public void TaskUIInstantiate(GameObject TargetObj)
+    {
+        GameObject TaskUIObj = Instantiate(TaskUIPrefab);
+
+        // TaskUIController로 UI 초기화 위임
+        TaskUIController uiController = TaskUIObj.GetComponent<TaskUIController>();
+        if (uiController == null)
+        {
+            uiController = TaskUIObj.AddComponent<TaskUIController>();
+        }
+
+        Vector3 offset = new Vector3(0, 1.0f, 0);
+        Vector2 uiSize = taskPanelSize;
+        Vector3 scale = new Vector3(0.01f, 0.01f, 0.01f);
+
+        uiController.InitializeTargetUI(TargetObj, offset, uiSize, scale);
+    }
+
+    /// <summary>
+    /// 업무 UI 생성 (알바생용)
+    /// </summary>
+    /// <param name="arbeitObj">알바생 게임오브젝트</param>
+    /// <param name="task">할당된 업무</param>
+    /// <param name="yOffset">Y축 오프셋</param>
+    /// <param name="index">업무 인덱스</param>
+    /// <returns>생성된 UI 오브젝트</returns>
+    public GameObject TaskUIInstantiate(GameObject arbeitObj, TaskInfo task, float yOffset, int index)
+    {
+        GameObject TaskUIObj = Instantiate(TaskUIPrefab);
+
+        // TaskUIController로 UI 초기화 위임
+        TaskUIController uiController = TaskUIObj.GetComponent<TaskUIController>();
+        if (uiController == null)
+        {
+            uiController = TaskUIObj.AddComponent<TaskUIController>();
+        }
+
+        uiController.InitializeArbeitUI(arbeitObj, task, yOffset, index);
+
+        return TaskUIObj;
+    }
+
+    /// <summary>
+    /// 알바생 업무 UI 클릭 시 처리 (업무 취소)
+    /// </summary>
+    public void OnArbeitTaskUIClicked(GameObject arbeitObj, TaskInfo task)
+    {
+        var arbeitController = arbeitObj.GetComponent<ArbeitController>();
+
+        // 현재 수행 중인 업무인 경우
+        if (arbeitController.GetCurrentTask() == task)
+        {
+            arbeitController.CancelCurrentTask();
+        }
+        // 큐에 있는 업무인 경우
+        else
+        {
+            arbeitController.RemoveTaskFromQueue(task);
+            RemoveTask(task);
+        }
+    }
+
+    /// <summary>
+    /// 업무 UI 클릭 시 호출되는 메서드
+    /// </summary>
+    public void OnTargetTaskUIClicked(GameObject taskUI, GameObject TargetObj)
+    {
+        var selectedArbeit = CurrentSelected.GetComponent<ArbeitController>();
+
+        // 알바생이 업무를 추가할 수 있는지 확인
+        if (!selectedArbeit.CanAddTask())
+        {
+            return;
+        }
+
+        // 해당 타겟에 대한 업무 찾기
+        TaskInfo task = GetTaskByTarget(TargetObj);
+        
+        if (task != null)
+        {
+            // 알바생에게 업무 할당
+            selectedArbeit.AddTask(task);
+        }
+        else
+        {
+            Debug.LogWarning("해당 타겟에 대한 업무를 찾을 수 없습니다."); // 없으면 곤란함
+        }
+    }
+    #endregion
+
+    #region 업무 제거 메소드
+    /// <summary>
+    /// 업무 제거 메소드
+    /// </summary>
+    public void RemoveTask(TaskInfo task)
+    {
+        if (task != null && allTasks.Contains(task))
+        {
+            task.CompleteTask();
+            allTasks.Remove(task);
+            
+            // 동일한 타겟에 할당된 다른 알바생의 업무도 제거
+            NotifyTaskCompleted(task);
+        }
+    }
+    #endregion
+
+    #region 업무 완료 시
+    /// <summary>
+    /// 업무 완료 시 => 동일한 업무를 가진 다른 알바생에게 전파
+    /// </summary>
+    private void NotifyTaskCompleted(TaskInfo completedTask)
+    {
+        // 모든 알바생 찾기
+        ArbeitController[] allArbeits = FindObjectsOfType<ArbeitController>();
+        
+        foreach (var arbeit in allArbeits)
+        {
+            arbeit.RemoveTaskIfMatch(completedTask);
+        }
+    }
+    #endregion
+
+    #region 조회용 메소드
+    /// <summary>
+    /// 특정 타겟 오브젝트에 대한 업무 가져오기
+    /// </summary>
+    public TaskInfo GetTaskByTarget(GameObject target)
+    {
+        return allTasks.Find(task => task.targetObject == target && !task.isCompleted);
+    }
+
+    /// <summary>
+    /// 모든 업무 리스트 가져오기
+    /// </summary>
+    public List<TaskInfo> GetAllTasks()
+    {
+        return allTasks;
+    }
+    #endregion
+
+    #region 칵테일 주문 처리
+    /// <summary>
+    /// 주문 완료 처리 (대화창에서 주문 수락 시 호출)
+    /// 추후 구현 예정
+    /// </summary>
+    public void AcceptOrder(GameObject arbeit, TaskInfo task)
+    {
+        if (task == null || task.orderedCocktail == null)
+        {
+            Debug.LogError("유효하지 않은 주문입니다.");
+            return;
+        }
+
+        Debug.Log($"주문 수락: {task.orderedCocktail.CocktailName}");
+        
+        // 후에 해야할 일 : 주문 데이터를 저장하는 로직 추가
+        // 예: 주문 테이블, 칵테일 정보, 개수 등을 별도 리스트나 딕셔너리에 저장
+        
+        // 대화창 닫기
+        CloseDialog();
+        
+        // 알바생의 현재 업무 완료 처리
+        var arbeitController = arbeit.GetComponent<ArbeitController>();
+        if (arbeitController != null)
+        {
+            arbeitController.CompleteCurrentTask();
+        }
+    }
+
+    /// <summary>
+    /// 대화창 열기 (대화창 구현 시 호출)
+    /// 추후 구현 예정
+    /// </summary>
+    public void OpenDialog(GameObject TargetObj)
+    {
+        isDialogOpen = true;
+        //dialogOwner = ???;
+    }
+
+    /// <summary>
+    /// 대화창 닫기 (ESC 또는 주문 완료 시 호출)
+    /// 추후 구현 예정
+    /// </summary>
+    public void CloseDialog()
+    {
+        if (isDialogOpen)
+        {
+            Debug.Log($"{dialogOwner?.name}의 대화창이 닫혔습니다.");
+            isDialogOpen = false;
+            dialogOwner = null;
+        }
+    }
+    #endregion
 }

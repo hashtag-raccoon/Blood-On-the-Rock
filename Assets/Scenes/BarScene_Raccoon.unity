@@ -7984,8 +7984,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cb9a5d49ef8a83428165abfcda268db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cocktailDataSO: {fileID: 0}
-  cocktailRecipeSO: {fileID: 0}
+  cocktailDataSO: {fileID: 11400000, guid: 302d487748edd694bbb0126e3ca82104, type: 2}
+  cocktailRecipeSO: {fileID: 11400000, guid: 4688422486f60d04497c5bc53f682888, type: 2}
 --- !u!1 &131115462
 GameObject:
   m_ObjectHideFlags: 0
@@ -8404,6 +8404,7 @@ MonoBehaviour:
   ConstructedBuildings: []
   cocktails: []
   EditMode_InventoryBuildings: []
+  cocktailRecipes: []
   wood: 0
   money: 0
   storeFavor: 100
@@ -8455,7 +8456,15 @@ MonoBehaviour:
   selectedOutlineMaterial: {fileID: 2100000, guid: 32d3c48df288d524e9dbc000debd3791, type: 2}
   DefaultMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   TaskUIPrefab: {fileID: 3600446117159282481, guid: 3cab5c78ec58ad94dbce3feb0b6aacd0, type: 3}
+  takeOrderIcon: {fileID: 21300000, guid: da7129ed6a246f048a49d8d97de2d2d4, type: 3}
+  serveOrderIcon: {fileID: 21300000, guid: 59c8cd2a91ad7f846b9efd79b945c356, type: 3}
+  cleanTableIcon: {fileID: 21300000, guid: 6a08ec4b334ea1c46b8171679417a74f, type: 3}
+  taskPanelSize: {x: 0, y: 0}
+  Arbiets: []
   CurrentSelected: {fileID: 0}
+  allTasks: []
+  isDialogOpen: 0
+  dialogOwner: {fileID: 0}
 --- !u!1 &569516353
 GameObject:
   m_ObjectHideFlags: 0
@@ -10253,6 +10262,7 @@ MonoBehaviour:
   pathfinder: {fileID: 1475903529}
   moveSpeed: 5
   isSelected: 0
+  taskUI_Y_Offset: 1.5
 --- !u!70 &713398804
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -16629,7 +16639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5af5d3bcbe4bf2418db0b67813ad61a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  glassSO: {fileID: 0}
+  glassSO: {fileID: 11400000, guid: b3493830dd3586d4dbe0150382815e23, type: 2}
 --- !u!1 &2092207950
 GameObject:
   m_ObjectHideFlags: 0
@@ -16766,6 +16776,7 @@ MonoBehaviour:
   pathfinder: {fileID: 1475903529}
   moveSpeed: 5
   isSelected: 0
+  taskUI_Y_Offset: 1.5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

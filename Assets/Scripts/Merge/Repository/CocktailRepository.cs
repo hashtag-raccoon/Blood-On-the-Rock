@@ -98,4 +98,10 @@ public class CocktailRepository : MonoBehaviour, IRepository
         _cocktailRecipeDict.TryGetValue(cocktailId, out var recipe);
         return recipe;
     }
+
+    // 당분간 임시로 쓸 메소드, 전체 레시피를 리스트로 반환
+    public List<CocktailRecipeScript> GetAllCocktailRecipe()
+    {
+        return cocktailRecipeSO.recipes.ToList();
+    }
 }
