@@ -1,35 +1,12 @@
 name: Gemini Code Review
 on: [pull_request, issues]
-
 jobs:
-  gemini-review:
+  run-gemini-cli:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write # PR에 코멘트를 남기려면 권한 필요
-      
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # 1. 실행 환경 설정 (예: Python)
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Run Gemini CLI
+        uses: google-github-actions/run-gemini-cli@v1
         with:
-          python-version: '3.10'
-
-      # 2. CLI 도구 설치 (pip 등을 이용)
-      # *주의: 사용하시려는 실제 패키지 이름을 정확히 입력해야 합니다.
-      # 예시로 'some-gemini-cli-tool'이라고 적었습니다.
-      - name: Install Gemini CLI tool
-        run: pip install some-gemini-cli-tool 
-
-      # 3. CLI 실행
-      - name: Run Gemini Code Review
-        env:
-          # GitHub Secrets에 GEMINI_API_KEY를 등록해야 합니다.
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # 설치한 툴의 사용법에 맞게 명령어 실행
-          gemini-cli review pr
+          args: "review pr"

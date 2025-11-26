@@ -9,31 +9,11 @@ public class ArbeitController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     [Header("데이터 확인용")]
-    public npc myNpcData;
+    [SerializeField] private npc myNpcData;
     private Transform currentTarget;
     private List<Vector3Int> currentPath;
     private int currentPathIndex;
     private bool isMoving = false;
-    [HideInInspector]
-    public bool isSelected = false;
-
-    [Header("업무 관리")]
-    private const int MAX_TASKS = 3; // 최대 업무 개수
-    private List<TaskInfo> taskQueue = new List<TaskInfo>(); // 업무 큐
-    private TaskInfo currentTask = null; // 현재 수행 중인 업무
-    [SerializeField] private float taskUI_Y_Offset = 1.5f; // 업무 UI Y축 오프셋
-    private List<GameObject> taskUIObjects = new List<GameObject>(); // 업무 UI 오브젝트 리스트
-
-    private Camera mainCamera;
-
-    private void Awake()
-    {
-        mainCamera = Camera.main;
-        if (mainCamera == null)
-        {
-            Debug.LogError("Main Camera를 찾을 수 없습니다. 카메라에 'MainCamera' 태그가 있는지 확인해주세요.");
-        }
-    }
 
     #region Initialization
     /// <summary>
@@ -48,18 +28,13 @@ public class ArbeitController : MonoBehaviour
     }
     #endregion
 
-    #region 이동 및 길찾기
+    #region Pathfinding and Movement
     /// <summary>
     /// Target 설정, IsometricPathfinder를 통해 경로 계산 시작
     /// 만약 IsometricPathfinder가 null이면 작동을 하지않으니 참고바람
     /// </summary>
     public void SetTarget(Transform newTarget)
     {
-        if (pathfinder == null)
-        {
-            Debug.LogError("IsometricPathfinder가 할당되지 않았습니다.");
-            return;
-        }
         currentTarget = newTarget;
         CalculatePath();
     }
@@ -73,12 +48,12 @@ public class ArbeitController : MonoBehaviour
 
         Vector3 targetPos = new Vector3(currentTarget.position.x, currentTarget.position.y, 0);
         Vector3 startPos = new Vector3(this.transform.position.x, this.transform.position.y, 0);
-
+        
         Vector3Int targetCell = pathfinder.WorldToCell(targetPos);
         Vector3Int startCell = pathfinder.WorldToCell(startPos);
 
         // 시작점에서 목표점까지의 경로 계산
-        currentPath = pathfinder.FindPath(startCell, targetCell, 1, 1);
+        currentPath = pathfinder.FindPath(startCell, targetCell); 
 
         // 경로가 유효한지 확인 후 이동 시작
         // A* 알고리즘을 통해 경로를 반환하고, 최소 이동 가능한 노드값이 0 이상이면 이동시작
@@ -91,32 +66,12 @@ public class ArbeitController : MonoBehaviour
         else
         {
             isMoving = false;
-            Debug.Log("경로를 찾을 수 없습니다.");
+            Debug.Log("ArbeitController: Path not found or already at destination.");
         }
     }
 
     void Update()
     {
-        /// <summary>
-        /// 마우스 클릭 감지 및 알바 선택 처리
-        /// </summary>
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector2 pos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-
-            // ignoreLayerMask를 반전시켜서 해당 레이어를 제외하고 Raycast
-            int layerMask = ~CameraManager.instance.ignoreLayerMask.value;
-            RaycastHit2D hitCollider = Physics2D.Raycast(pos, Vector2.zero, 0, layerMask);
-
-            if (hitCollider.collider != null)
-            {
-                if (hitCollider.transform == this.transform)
-                {
-                    OrderingManager.Instance.ToggleSelected(this.gameObject);
-                }
-            }
-        }
-
         // 매 프레임마다 이동 가능한 노드값이 Null 이 아니고, 이동 중이면 이동 처리
         if (isMoving && currentPath != null)
         {
@@ -131,7 +86,7 @@ public class ArbeitController : MonoBehaviour
     {
         // 경로의 끝에 도달했는지 확인
         if (currentPathIndex >= currentPath.Count)
-        {
+        {   
             // 경로 끝에 도달
             isMoving = false;
             OnReachedDestination(); // 목적지 도착 시 호출
@@ -141,7 +96,7 @@ public class ArbeitController : MonoBehaviour
         Vector3 targetPos = pathfinder.CellToWorld(currentPath[currentPathIndex]);
         // IsometricPathfinder의 CellToWorld가 타일 중심을 반환한다면 정상 작동하는 코드
         // 만약 아니라면 오프셋 조정이 필요하거나 다른 방식으로 목표 위치를 계산해야 할 수 있음
-
+        
         // 현재 위치에서 목표 위치로 이동
         this.transform.position = Vector3.MoveTowards(this.transform.position, targetPos, moveSpeed * Time.deltaTime);
 
@@ -154,7 +109,7 @@ public class ArbeitController : MonoBehaviour
     }
     #endregion
 
-    #region 목적지 도착
+    #region Destination Reached
     /// <summary>
     /// 목적지에 도착했을 때 호출되는 메소드
     /// </summary>
@@ -163,239 +118,6 @@ public class ArbeitController : MonoBehaviour
         // 목적지 도착 시 로직
         // 목적지 도착 시 처리할 추가 로직이 있으면 여기에 작성할 것
         Debug.Log($"Arbeit {myNpcData?.part_timer_name} reached destination.");
-    }
-    #endregion
-
-    #region 업무 관리
-    /// <summary>
-    /// 업무 추가
-    /// </summary>
-    public bool AddTask(TaskInfo task)
-    {
-        if (task == null || taskQueue.Count >= MAX_TASKS)
-        {
-            return false;
-        }
-
-        taskQueue.Add(task);
-        UpdateTaskUI();
-
-        // 현재 업무가 없으면 바로 시작
-        if (currentTask == null)
-        {
-            StartNextTask();
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// 다음 업무 시작
-    /// </summary>
-    private void StartNextTask()
-    {
-        if (taskQueue.Count > 0)
-        {
-            currentTask = taskQueue[0];
-            taskQueue.RemoveAt(0);
-            UpdateTaskUI();
-            ProcessTask(currentTask);
-        }
-        else
-        {
-            currentTask = null;
-            UpdateTaskUI();
-        }
-    }
-
-    /// <summary>
-    /// 업무 처리
-    /// </summary>
-    private void ProcessTask(TaskInfo task)
-    {
-        if (task == null) return;
-
-        switch (task.taskType)
-        {
-            case TaskType.TakeOrder:
-                ProcessTakeOrder(task);
-                break;
-            case TaskType.ServeOrder:
-                ProcessServeOrder(task);
-                break;
-            case TaskType.CleanTable:
-                ProcessCleanTable(task);
-                break;
-        }
-    }
-
-    /// <summary>
-    /// 주문 받기 업무 처리
-    /// </summary>
-    private void ProcessTakeOrder(TaskInfo task)
-    {
-        Debug.Log($"{myNpcData?.part_timer_name}이(가) 주문을 받으러 갑니다.");
-        // 추후 추가할 일: 손님에게 이동 후 대화창 열기
-        SetTarget(task.targetObject.transform);
-    }
-
-    /// <summary>
-    /// 서빙 업무 처리
-    /// </summary>
-    private void ProcessServeOrder(TaskInfo task)
-    {
-        Debug.Log($"{myNpcData?.part_timer_name}이(가) 서빙을 시작합니다.");
-        // 추후 추가할 일: 칵테일 제조 후 테이블로 이동
-        CompleteCurrentTask();
-    }
-
-    /// <summary>
-    /// 청소 업무 처리
-    /// </summary>
-    private void ProcessCleanTable(TaskInfo task)
-    {
-        Debug.Log($"{myNpcData?.part_timer_name}이(가) 테이블을 청소합니다.");
-        // 추후 추가할 일: 테이블로 이동 후 청소
-        CompleteCurrentTask();
-    }
-
-    /// <summary>
-    /// 현재 업무 완료
-    /// </summary>
-    public void CompleteCurrentTask()
-    {
-        if (currentTask != null)
-        {
-            OrderingManager.Instance.RemoveTask(currentTask);
-            currentTask = null;
-            StartNextTask();
-        }
-    }
-
-    /// <summary>
-    /// 현재 업무 취소
-    /// </summary>
-    public void CancelCurrentTask()
-    {
-        if (currentTask != null)
-        {
-            OrderingManager.Instance.RemoveTask(currentTask);
-            currentTask = null;
-            StartNextTask();
-        }
-    }
-
-    /// <summary>
-    /// 큐에서 특정 업무 제거
-    /// </summary>
-    public void RemoveTaskFromQueue(TaskInfo task)
-    {
-        // 현재 실행 중인 업무인지 확인
-        if (currentTask != null && currentTask == task)
-        {
-            Debug.Log("Cancelling current task: " + task.taskType); // 당분간 없으면 곤란
-            CancelCurrentTask();
-            return;
-        }
-
-        // 큐에 있는 업무인지 확인
-        if (taskQueue.Contains(task))
-        {
-            Debug.Log("Removing task from queue: " + task.taskType); // 당분간 없으면 곤란
-            taskQueue.Remove(task);
-            UpdateTaskUI();
-        }
-    }
-
-    /// <summary>
-    /// 다른 알바생이 완료한 업무와 동일한 업무 제거
-    /// </summary>
-    public void RemoveTaskIfMatch(TaskInfo completedTask)
-    {
-        // 현재 수행 중인 업무가 동일한 타겟인지 확인
-        if (currentTask != null && currentTask.targetObject == completedTask.targetObject)
-        {
-            CancelCurrentTask();
-            return;
-        }
-
-        // 큐에 있는 업무 중 동일한 타겟 제거
-        TaskInfo matchingTask = taskQueue.Find(t => t.targetObject == completedTask.targetObject);
-        if (matchingTask != null)
-        {
-            RemoveTaskFromQueue(matchingTask);
-        }
-    }
-
-    /// <summary>
-    /// 업무 UI 업데이트
-    /// </summary>
-    private void UpdateTaskUI()
-    {
-        // 업무 큐가 비어있으면 모든 UI 제거, 그 후 리턴
-        if (taskQueue == null)
-        {
-            if (taskUIObjects.Count > 0)
-            {
-                for (int i = 0; i < taskUIObjects.Count; i++)
-                {
-                    Destroy(taskUIObjects[i]);
-                }
-            }
-            return;
-        }
-        // 기존 UI 제거
-        foreach (var uiObj in taskUIObjects)
-        {
-            if (uiObj != null)
-            {
-                Destroy(uiObj);
-            }
-        }
-        taskUIObjects.Clear();
-
-        // 현재 업무 UI 생성
-        if (currentTask != null)
-        {
-            GameObject uiObj = OrderingManager.Instance.TaskUIInstantiate(this.gameObject, currentTask, taskUI_Y_Offset, 0);
-            taskUIObjects.Add(uiObj);
-        }
-
-        // 큐의 업무들 UI 생성
-        for (int i = 0; i < taskQueue.Count; i++)
-        {
-            GameObject uiObj = OrderingManager.Instance.TaskUIInstantiate(this.gameObject, taskQueue[i], taskUI_Y_Offset, i + 1);
-            taskUIObjects.Add(uiObj);
-        }
-    }
-
-    /// <summary>
-    /// 현재 업무 가져오기
-    /// </summary>
-    public TaskInfo GetCurrentTask()
-    {
-        return currentTask;
-    }
-
-    /// <summary>
-    /// 업무 개수 가져오기
-    /// </summary>
-    public int GetTaskCount()
-    {
-        int count = taskQueue.Count;
-        if (currentTask != null)
-        {
-            count++;
-        }
-        return count;
-    }
-
-    /// <summary>
-    /// 업무 추가 가능 여부 확인
-    /// </summary>
-    public bool CanAddTask()
-    {
-        return GetTaskCount() < MAX_TASKS;
     }
     #endregion
 }

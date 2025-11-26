@@ -14,15 +14,9 @@ public class CocktailSystem : MonoBehaviour
 
     private int selectedTechnique = -1; // -1 = 미선택
     private int selectedGlassId = -1;   // -1 = 미선택
-    private CocktailRecipeScript recipeData;
-    private Dictionary<int, Ingridiant> Ingridiants = new Dictionary<int, Ingridiant>(); // 제작 시 user가 선택한 재료
-
-    private int selectedTechnique = -1; // -1 = 미선택
-    private int selectedGlassId = -1;   // -1 = 미선택
 
     public void Awake()
     {
-
 
     }
 
@@ -32,43 +26,6 @@ public class CocktailSystem : MonoBehaviour
         // DataManager 인스턴스를 가져옵니다.
         _dataManager = DataManager.Instance;
     }
-
-    #region Public Methods
-    /// <summary>
-    /// UI에서 사용자가 선택한 기법을 설정합니다.
-    /// </summary>
-    public void SetSelectedTechnique(int techniqueId)
-    {
-        selectedTechnique = techniqueId;
-    }
-
-    /// <summary>
-    /// UI에서 사용자가 선택한 잔을 설정합니다.
-    /// </summary>
-    public void SetSelectedGlass(int glassId)
-    {
-        selectedGlassId = glassId;
-    }
-
-    /// <summary>
-    /// UI에서 사용자가 추가한 재료를 저장합니다.
-    /// </summary>
-    public void AddIngredient(int ingredientId, Ingridiant ingredient)
-    {
-        Ingridiants[ingredientId] = ingredient;
-    }
-
-    /// <summary>
-    /// 저장된 재료 목록을 초기화합니다.
-    /// </summary>
-    public void ClearIngredients()
-    {
-        Ingridiants.Clear();
-        selectedTechnique = -1;
-        selectedGlassId = -1;
-    }
-    #endregion
-
 
     #region Public Methods
     /// <summary>

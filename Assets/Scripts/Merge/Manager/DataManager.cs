@@ -6,25 +6,12 @@ using System.Linq;
 using Newtonsoft.Json;
 using System;
 using System.Data;
-using System.Data;
 
 
 public class DataManager : MonoBehaviour
 {
     #region Singleton
 
-    private static DataManager _instance;
-    public static DataManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<DataManager>();
-            }
-            return _instance;
-        }
-    }
     private static DataManager _instance;
     public static DataManager Instance
     {
@@ -54,12 +41,8 @@ public class DataManager : MonoBehaviour
     #region Raw Data Lists (원본 데이터 - 일부는 Repository로 이전)
     // --- 건물 관련 데이터 (저장/로드) ---
     [Header("저장/로드 데이터 (Player-specific)")]
-    #region Raw Data Lists (원본 데이터 - 일부는 Repository로 이전)
-    // --- 건물 관련 데이터 (저장/로드) ---
-    [Header("저장/로드 데이터 (Player-specific)")]
     // 현재 건설된 건물의 생산 상태 (플레이어 세이브 파일에서 로드)
     public List<ConstructedBuildingProduction> ConstructedBuildingProductions = new List<ConstructedBuildingProduction>();
-    public List<ConstructedBuildingPos> ConstructedBuildingPositions = new List<ConstructedBuildingPos>();
     public List<ConstructedBuildingPos> ConstructedBuildingPositions = new List<ConstructedBuildingPos>();
     #endregion
 
@@ -88,8 +71,6 @@ public class DataManager : MonoBehaviour
     #region JSON Handler
     private JsonDataHandler jsonDataHandler;
     #endregion
-
-    private readonly List<IRepository> _repositories = new List<IRepository>();
 
     private readonly List<IRepository> _repositories = new List<IRepository>();
 
@@ -139,11 +120,9 @@ public class DataManager : MonoBehaviour
         // 게임 종료 직전, 변경된 런타임 데이터의 '상태'를 원본 '상태' 데이터에 반영 후 저장합니다.
         UpdateConstructedBuildingProductionsFromConstructedBuildings();
         UpdateConstructedBuildingPositionsFromConstructedBuildings();
-        UpdateConstructedBuildingPositionsFromConstructedBuildings();
         UpdateAndSaveArbeitData();
         SaveCocktailProgress();
         SaveConstructedBuildingProductions();
-        SaveConstructedBuidlingPositions();
         SaveConstructedBuidlingPositions();
     }
 
@@ -157,27 +136,15 @@ public class DataManager : MonoBehaviour
     private void InitializeSingleton()
     {
         if (_instance == null)
-            if (_instance == null)
-            {
-                _instance = this;
-                transform.SetParent(null);
-                _instance = this;
-                transform.SetParent(null);
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-    }
-
-    /// <summary>
-    /// 각 Repository가 Awake 시점에 자신을 등록하기 위해 호출하는 메서드입니다.
-    /// </summary>
-    /// <param name="repository">등록할 Repository 인스턴스</param>
-    public void RegisterRepository(IRepository repository)
-    {
-        _repositories.Add(repository);
+        {
+            _instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     /// <summary>
@@ -202,21 +169,10 @@ public class DataManager : MonoBehaviour
 
         ConstructedBuildingPositions = jsonDataHandler.LoadBuildingPositions();
         Debug.Log($"ConstructedBuildingPositions {ConstructedBuildingPositions.Count}개를 JSON에서 로드했습니다.");
-
-        ConstructedBuildingPositions = jsonDataHandler.LoadBuildingPositions();
-        Debug.Log($"ConstructedBuildingPositions {ConstructedBuildingPositions.Count}개를 JSON에서 로드했습니다.");
     }
     #endregion
 
     #region Data Saving Methods
-    /// <summary>
-    /// 현재 건설된 건물 위치를 JSON 파일에 저장합니다.
-    /// </summary>
-    public void SaveConstructedBuidlingPositions()
-    {
-        jsonDataHandler.SaveBuildingPosition(ConstructedBuildingPositions);
-    }
-
     /// <summary>
     /// 현재 건설된 건물 위치를 JSON 파일에 저장합니다.
     /// </summary>
@@ -394,25 +350,21 @@ public class DataManager : MonoBehaviour
     private void UpdateAndSaveArbeitData()
     {
         if (npcs == null) return;
-        if (npcs == null) return;
 
-        var arbeitDict = jsonDataHandler.LoadArbeitData().ToDictionary(a => a.part_timer_id);
         var arbeitDict = jsonDataHandler.LoadArbeitData().ToDictionary(a => a.part_timer_id);
 
         foreach (var npc in this.npcs)
-            foreach (var npc in this.npcs)
+        {
+            if (arbeitDict.TryGetValue(npc.part_timer_id, out var arbeitData))
             {
-                if (arbeitDict.TryGetValue(npc.part_timer_id, out var arbeitData))
-                {
-                    // npc 객체의 변경 가능한 상태(레벨, 경험치 등)를 arbeitData에 덮어씁니다. 
-                    // npc 객체의 변경 가능한 상태(레벨, 경험치 등)를 arbeitData에 덮어씁니다. 
-                    arbeitData.level = npc.level;
-                    arbeitData.exp = npc.exp;
-                    arbeitData.employment_state = npc.employment_state;
-                    arbeitData.fatigue = npc.fatigue;
-                    arbeitData.need_rest = npc.need_rest;
-                }
+                // npc 객체의 변경 가능한 상태(레벨, 경험치 등)를 arbeitData에 덮어씁니다. 
+                arbeitData.level = npc.level;
+                arbeitData.exp = npc.exp;
+                arbeitData.employment_state = npc.employment_state;
+                arbeitData.fatigue = npc.fatigue;
+                arbeitData.need_rest = npc.need_rest;
             }
+        }
 
         // 최신 상태가 반영된 arbeitDatas 리스트를 파일에 저장합니다.
         jsonDataHandler.SaveArbeitData(arbeitDict.Values.ToList());
@@ -459,9 +411,7 @@ public class DataManager : MonoBehaviour
     #endregion
 
     #region Constructed Building_Inventory Methods
-    #region Constructed Building_Inventory Methods
 
-    public List<ConstructedBuilding> GetInventoryBuildings()
     public List<ConstructedBuilding> GetInventoryBuildings()
     {
         return ConstructedBuildings.FindAll(data => data.IsEditInventory);
@@ -472,8 +422,6 @@ public class DataManager : MonoBehaviour
     /// </summary>
     public void RefreshEditModeInventory()
     {
-        EditMode_InventoryBuildings = GetInventoryBuildings();
-        Debug.Log($"EditMode_InventoryBuildings 갱신: {EditMode_InventoryBuildings.Count}개의 건물");
         EditMode_InventoryBuildings = GetInventoryBuildings();
         Debug.Log($"EditMode_InventoryBuildings 갱신: {EditMode_InventoryBuildings.Count}개의 건물");
     }

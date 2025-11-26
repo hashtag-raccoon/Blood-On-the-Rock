@@ -34,15 +34,13 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private float DampingValue = 0.2f;
 
     [Header("섬 씬/최대 줌아웃 값")]
-    public float MaxZoomIn = 50;
+    [SerializeField] private float MaxZoomIn = 50;
 
     [Header("섬 씬/최소 줌인 값")]
-    public float MinZoomOut = 1;
+    [SerializeField] private float MinZoomOut = 1;
 
     [Header("섬 씬/줌 속도")]
     [SerializeField] private float ZoomSpeed = 2f;
-    [Header("오브젝트 클릭 시 무시할 레이어")]
-    public LayerMask ignoreLayerMask; // CameraBoundary 등
 
     private Vector3 _tmpClickPos;
     private Vector3 _tmpCameraPos;
@@ -76,37 +74,36 @@ public class CameraManager : MonoBehaviour
 
     void Update()
     {        
+
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = Mathf.Abs(Camera.main.transform.position.z); 
+
         if (!isIsland)
         {
-            Vector3 mouseScreenPos = Input.mousePosition;
-            
-            // 화면 범위 체크
-            if (mouseScreenPos.x >= 0 && mouseScreenPos.x <= Screen.width && 
-                mouseScreenPos.y >= 0 && mouseScreenPos.y <= Screen.height)
-            {
-                // 카메라부터 평면까지의 거리
-                mouseScreenPos.z = Camera.main.nearClipPlane + 1f;
-                
-                Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-                mouseWorldPos.z = 0;
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+            mouseWorldPos.z = 0; // 2D 환경일 경우 z값 고정
 
-                MouseFollowingObj.transform.position = Vector3.Lerp(
-                    MouseFollowingObj.transform.position, 
-                    mouseWorldPos, 
-                    DampingValue
-                );
+            // 댐핑
+            MouseFollowingObj.transform.position = Vector3.Lerp(MouseFollowingObj.transform.position, mouseWorldPos, DampingValue);
+
+            if ((Input.GetKeyDown(KeyCode.T) && isMaking == false)) // 바 시점 X 일때, T키로 시점 전환
+            {
+                switch (isMouse)
+                {
+                    case true:
+                        isMouse = false;
+                        break;
+                    case false:
+                        isMouse = true;
+                        break;
+                }
             }
 
-            if (Input.GetKeyDown(KeyCode.T) && isMaking == false)
-            {
-                isMouse = !isMouse; // 간소화
-            }
-
-            if (isMaking == true)
+            if (isMaking == true) // 바 시점 O 일때, 무조건 바 시점
             {
                 isMouse = false;
-                confiner.m_BoundingShape2D = null;
-                virtualCamera.Follow = WorkspaceObj.transform;
+                confiner.m_BoundingShape2D = null; // 바 시점 콜라이더 초기화
+                virtualCamera.Follow = WorkspaceObj.transform; // 바 시점
                 virtualCamera.OnTargetObjectWarped(
                     WorkspaceObj.transform,
                     WorkspaceObj.transform.position - virtualCamera.Follow.position
@@ -115,18 +112,36 @@ public class CameraManager : MonoBehaviour
             }
             else
             {
-                confiner.m_BoundingShape2D = defaultCollider;
+                confiner.m_BoundingShape2D = defaultCollider; // 평소 시점 콜라이더
                 virtualCamera.PreviousStateIsValid = true;
-                virtualCamera.Follow = isMouse ? MouseFollowingObj.transform : PlayerObj.transform;
+                if (isMouse == true)
+                {
+                    virtualCamera.Follow = MouseFollowingObj.transform; // 마우스 시점
+
+                }
+                else
+                {
+                    virtualCamera.Follow = PlayerObj.transform; // 플레이어 시점
+                }
             }
         }
-        else // IslandScene
+        else // IslandScene 일때
         {
             DragToCameramMove();
+
             WheelToZoom();
-            confiner.m_BoundingShape2D = isBuildingUIActive ? null : defaultCollider;
+
+            if(isBuildingUIActive == true)
+            {
+                confiner.m_BoundingShape2D = null;
+            }
+            else
+            {
+                confiner.m_BoundingShape2D = defaultCollider; 
+            }
         }
     }
+
 
     // 섬 초기 카메라 설정
     private void IslandInit()
@@ -183,34 +198,35 @@ public class CameraManager : MonoBehaviour
             _isDragging = false;
         }
     }
-
     // 휠로 줌 인 / 줌 아웃
     private void WheelToZoom()
     {
-        // 화면 범위 체크를 먼저
+        Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         bool isInCamera = (Input.mousePosition.x >= 0 && Input.mousePosition.x <= Screen.width)
                 && (Input.mousePosition.y >= 0 && Input.mousePosition.y <= Screen.height);
-        
-        if (!isInCamera || isBuildingUIActive)
+        // 건물 UI가 활성화되어 있으면 줌 불가
+        if (isBuildingUIActive)
         {
             return;
         }
 
-        float scrollWheelInput = Input.GetAxis("Mouse ScrollWheel");
+        if (isInCamera)
+        {
+            float scrollWheelInput = Input.GetAxis("Mouse ScrollWheel");
 
-        if (scrollWheelInput != 0)
-        { 
-            virtualCamera.m_Lens.OrthographicSize += (1 * -Mathf.Sign(scrollWheelInput)) * ZoomSpeed;
-            
-            // Clamp 처리
-            virtualCamera.m_Lens.OrthographicSize = Mathf.Clamp(
-                virtualCamera.m_Lens.OrthographicSize, 
-                MinZoomOut, 
-                MaxZoomIn
-            );
+            if (scrollWheelInput != 0)
+            { virtualCamera.m_Lens.OrthographicSize += (1 * -Mathf.Sign(scrollWheelInput)) * ZoomSpeed; }
+
+            if (virtualCamera.m_Lens.OrthographicSize < MinZoomOut)
+            {
+                virtualCamera.m_Lens.OrthographicSize = MinZoomOut;
+            }
+            if (virtualCamera.m_Lens.OrthographicSize > MaxZoomIn)
+            {
+                virtualCamera.m_Lens.OrthographicSize = MaxZoomIn;
+            }
         }
     }
-
 
     private Vector2 ClampToPolygon(Vector2 targetPosition)
     {

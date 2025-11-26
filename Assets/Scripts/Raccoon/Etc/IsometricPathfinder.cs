@@ -15,16 +15,15 @@ public class IsometricPathfinder : MonoBehaviour
 
     [Header("Map Settings")]
     /// <summary>
-    /// 여러 타일맵을 관리하는 배열입니다. 특정 타일맵에서 길찾기를 수행할 때 사용합니다.
+    /// 길찾기를 수행할 대상 타일맵 컴포넌트입니다. 인스펙터에서 할당해야 합니다.
     /// </summary>
-    [SerializeField] private Tilemap[] tilemaps;
+    [SerializeField] private Tilemap tilemap;
 
     /// <summary>
     /// 이동 가능한 타일의 종류를 지정합니다. 
     /// <para>null일 경우 타일이 존재하는 모든 곳을 이동 가능으로 간주하며, 특정 타일(예: 땅)을 지정하면 그 타일 위로만 이동합니다.</para>
     /// </summary>
-    [SerializeField] private TileBase[] walkableTile;
-
+    [SerializeField] private TileBase walkableTile;
 
     /// <summary>
     /// 현재 길찾기 연산 중에 생성된 노드들을 관리하는 딕셔너리입니다.
@@ -76,10 +75,6 @@ public class IsometricPathfinder : MonoBehaviour
 
     #region 핵심 길찾기 로직 (Core Pathfinding Logic)
 
-    // FindPath 메서드 오버로드해서 구현을 했음
-    // 3번째 매개변수로 특정 타일맵을 넣어주면 해당 타일맵에서 길찾기를 수행함
-    // 만약 시작점과 끝점만 넣어주면 기본 타일맵에서 길찾기를 수행함
-
     /// <summary>
     /// A* 알고리즘을 사용하여 시작 위치에서 목표 위치까지의 최단 경로를 계산합니다.
     /// </summary>
@@ -88,33 +83,13 @@ public class IsometricPathfinder : MonoBehaviour
     /// <returns>경로를 구성하는 타일 좌표들의 리스트 (경로가 없으면 null 반환)</returns>
     public List<Vector3Int> FindPath(Vector3Int start, Vector3Int target)
     {
-        return FindPath(start, target, 0, 0);
-    }
-
-    /// <summary>
-    /// A* 알고리즘을 사용하여 특정 타일맵에서 시작 위치에서 목표 위치까지의 최단 경로를 계산합니다.
-    /// </summary>
-    /// <param name="start">시작 타일 좌표 (Grid 좌표)</param>
-    /// <param name="target">목표 타일 좌표 (Grid 좌표)</param>
-    /// <param name="Tilemap_index">길찾기를 수행할 타일맵 인덱스</param>
-    /// <param name="targetTilemap_index">walkableTile 배열의 인덱스</param>
-    /// <returns>경로를 구성하는 타일 좌표들의 리스트 (경로가 없으면 null 반환)</returns>
-    public List<Vector3Int> FindPath(Vector3Int start, Vector3Int target, int Tilemap_index, int targetTilemap_index)
-    {
-        Tilemap targetTilemap = tilemaps[Tilemap_index];
-        if (targetTilemap == null)
-        {
-            Debug.LogError("[Pathfinder] 타일맵이 설정되지 않았습니다.");
-            return null;
-        }
-
         // 1. 유효성 검사: 시작점이나 목표점이 이동 불가능한 곳인지 확인
-        if (!IsWalkable(start, targetTilemap, targetTilemap_index))
+        if (!IsWalkable(start))
         {
             Debug.LogWarning($"[Pathfinder] 시작 위치가 이동 불가능한 타일입니다: {start}");
             return null;
         }
-        if (!IsWalkable(target, targetTilemap, targetTilemap_index))
+        if (!IsWalkable(target))
         {
             Debug.LogWarning($"[Pathfinder] 목표 위치가 이동 불가능한 타일입니다: {target}");
             return null;
@@ -129,7 +104,7 @@ public class IsometricPathfinder : MonoBehaviour
         Node startNode = new Node(start);
         startNode.gCost = 0;
         startNode.hCost = GetDistance(start, target);
-
+        
         openSet.Add(startNode);
         nodes[start] = startNode;
 
@@ -161,7 +136,7 @@ public class IsometricPathfinder : MonoBehaviour
             foreach (Vector3Int neighborPos in GetNeighbors(currentNode.position))
             {
                 // 이동 불가능하거나 이미 닫힌 목록에 있다면 스킵
-                if (!IsWalkable(neighborPos, targetTilemap, targetTilemap_index) || closedSet.Contains(neighborPos))
+                if (!IsWalkable(neighborPos) || closedSet.Contains(neighborPos))
                     continue;
 
                 // G Cost 계산: 현재까지의 거리 + 이웃까지의 거리 (여기선 인접하므로 거리는 보통 1)
@@ -234,8 +209,24 @@ public class IsometricPathfinder : MonoBehaviour
             pos + new Vector3Int(0, 1, 0),   // 상
             pos + new Vector3Int(0, -1, 0)   // 하
         };
+
         return neighbors;
     }
+
+    // 8방향 이동이 필요할 경우 주석 해제하여 사용
+    /*
+    private List<Vector3Int> GetNeighbors8(Vector3Int pos)
+    {
+        List<Vector3Int> neighbors = new List<Vector3Int>
+        {
+            pos + new Vector3Int(1, 0, 0), pos + new Vector3Int(-1, 0, 0),
+            pos + new Vector3Int(0, 1, 0), pos + new Vector3Int(0, -1, 0),
+            pos + new Vector3Int(1, 1, 0), pos + new Vector3Int(1, -1, 0),
+            pos + new Vector3Int(-1, 1, 0), pos + new Vector3Int(-1, -1, 0)
+        };
+        return neighbors;
+    }
+    */
 
     /// <summary>
     /// 두 타일 사이의 거리를 계산합니다 (Heuristic).
@@ -251,7 +242,7 @@ public class IsometricPathfinder : MonoBehaviour
 
         // 4방향 이동 시에는 대각선 이동이 불가능하므로 가로+세로 거리를 합산함 (맨해튼 거리)
         return dx + dy;
-
+        
         // 만약 8방향(대각선) 이동을 허용한다면 아래  Chebyshev 거리 등을 고려해야 함
         // return Mathf.Max(dx, dy);
     }
@@ -263,29 +254,12 @@ public class IsometricPathfinder : MonoBehaviour
     /// <returns>이동 가능 여부</returns>
     private bool IsWalkable(Vector3Int pos)
     {
-        return IsWalkable(pos, tilemaps != null && tilemaps.Length > 0 ? tilemaps[0] : null, 0);
-    }
+        TileBase tile = tilemap.GetTile(pos);
 
-    /// <summary>
-    /// 특정 타일맵에서 해당 좌표의 타일이 이동 가능한지 확인합니다.
-    /// </summary>
-    /// <param name="pos">확인할 좌표</param>
-    /// <param name="targetTilemap">검사할 타일맵</param>
-    /// <param name="targetTilemap_index">walkableTile 배열의 인덱스</param>
-    /// <returns>이동 가능 여부</returns>
-    private bool IsWalkable(Vector3Int pos, Tilemap targetTilemap, int targetTilemap_index)
-    {
-        if (targetTilemap == null)
+        // walkableTile 변수가 설정되어 있다면, 해당 타일과 일치해야만 이동 가능
+        if (walkableTile != null)
         {
-            return false;
-        }
-
-        TileBase tile = targetTilemap.GetTile(pos);
-
-        // walkableTile 배열이 설정되어 있고, 인덱스가 유효하다면 해당 타일과 일치해야만 이동 가능
-        if (walkableTile != null && targetTilemap_index >= 0 && targetTilemap_index < walkableTile.Length && walkableTile[targetTilemap_index] != null)
-        {
-            return tile == walkableTile[targetTilemap_index];
+            return tile == walkableTile;
         }
 
         // walkableTile이 설정되지 않았다면, 타일이 존재하기만 하면 이동 가능 (빈 공간은 이동 불가)
@@ -297,44 +271,13 @@ public class IsometricPathfinder : MonoBehaviour
     #region 유틸리티 & 디버그 (Utilities & Debug)
 
     /// <summary>
-    /// 타일맵 배열에서 인덱스로 타일맵을 가져옵니다.
-    /// </summary>
-    /// <param name="index">타일맵 배열의 인덱스</param>
-    /// <returns>해당 인덱스의 타일맵 (없으면 null)</returns>
-    public Tilemap GetTilemapByIndex(int index)
-    {
-        if (tilemaps == null || index < 0 || index >= tilemaps.Length)
-        {
-            Debug.LogWarning($"[Pathfinder] 유효하지 않은 타일맵 인덱스: {index}");
-            return null;
-        }
-        return tilemaps[index];
-    }
-
-    /// <summary>
     /// 월드 좌표(Vector3)를 그리드 셀 좌표(Vector3Int)로 변환합니다.
     /// </summary>
     /// <param name="worldPosition">월드 상의 위치</param>
     /// <returns>해당 위치의 그리드 좌표</returns>
     public Vector3Int WorldToCell(Vector3 worldPosition)
     {
-        return tilemaps != null && tilemaps.Length > 0 ? tilemaps[0].WorldToCell(worldPosition) : Vector3Int.zero;
-    }
-
-    /// <summary>
-    /// 특정 타일맵에서 월드 좌표(Vector3)를 그리드 셀 좌표(Vector3Int)로 변환합니다.
-    /// </summary>
-    /// <param name="worldPosition">월드 상의 위치</param>
-    /// <param name="targetTilemap">변환할 타일맵</param>
-    /// <returns>해당 위치의 그리드 좌표</returns>
-    public Vector3Int WorldToCell(Vector3 worldPosition, Tilemap targetTilemap)
-    {
-        if (targetTilemap == null)
-        {
-            Debug.LogWarning("[Pathfinder] 타일맵이 null입니다. 기본 타일맵을 사용합니다.");
-            return tilemaps != null && tilemaps.Length > 0 ? tilemaps[0].WorldToCell(worldPosition) : Vector3Int.zero;
-        }
-        return targetTilemap.WorldToCell(worldPosition);
+        return tilemap.WorldToCell(worldPosition);
     }
 
     /// <summary>
@@ -344,23 +287,7 @@ public class IsometricPathfinder : MonoBehaviour
     /// <returns>해당 그리드의 월드 중심 좌표</returns>
     public Vector3 CellToWorld(Vector3Int cellPosition)
     {
-        return tilemaps != null && tilemaps.Length > 0 ? tilemaps[0].CellToWorld(cellPosition) : Vector3.zero;
-    }
-
-    /// <summary>
-    /// 특정 타일맵에서 그리드 셀 좌표(Vector3Int)를 월드 좌표(Vector3)로 변환합니다.
-    /// </summary>
-    /// <param name="cellPosition">그리드 좌표</param>
-    /// <param name="targetTilemap">변환할 타일맵</param>
-    /// <returns>해당 그리드의 월드 중심 좌표</returns>
-    public Vector3 CellToWorld(Vector3Int cellPosition, Tilemap targetTilemap)
-    {
-        if (targetTilemap == null)
-        {
-            Debug.LogWarning("[Pathfinder] 타일맵이 null입니다. 기본 타일맵을 사용합니다.");
-            return tilemaps != null && tilemaps.Length > 0 ? tilemaps[0].CellToWorld(cellPosition) : Vector3.zero;
-        }
-        return targetTilemap.CellToWorld(cellPosition);
+        return tilemap.CellToWorld(cellPosition);
     }
 
     /// <summary>
@@ -369,29 +296,14 @@ public class IsometricPathfinder : MonoBehaviour
     /// <param name="path">그릴 경로 리스트</param>
     public void DrawPath(List<Vector3Int> path)
     {
-        DrawPath(path, tilemaps != null && tilemaps.Length > 0 ? tilemaps[0] : null);
-    }
-
-    /// <summary>
-    /// 특정 타일맵에서 계산된 경로를 씬 뷰(Scene View)에 선으로 그려 시각화합니다. (디버깅용)
-    /// </summary>
-    /// <param name="path">그릴 경로 리스트</param>
-    /// <param name="targetTilemap">경로를 그릴 타일맵</param>
-    public void DrawPath(List<Vector3Int> path, Tilemap targetTilemap)
-    {
         if (path == null || path.Count == 0) return;
-        if (targetTilemap == null)
-        {
-            Debug.LogWarning("[Pathfinder] 타일맵이 null입니다.");
-            return;
-        }
 
         for (int i = 0; i < path.Count - 1; i++)
         {
             // 경로의 각 지점을 월드 좌표로 변환하여 선을 그림
-            Vector3 start = targetTilemap.GetCellCenterWorld(path[i]);
-            Vector3 end = targetTilemap.GetCellCenterWorld(path[i + 1]);
-
+            Vector3 start = tilemap.GetCellCenterWorld(path[i]);
+            Vector3 end = tilemap.GetCellCenterWorld(path[i + 1]);
+            
             // 녹색 선을 2초간 표시
             Debug.DrawLine(start, end, Color.green, 2f);
         }

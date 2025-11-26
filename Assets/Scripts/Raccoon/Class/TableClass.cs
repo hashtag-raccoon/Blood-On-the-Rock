@@ -3,117 +3,36 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-// ë¨¸ì§€ ë„ì¤‘ ì£¼ì„ì´ ë‚ ì•„ê°€ì„œ ìš°ì„  Gemini ì´ìš©í•´ì„œ ì£¼ì„ì„ ë‹¬ìŒ
-// í›„ì— ë‚´ ë°©ì‹ìœ¼ë¡œ ì£¼ì„ì„ ë‹¤ì‹œ ì²˜ìŒë¶€í„° ë‹¤ëŠ” ì‘ì—…ì„ í•  ì˜ˆì •ì´ë‹ˆ ì°¸ê³ ë°”ëŒ !!
-
-
-public enum seatingDirectionSelection
-{
-    Up,
-    Down,
-    Left,
-    Right
-}
-
-
-/// <summary>
-/// í…Œì´ë¸”ì˜ ë°ì´í„°ì™€ ì¢Œì„ ê´€ë¦¬ ê¸°ëŠ¥ì„ ë‹´ë‹¹í•˜ëŠ” í´ë˜ìŠ¤ì…ë‹ˆë‹¤.
-/// ì¢Œì„ ìë™ ìƒì„± ë° ì†ë‹˜ ë°°ì • ë¡œì§ì„ í¬í•¨í•©ë‹ˆë‹¤.
-/// </summary>
 public class TableClass : MonoBehaviour
 {
-    #region Variables
-
-    [Header("ì°¸ì¡° ë° ìƒíƒœ")]
     public TableManager tableManager;
     public bool isCustomerSeated = false;
     public List<GameObject> Seated_Customer = new List<GameObject>();
     public int MAX_Capacity = 2;
 
-    [Header("ì¢Œì„ ì„¤ì •")]
-    /// <summary>
-    /// ìƒì„±í•  ì¢Œì„ì˜ í”„ë¦¬íŒ¹ì…ë‹ˆë‹¤.
-    /// </summary>
-    public GameObject seatPrefab; 
+    [Header("ÁÂ¼® ¼³Á¤")]
+    public GameObject seatPrefab; // ÁÂ¼® ÇÁ¸®ÆÕ
+    public List<Transform> seats = new List<Transform>(); // »ı¼ºµÈ ÁÂ¼® À§Ä¡µé
+    public float seatDistance = 1f; // Å×ÀÌºí¿¡¼­ ÁÂ¼®±îÁöÀÇ °Å¸®
 
-    /// <summary>
-    /// í˜„ì¬ ìƒì„±ëœ ì¢Œì„ë“¤ì˜ Transform ë¦¬ìŠ¤íŠ¸ì…ë‹ˆë‹¤.
-    /// </summary>
-    public List<Transform> seats = new List<Transform>(); 
+    [Header("¾ÆÀÌ¼Ò¸ŞÆ®¸¯ Pathfinder")]
+    public IsometricPathfinder pathfinder; // ¾ÆÀÌ¼Ò¸ŞÆ®¸¯ Å¸ÀÏ¸Ê ÂüÁ¶
 
-    /// <summary>
-    /// 1ì¸ í…Œì´ë¸” ì‹œ, ì•‰ëŠ” ì¢Œì„ì˜ ë°©í–¥ì„ ì„¤ì •í•  ìˆ˜ ìˆìŒ
-    /// </summary>
-    public seatingDirectionSelection seatingDirection = seatingDirectionSelection.Down;
-
-    /// <summary>
-    /// Pathfinderê°€ ì—†ì„ ë•Œ ì‚¬ìš©í•˜ëŠ” ê¸°ë³¸ ì¢Œì„ ê°„ ê±°ë¦¬ì…ë‹ˆë‹¤.
-    /// </summary>
-    public float seatDistance = 1f;
-
-    [Header("ì•„ì´ì†Œë©”íŠ¸ë¦­ Pathfinder")]
-    /// <summary>
-    /// íƒ€ì¼ë§µ ê·¸ë¦¬ë“œ ì¢Œí‘œ ë³€í™˜ì„ ìœ„í•œ ì•„ì´ì†Œë©”íŠ¸ë¦­ ê²½ë¡œ íƒìƒ‰ê¸° ì°¸ì¡°ì…ë‹ˆë‹¤.
-    /// </summary>
-    public IsometricPathfinder pathfinder;
-
-    /// <summary>
-    /// ê° ì¢Œì„(Transform)ì— ë°°ì •ëœ ì†ë‹˜(GameObject)ì„ ê´€ë¦¬í•˜ëŠ” ë”•ì…”ë„ˆë¦¬ì…ë‹ˆë‹¤.
-    /// </summary>
+    // °¢ ÁÂ¼®¿¡ ¹èÁ¤µÈ ¼Õ´Ô ÃßÀû
     private Dictionary<Transform, GameObject> seatAssignments = new Dictionary<Transform, GameObject>();
-
-    #endregion
-
-    #region Unity Methods
 
     private void Awake()
     {
-        // í…Œì´ë¸” ë§¤ë‹ˆì € ë¦¬ìŠ¤íŠ¸ì— ìì‹ ì„ ë“±ë¡
         tableManager.tables.Add(this.gameObject);
-        
-        // ì´ˆê¸° ì¢Œì„ ìƒì„±
-        GenerateSeats(); 
+        GenerateSeats(); // ÁÂ¼® »ı¼º
     }
 
-    /// <summary>
-    /// ì—ë””í„° ìƒì—ì„œ ì¢Œì„ ìœ„ì¹˜ì™€ ë°°ì • ìƒíƒœë¥¼ ì‹œê°í™”í•©ë‹ˆë‹¤.
-    /// </summary>
-    private void OnDrawGizmosSelected()
-    {
-        if (seats.Count == 0) return;
-
-        Gizmos.color = Color.cyan;
-        foreach (Transform seat in seats)
-        {
-            if (seat != null)
-            {
-                // ì¢Œì„ ìœ„ì¹˜ í‘œì‹œ
-                Gizmos.DrawWireSphere(seat.position, 0.3f);
-                Gizmos.DrawLine(transform.position, seat.position);
-
-                // ë°°ì •ëœ ìƒíƒœ í‘œì‹œ (ë¹¨ê°„ìƒ‰)
-                if (seatAssignments.ContainsKey(seat) && seatAssignments[seat] != null)
-                {
-                    Gizmos.color = Color.red; 
-                    Gizmos.DrawSphere(seat.position, 0.2f);
-                    Gizmos.color = Color.cyan; // ìƒ‰ìƒ ì´ˆê¸°í™”
-                }
-            }
-        }
-    }
-
-    #endregion
-
-    #region Seat Generation Logic
-
-    /// <summary>
-    /// Pathfinder ìœ ë¬´ì— ë”°ë¼ ì ì ˆí•œ ë°©ì‹ìœ¼ë¡œ ì¢Œì„ì„ ìƒì„±í•©ë‹ˆë‹¤.
-    /// </summary>
+    // ¾ÆÀÌ¼Ò¸ŞÆ®¸¯ Å¸ÀÏ ±â¹İ ÁÂ¼® »ı¼º
     private void GenerateSeats()
     {
         if (MAX_Capacity <= 0) return;
 
-        // ê¸°ì¡´ ì¢Œì„ ì œê±° ë° ì´ˆê¸°í™”
+        // ±âÁ¸ ÁÂ¼® Á¦°Å
         foreach (Transform seat in seats)
         {
             if (seat != null)
@@ -122,42 +41,26 @@ public class TableClass : MonoBehaviour
         seats.Clear();
         seatAssignments.Clear();
 
-        // Pathfinderê°€ ì—†ìœ¼ë©´ ê¸°ë³¸ ì¢Œí‘œ ê³„ì‚° ë°©ì‹ìœ¼ë¡œ ì „í™˜
+        // pathfinder°¡ ¾øÀ¸¸é ±âº» ÁÂÇ¥°è »ç¿ë
         if (pathfinder == null)
         {
-            Debug.LogWarning("IsometricPathfinderê°€ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. ê¸°ë³¸ ì¢Œí‘œê³„ë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.");
+            Debug.LogWarning("IsometricPathfinder°¡ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù. ±âº» ÁÂÇ¥°è¸¦ »ç¿ëÇÕ´Ï´Ù.");
             GenerateSeatsBasic();
             return;
         }
 
-        // ì•„ì´ì†Œë©”íŠ¸ë¦­ ê·¸ë¦¬ë“œ ê¸°ë°˜ ë°°ì¹˜
+        // Å×ÀÌºíÀÇ ±×¸®µå À§Ä¡
         Vector3Int tableGridPos = pathfinder.WorldToCell(transform.position);
 
         if (MAX_Capacity == 1)
         {
-            switch(seatingDirection)
-            {
-                case seatingDirectionSelection.Up:
-                    tableGridPos += new Vector3Int(0, 1, 0);
-                    break;
-                case seatingDirectionSelection.Down:
-                    tableGridPos += new Vector3Int(0, -1, 0);
-                    break;
-                case seatingDirectionSelection.Left:
-                    tableGridPos += new Vector3Int(-1, 0, 0);
-                    break;
-                case seatingDirectionSelection.Right:
-                    tableGridPos += new Vector3Int(1, 0, 0);
-                    break;
-            }
-
-            // 1ì¸ í…Œì´ë¸”: seatingDirection ì— ë”°ë¼ ë‹¬ë¼ì§
-            Vector3Int seatGridPos = tableGridPos;
+            // 1ÀÎ Å×ÀÌºí: ¾Æ·¡ÂÊ (0, -1, 0)
+            Vector3Int seatGridPos = tableGridPos + new Vector3Int(0, -1, 0);
             CreateSeatAtGrid(seatGridPos);
         }
         else if (MAX_Capacity == 2)
         {
-            // 2ì¸ í…Œì´ë¸”: ì¢Œìš° (ì„œë¡œ ë§ˆì£¼ë´„)
+            // 2ÀÎ Å×ÀÌºí: ÁÂ¿ì ¾çÂÊ (¤· ¤± ¤·)
             Vector3Int leftGridPos = tableGridPos + new Vector3Int(-1, 0, 0);
             Vector3Int rightGridPos = tableGridPos + new Vector3Int(1, 0, 0);
             CreateSeatAtGrid(leftGridPos);
@@ -165,7 +68,7 @@ public class TableClass : MonoBehaviour
         }
         else if (MAX_Capacity == 3)
         {
-            // 3ì¸ í…Œì´ë¸”: ì¢Œ, ìš°, ì•„ë˜
+            // 3ÀÎ Å×ÀÌºí: ÁÂ, ¿ì, ¾Æ·¡
             Vector3Int leftGridPos = tableGridPos + new Vector3Int(-1, 0, 0);
             Vector3Int rightGridPos = tableGridPos + new Vector3Int(1, 0, 0);
             Vector3Int bottomGridPos = tableGridPos + new Vector3Int(0, -1, 0);
@@ -175,7 +78,7 @@ public class TableClass : MonoBehaviour
         }
         else if (MAX_Capacity >= 4)
         {
-            // 4ì¸ ì´ìƒ í…Œì´ë¸”: ìƒí•˜ì¢Œìš° ëª¨ë‘ ë°°ì¹˜
+            // 4ÀÎ ÀÌ»ó Å×ÀÌºí: »ç¹æ
             Vector3Int leftGridPos = tableGridPos + new Vector3Int(-1, 0, 0);
             Vector3Int rightGridPos = tableGridPos + new Vector3Int(1, 0, 0);
             Vector3Int topGridPos = tableGridPos + new Vector3Int(0, 1, 0);
@@ -187,13 +90,10 @@ public class TableClass : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ê·¸ë¦¬ë“œ ì¢Œí‘œë¥¼ ê¸°ë°˜ìœ¼ë¡œ ì¢Œì„ì„ ìƒì„±í•©ë‹ˆë‹¤ (Pathfinder ì‚¬ìš© ì‹œ).
-    /// </summary>
-    /// <param name="gridPos">ìƒì„±í•  ê·¸ë¦¬ë“œ ì¢Œí‘œ</param>
+    // ±×¸®µå ÁÂÇ¥¿¡ ÁÂ¼® »ı¼º (¾ÆÀÌ¼Ò¸ŞÆ®¸¯)
     private void CreateSeatAtGrid(Vector3Int gridPos)
     {
-        // ê·¸ë¦¬ë“œ ì¢Œí‘œë¥¼ ì›”ë“œ ì¢Œí‘œë¡œ ë³€í™˜
+        // ±×¸®µå ÁÂÇ¥¸¦ ¿ùµå ÁÂÇ¥·Î º¯È¯
         Vector3 worldPos = pathfinder.CellToWorld(gridPos);
 
         GameObject seatObj;
@@ -210,12 +110,10 @@ public class TableClass : MonoBehaviour
         }
 
         seats.Add(seatObj.transform);
-        seatAssignments[seatObj.transform] = null; // ì´ˆê¸°ì—ëŠ” ë¹ˆ ì¢Œì„
+        seatAssignments[seatObj.transform] = null; // ÃÊ±â¿¡´Â ºó ÁÂ¼®
     }
 
-    /// <summary>
-    /// Pathfinder ì—†ì´ ê¸°ë³¸ ì›”ë“œ ì¢Œí‘œ ê±°ë¦¬ ê³„ì‚°ìœ¼ë¡œ ì¢Œì„ì„ ìƒì„±í•©ë‹ˆë‹¤.
-    /// </summary>
+    // ±âº» ÁÂÇ¥°è·Î ÁÂ¼® »ı¼º (pathfinder ¾øÀ» ¶§)
     private void GenerateSeatsBasic()
     {
         Vector3 tablePos = transform.position;
@@ -254,10 +152,7 @@ public class TableClass : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ì›”ë“œ ì¢Œí‘œì— ì¢Œì„ ì˜¤ë¸Œì íŠ¸ë¥¼ ìƒì„±í•˜ëŠ” ë‚´ë¶€ í—¬í¼ ë©”ì„œë“œì…ë‹ˆë‹¤.
-    /// </summary>
-    /// <param name="position">ìƒì„±í•  ì›”ë“œ ì¢Œí‘œ</param>
+    // ÁÂ¼® »ı¼º ÇïÆÛ ¸Ş¼­µå
     private void CreateSeat(Vector3 position)
     {
         GameObject seatObj;
@@ -274,65 +169,48 @@ public class TableClass : MonoBehaviour
         }
 
         seats.Add(seatObj.transform);
-        seatAssignments[seatObj.transform] = null; // ì´ˆê¸°ì—ëŠ” ë¹ˆ ì¢Œì„
+        seatAssignments[seatObj.transform] = null; // ÃÊ±â¿¡´Â ºó ÁÂ¼®
     }
 
-    #endregion
-
-    #region Guest Management Logic
-
-    /// <summary>
-    /// íŠ¹ì • ì†ë‹˜ì—ê²Œ ë°°ì • ê°€ëŠ¥í•œ ë¹ˆ ì¢Œì„ì„ ì°¾ì•„ ë°˜í™˜í•©ë‹ˆë‹¤.
-    /// ì´ë¯¸ ë°°ì •ëœ ê²½ìš° í•´ë‹¹ ì¢Œì„ì„ ë°˜í™˜í•˜ê³ , ì—†ìœ¼ë©´ ë¹ˆ ì¢Œì„ì„ ìƒˆë¡œ í• ë‹¹í•©ë‹ˆë‹¤.
-    /// </summary>
-    /// <param name="guest">ì¢Œì„ì„ ì°¾ëŠ” ì†ë‹˜ ì˜¤ë¸Œì íŠ¸</param>
-    /// <returns>ë°°ì •ëœ ì¢Œì„ì˜ Transform (ì‹¤íŒ¨ ì‹œ null)</returns>
+    // Æ¯Á¤ ¼Õ´Ô¿¡°Ô ºó ÁÂ¼® ¹èÁ¤ (°ãÄ¡Áö ¾Ê°Ô)
     public Transform GetAvailableSeatForGuest(GameObject guest)
     {
-        // 1. ì´ë¯¸ ì´ ì†ë‹˜ì—ê²Œ ë°°ì •ëœ ì¢Œì„ì´ ìˆëŠ”ì§€ í™•ì¸
+        // ÀÌ¹Ì ¹èÁ¤µÈ ÁÂ¼®ÀÌ ÀÖ´ÂÁö È®ÀÎ
         foreach (var kvp in seatAssignments)
         {
             if (kvp.Value == guest)
             {
-                return kvp.Key; // ì´ë¯¸ ë°°ì •ëœ ì¢Œì„ ë°˜í™˜
+                return kvp.Key; // ÀÌ¹Ì ¹èÁ¤µÈ ÁÂ¼® ¹İÈ¯
             }
         }
 
-        // 2. ë¹ˆ ì¢Œì„ ì°¾ê¸° ë° ë°°ì •
+        // ºó ÁÂ¼® Ã£±â
         foreach (var kvp in seatAssignments)
         {
-            if (kvp.Value == null) // ë¹ˆ ì¢Œì„ ë°œê²¬
+            if (kvp.Value == null) // ºó ÁÂ¼®
             {
-                seatAssignments[kvp.Key] = guest; // ì†ë‹˜ ë°°ì •
-                return kvp.Key; // ì¢Œì„ ë°˜í™˜
+                seatAssignments[kvp.Key] = guest; // ¼Õ´Ô ¹èÁ¤
+                return kvp.Key; // ÁÂ¼® ¹İÈ¯
             }
         }
 
-        return null; // ë¹ˆ ì¢Œì„ ì—†ìŒ
+        return null; // ºó ÁÂ¼® ¾øÀ½
     }
 
-    /// <summary>
-    /// ì†ë‹˜ì´ ë– ë‚  ë•Œ ì¢Œì„ ë°°ì •ì„ í•´ì œí•©ë‹ˆë‹¤.
-    /// </summary>
-    /// <param name="guest">ë– ë‚˜ëŠ” ì†ë‹˜ ì˜¤ë¸Œì íŠ¸</param>
+    // ¼Õ´ÔÀÌ ÁÂ¼®À» ¶°³¯ ¶§ È£Ãâ
     public void ReleaseSeat(GameObject guest)
     {
         foreach (var kvp in seatAssignments)
         {
             if (kvp.Value == guest)
             {
-                seatAssignments[kvp.Key] = null; // ì¢Œì„ ë¹„ìš°ê¸°
+                seatAssignments[kvp.Key] = null; // ÁÂ¼® ºñ¿ì±â
                 break;
             }
         }
     }
 
-    /// <summary>
-    /// íŠ¹ì • ì¢Œì„ì´ í•´ë‹¹ ì†ë‹˜ì—ê²Œ ë°°ì •ë˜ì—ˆëŠ”ì§€ í™•ì¸í•©ë‹ˆë‹¤.
-    /// </summary>
-    /// <param name="seat">í™•ì¸í•  ì¢Œì„ Transform</param>
-    /// <param name="guest">í™•ì¸í•  ì†ë‹˜ GameObject</param>
-    /// <returns>ë°°ì • ì—¬ë¶€</returns>
+    // ÁÂ¼®ÀÌ Æ¯Á¤ ¼Õ´Ô¿¡°Ô ¹èÁ¤µÇ¾ú´ÂÁö È®ÀÎ
     public bool IsSeatAssignedToGuest(Transform seat, GameObject guest)
     {
         if (seatAssignments.ContainsKey(seat))
@@ -342,5 +220,27 @@ public class TableClass : MonoBehaviour
         return false;
     }
 
-    #endregion
+    // Scene ºä¿¡¼­ ÁÂ¼® À§Ä¡ ½Ã°¢È­
+    private void OnDrawGizmosSelected()
+    {
+        if (seats.Count == 0) return;
+
+        Gizmos.color = Color.cyan;
+        foreach (Transform seat in seats)
+        {
+            if (seat != null)
+            {
+                Gizmos.DrawWireSphere(seat.position, 0.3f);
+                Gizmos.DrawLine(transform.position, seat.position);
+
+                // ¹èÁ¤ »óÅÂ Ç¥½Ã
+                if (seatAssignments.ContainsKey(seat) && seatAssignments[seat] != null)
+                {
+                    Gizmos.color = Color.red; // ¹èÁ¤µÈ ÁÂ¼®
+                    Gizmos.DrawSphere(seat.position, 0.2f);
+                    Gizmos.color = Color.cyan;
+                }
+            }
+        }
+    }
 }

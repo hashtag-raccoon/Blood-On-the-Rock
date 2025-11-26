@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// cocktail 전체 데이터
@@ -24,4 +25,19 @@ public class CocktailData
     public int production_cost { get; private set; } // 제작원가
     public int glass_id { get; private set; } // 잔 종류(외래키)
     public Sprite Icon { get; private set; } // 칵테일 아이콘 (UI 표시용)
+}
+
+/// <summary>
+/// 칵테일 레시피 데이터
+/// </summary>
+public class CocktailRecipeScript
+{
+    public int RecipeId { get; private set; }
+    public int CocktailId { get; private set; }
+    public int Technique { get; private set; } // (0/1/2) : (build, floating, shaking)
+    public string CocktailName { get; private set; }
+    public string Description { get; private set; }
+    public Dictionary<int, Ingridiant> Recipedict = new Dictionary<int, Ingridiant>();
+    public string RecipeOrder { get; private set; }
+
 }

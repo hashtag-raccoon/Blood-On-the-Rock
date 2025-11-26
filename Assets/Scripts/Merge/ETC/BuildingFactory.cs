@@ -28,7 +28,7 @@ public static class BuildingFactory
 
         GameObject buildingObj = new GameObject($"{buildingData.Building_Name}_{instanceId}");
         buildingObj.transform.position = position;
-
+        
         if (parent != null)
         {
             buildingObj.transform.SetParent(parent);
@@ -38,7 +38,7 @@ public static class BuildingFactory
         AddBasicComponents(buildingObj, buildingData);
 
         // 건물 타입에 따라 컴포넌트 추가시킴
-        switch (buildingData.buildingType)
+        switch(buildingData.buildingType)
         {
             case BuildingType.Production: // 생산형 건물일 경우
                 AddProductionBuildingComponents(buildingObj, buildingData, instanceId);
@@ -177,12 +177,12 @@ public static class BuildingFactory
     /// </summary>
     private static void SetField(Type type, object instance, string fieldName, object value)
     {
-        var field = type.GetField(fieldName,
-            System.Reflection.BindingFlags.NonPublic |
-            System.Reflection.BindingFlags.Public |
+        var field = type.GetField(fieldName, 
+            System.Reflection.BindingFlags.NonPublic | 
+            System.Reflection.BindingFlags.Public | 
             System.Reflection.BindingFlags.Instance)
             ;
-
+        
         if (field != null)
         {
             field.SetValue(instance, value);
