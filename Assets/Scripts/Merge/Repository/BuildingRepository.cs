@@ -414,28 +414,6 @@ public class BuildingRepository : MonoBehaviour, IRepository
         }
     }
 
-    public void SpawnConstructedBuildings()
-    {
-        try
-        {
-            foreach (var building in _constructedBuildings)
-            {
-                Vector3Int gridpos = building.Position;
-                Vector3 worldPos = grid.CellToWorld(gridpos);
-                //Vector3Int worldPos = grid.CellToWorld
-                //float rot = building.Rotation;
-                BuildingData buildingData = GetBuildingDataById(building.Id);
-                GameObject constructedbuilding = BuildingFactory.CreateBuilding(buildingData, worldPos);
-                DragDropController.Instance.PlaceTilemapMarkers(gridpos, buildingData.tileSize, buildingData.MarkerPositionOffset);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.Log(ex);
-            return;
-        }
-    }
-
     /// <summary>
     /// 모든 건설된 건물 정보를 로그로 출력합니다. (디버깅용)
     /// </summary>
