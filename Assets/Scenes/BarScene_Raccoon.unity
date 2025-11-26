@@ -8141,6 +8141,7 @@ MonoBehaviour:
   MAX_Capacity: 2
   seatPrefab: {fileID: 0}
   seats: []
+  seatingDirection: 1
   seatDistance: 1
   pathfinder: {fileID: 1475903529}
 --- !u!1 &182720677
@@ -10226,6 +10227,7 @@ MonoBehaviour:
   MAX_Capacity: 1
   seatPrefab: {fileID: 0}
   seats: []
+  seatingDirection: 1
   seatDistance: 1
   pathfinder: {fileID: 1475903529}
 --- !u!1 &713398802
@@ -15734,6 +15736,7 @@ MonoBehaviour:
   MAX_Capacity: 2
   seatPrefab: {fileID: 0}
   seats: []
+  seatingDirection: 1
   seatDistance: 1
   pathfinder: {fileID: 1475903529}
 --- !u!1 &1001477451
@@ -16119,6 +16122,7 @@ MonoBehaviour:
   MAX_Capacity: 1
   seatPrefab: {fileID: 0}
   seats: []
+  seatingDirection: 2
   seatDistance: 1
   pathfinder: {fileID: 1475903529}
 --- !u!1 &1475903526
