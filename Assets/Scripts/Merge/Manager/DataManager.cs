@@ -462,6 +462,43 @@ public class DataManager : MonoBehaviour
         return ResourceRepository.Instance.GetResourceByName(resourceName);
     }
 
+    #region NPC Prefab Mapping Methods
+
+    /// <summary>
+    /// prefab_name을 기준으로 prefab과 npcs 리스트를 매핑합니다.
+    /// prefab_name 형식: "[종족]_[npc_id]" (예: "오크_1", "인간_5")
+    /// </summary>
+    public void UpdateBuildingInventoryStatus(long instance_id, bool isInInventory)
+    {
+        var building = ConstructedBuildings.Find(b => b.InstanceId == instanceId);
+        if (building != null)
+        {
+            building.IsEditInventory = isInInventory;
+            Debug.Log($"건물 인스턴스 ID '{instanceId}'의 인벤토리 상태를 업데이트했습니다: {isInInventory}");
+        }
+        else
+        {
+            Debug.LogWarning($"건물 인스턴스 ID '{instanceId}'를 찾을 수 없습니다.");
+        }
+        return null;
+    }
+
+
+    /// <summary>
+    /// 편집 모드 인벤토리 리스트를 갱신합니다.
+    /// </summary>
+    public void RefreshEditModeInventory()
+    {
+        EditMode_InventoryBuildings = GetInventoryBuildings();
+        Debug.Log($"EditMode_InventoryBuildings 갱신: {EditMode_InventoryBuildings.Count}개의 건물");
+    }
+
+    #endregion
+
+    public ResourceData GetResourceByName(string resourceName)
+    {
+        return ResourceRepository.Instance.GetResourceByName(resourceName);
+    }
 
     /// <summary>
     /// Main_Island에 건설된 모든 건물의 통합 데이터를 가져옴
@@ -497,22 +534,5 @@ public class DataManager : MonoBehaviour
     {
         return ConstructedBuildings.FindAll(b => b.IsProducing);
     }
-
-    /// <summary>
-    /// Scene에서 특정 instance_id를 가진 ResourceBuildingController를 찾습니다.
-    /// </summary>
-    private ResourceBuildingController FindResourceBuildingControllerByInstanceId(long instanceId)
-    {
-        ResourceBuildingController[] controllers = FindObjectsOfType<ResourceBuildingController>();
-        foreach (var controller in controllers)
-        {
-            if (controller.GetConstructedBuilding() != null &&
-                controller.GetConstructedBuilding().InstanceId == instanceId)
-            {
-                return controller;
-            }
-        }
-        return null;
-    }
-
+#endregion
 }
