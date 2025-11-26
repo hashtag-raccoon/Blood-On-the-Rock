@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class GlassData
 {
     public string id;
@@ -11,7 +11,7 @@ public class GlassData
     public GameObject glassPrefab;
 }
 
-[System.Serializable]
+[Serializable]
 public class BaseSpiritData
 {
     public string id;
@@ -20,7 +20,7 @@ public class BaseSpiritData
     public Color liquidColor = Color.white;
 }
 
-[System.Serializable]
+[Serializable]
 public class MixerData
 {
     public string id;
@@ -29,7 +29,7 @@ public class MixerData
     public Color liquidColor = Color.white;
 }
 
-[System.Serializable]
+[Serializable]
 public class GarnishData
 {
     public string id;
@@ -38,7 +38,7 @@ public class GarnishData
     public GameObject garnishPrefab;
 }
 
-[System.Serializable]
+[Serializable]
 public class CocktailRecipe
 {
     public GlassData selectedGlass;

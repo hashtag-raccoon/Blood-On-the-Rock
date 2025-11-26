@@ -54,8 +54,8 @@ public class ArbeitController : MonoBehaviour
     /// 만약 IsometricPathfinder가 null이면 작동을 하지않으니 참고바람
     /// </summary>
     public void SetTarget(Transform newTarget)
-    {   
-        if(pathfinder == null)
+    {
+        if (pathfinder == null)
         {
             Debug.LogError("IsometricPathfinder가 할당되지 않았습니다.");
             return;
@@ -73,12 +73,12 @@ public class ArbeitController : MonoBehaviour
 
         Vector3 targetPos = new Vector3(currentTarget.position.x, currentTarget.position.y, 0);
         Vector3 startPos = new Vector3(this.transform.position.x, this.transform.position.y, 0);
-        
+
         Vector3Int targetCell = pathfinder.WorldToCell(targetPos);
         Vector3Int startCell = pathfinder.WorldToCell(startPos);
 
         // 시작점에서 목표점까지의 경로 계산
-        currentPath = pathfinder.FindPath(startCell, targetCell, 1, 1); 
+        currentPath = pathfinder.FindPath(startCell, targetCell, 1, 1);
 
         // 경로가 유효한지 확인 후 이동 시작
         // A* 알고리즘을 통해 경로를 반환하고, 최소 이동 가능한 노드값이 0 이상이면 이동시작
@@ -103,7 +103,7 @@ public class ArbeitController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 pos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            
+
             // ignoreLayerMask를 반전시켜서 해당 레이어를 제외하고 Raycast
             int layerMask = ~CameraManager.instance.ignoreLayerMask.value;
             RaycastHit2D hitCollider = Physics2D.Raycast(pos, Vector2.zero, 0, layerMask);
@@ -131,7 +131,7 @@ public class ArbeitController : MonoBehaviour
     {
         // 경로의 끝에 도달했는지 확인
         if (currentPathIndex >= currentPath.Count)
-        {   
+        {
             // 경로 끝에 도달
             isMoving = false;
             OnReachedDestination(); // 목적지 도착 시 호출
@@ -141,7 +141,7 @@ public class ArbeitController : MonoBehaviour
         Vector3 targetPos = pathfinder.CellToWorld(currentPath[currentPathIndex]);
         // IsometricPathfinder의 CellToWorld가 타일 중심을 반환한다면 정상 작동하는 코드
         // 만약 아니라면 오프셋 조정이 필요하거나 다른 방식으로 목표 위치를 계산해야 할 수 있음
-        
+
         // 현재 위치에서 목표 위치로 이동
         this.transform.position = Vector3.MoveTowards(this.transform.position, targetPos, moveSpeed * Time.deltaTime);
 
@@ -297,7 +297,7 @@ public class ArbeitController : MonoBehaviour
             CancelCurrentTask();
             return;
         }
-        
+
         // 큐에 있는 업무인지 확인
         if (taskQueue.Contains(task))
         {
@@ -333,11 +333,11 @@ public class ArbeitController : MonoBehaviour
     private void UpdateTaskUI()
     {
         // 업무 큐가 비어있으면 모든 UI 제거, 그 후 리턴
-        if(taskQueue == null)
+        if (taskQueue == null)
         {
-            if(taskUIObjects.Count > 0)
+            if (taskUIObjects.Count > 0)
             {
-                for(int i = 0; i < taskUIObjects.Count; i++)
+                for (int i = 0; i < taskUIObjects.Count; i++)
                 {
                     Destroy(taskUIObjects[i]);
                 }

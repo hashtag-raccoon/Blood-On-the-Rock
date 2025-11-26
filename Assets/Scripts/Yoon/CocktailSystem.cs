@@ -65,7 +65,32 @@ public class CocktailSystem : MonoBehaviour
 
     #region CheckSum
     /// <summary>
-    /// 사용자가 제작한 칵테일과 레시피를 비교하여 유사도 점수를 반환합니다.
+    /// 사용자가 제작한 칵테일과 주문된 칵테일을 비교하여 유사도 점수를 반환합니다.
+    /// (OrderedCocktail 객체를 직접 받는 오버로드 - 권장)
+    /// </summary>
+    /// <param name="orderedCocktail">주문된 칵테일 객체</param>
+    /// <returns>유사도 점수 (0~100)</returns>
+    public float CheckCocktailToRecipe(OrderedCocktail orderedCocktail)
+    {
+        if (orderedCocktail == null)
+        {
+            Debug.LogError("OrderedCocktail이 null입니다.");
+            return 0.0f;
+        }
+
+        float totalScore = 0.0f;
+
+        totalScore += CalculateIngredientScore(orderedCocktail.Recipe);
+        totalScore += CalculateGlassScore(orderedCocktail.GlassId);
+        totalScore += CalculateTechniqueScore(orderedCocktail.Technique);
+
+        Debug.Log($"칵테일 제작 완료 - 총점: {totalScore}점 / 성공 기준: {orderedCocktail.SimilarityThreshold}점");
+
+        return totalScore;
+    }
+
+    /// <summary>
+    /// 사용자가 제작한 칵테일과 레시피를 비교하여 유사도 점수를 반환
     /// </summary>
     /// <param name="orderId">손님이 주문한 칵테일 ID</param>
     /// <returns>유사도 점수 (0~100)</returns>
@@ -84,13 +109,13 @@ public class CocktailSystem : MonoBehaviour
         }
 
         // 2. 재료 점수 계산 (기주 40점 + 부재료 30점 + 가니쉬 5점)
-        totalScore += CalculateIngredientScore();
+        totalScore += CalculateIngredientScore(recipeData.Recipedict);
 
         // 3. 잔 점수 계산 (2점)
-        totalScore += CalculateGlassScore();
+        totalScore += CalculateGlassScore(cocktailData.glass_id);
 
         // 4. 기법 점수 계산 (23점)
-        totalScore += CalculateTechniqueScore();
+        totalScore += CalculateTechniqueScore(recipeData.Technique);
 
         Debug.Log($"칵테일 제작 완료 - 총점: {totalScore}점 / 성공 기준: {cocktailData.similarity_threadhold}점");
 
@@ -98,14 +123,14 @@ public class CocktailSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 재료 점수를 계산합니다. (기주 40점 + 부재료 30점 + 가니쉬 5점)
+    /// 재료 점수를 계산 (기주 40점 + 부재료 30점 + 가니쉬 5점)
     /// </summary>
-    private float CalculateIngredientScore()
+    private float CalculateIngredientScore(Dictionary<int, Ingridiant> recipeDict)
     {
         float ingredientScore = 0.0f;
 
         // 레시피의 각 재료 타입별로 점수 계산
-        foreach (var recipeItem in recipeData.Recipedict)
+        foreach (var recipeItem in recipeDict)
         {
             int ingredientId = recipeItem.Key;
             Ingridiant recipeIngredient = recipeItem.Value;
@@ -144,7 +169,7 @@ public class CocktailSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 용량 차이에 따라 점수를 계산합니다. (0~10점)
+    /// 용량 차이에 따라 점수를 계산 (0~10점)
     /// </summary>
     private float CalculateVolumeScore(Ingridiant recipeIngredient, Ingridiant userIngredient)
     {
@@ -178,12 +203,12 @@ public class CocktailSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 잔 점수를 계산합니다. (2점)
+    /// 잔 점수를 계산 (2점)
     /// </summary>
-    private float CalculateGlassScore()
+    private float CalculateGlassScore(int requiredGlassId)
     {
         // 잔이 일치하면 2점, 아니면 0점
-        if (selectedGlassId == cocktailData.glass_id)
+        if (selectedGlassId == requiredGlassId)
         {
             return 2.0f;
         }
@@ -191,12 +216,12 @@ public class CocktailSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 기법 점수를 계산합니다. (23점)
+    /// 기법 점수를 계산 (23점)
     /// </summary>
-    private float CalculateTechniqueScore()
+    private float CalculateTechniqueScore(int requiredTechnique)
     {
         // 기법이 일치하면 23점, 아니면 0점
-        if (selectedTechnique == recipeData.Technique)
+        if (selectedTechnique == requiredTechnique)
         {
             return 23.0f;
         }

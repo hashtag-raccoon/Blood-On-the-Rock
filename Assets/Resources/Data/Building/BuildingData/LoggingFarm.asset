@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8eb8c142112069b4ba08ddfccfde1296, type: 3}
   m_Name: LoggingFarm
   m_EditorClassIdentifier: 
-  building_id: 0
+  building_id: 2
   Building_Name: "\uBC8C\uBAA9\uC7A5"
   building_Type: Production
   island_id: 1

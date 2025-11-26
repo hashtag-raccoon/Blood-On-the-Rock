@@ -538,8 +538,8 @@ public class DragDropController : MonoBehaviour
                 var refundWoodData = ResourceRepository.Instance.GetResourceByName("Wood");
                 if (refundMoneyData != null)
                 {
-                    refundMoneyData.current_amount -= tempData.buildingData.construction_cost_gold;
-                    refundMoneyData.current_amount -= tempData.buildingData.construction_cost_wood;
+                    refundMoneyData.current_amount += tempData.buildingData.construction_cost_gold;
+                    refundMoneyData.current_amount += tempData.buildingData.construction_cost_wood;
                 }
             }
 
@@ -612,11 +612,10 @@ public class DragDropController : MonoBehaviour
             // BuildingData에서 MarkerPositionOffset 가져오기
             if (DataManager.Instance != null && DataManager.Instance.ConstructedBuildings != null)
             {
-                ConstructedBuilding constructedBuilding = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
+                ConstructedBuilding constructedBuilding = DataManager.Instance.GetConstructedBuildingByInstanceId(buildingBase.ConstructedBuildingId);
                 if (constructedBuilding != null && BuildingRepository.Instance != null)
                 {
-                    BuildingData buildingData = BuildingRepository.Instance.GetAllBuildingData()
-                        .Find(data => data.building_id == constructedBuilding.Id);
+                    BuildingData buildingData = BuildingRepository.Instance.GetBuildingDataByTypeId(constructedBuilding.Id);
                     if (buildingData != null)
                     {
                         markerOffset = buildingData.MarkerPositionOffset;
@@ -804,11 +803,11 @@ public class DragDropController : MonoBehaviour
                 BuildingBase buildingBase = draggedSpriteObject.GetComponent<BuildingBase>();
                 if (buildingBase != null && DataManager.Instance != null)
                 {
-                    ConstructedBuilding building = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
+                    ConstructedBuilding building = DataManager.Instance.GetConstructedBuildingByInstanceId(buildingBase.ConstructedBuildingId);
                     if (building != null)
                     {
                         building.Position = dropCell;
-                        Debug.Log($"건물 ID {building.Id}의 위치를 {dropCell}로 업데이트했습니다.");
+                        Debug.Log($"건물 인스턴스 ID {building.InstanceId}의 위치를 {dropCell}로 업데이트했습니다.");
                     }
                 }
 
@@ -1079,7 +1078,7 @@ public class DragDropController : MonoBehaviour
     /// EditBuildingButtonUI에서 호출
     /// 배치 확정 시 기존 ConstructedBuilding 정보로 실제 건물 생성
     /// </summary>
-    public void StartInventoryBuildingPlacement(BuildingData buildingData, int constructedBuildingId)
+    public void StartInventoryBuildingPlacement(BuildingData buildingData, long constructedBuildingId)
     {
         if (buildingData == null || buildingData.building_sprite == null)
         {
@@ -1209,7 +1208,7 @@ public class DragDropController : MonoBehaviour
             }
 
             // 버튼 클릭 리스너 추가
-            UnityEngine.UI.Button completeButton = uiInstance.GetComponentInChildren<UnityEngine.UI.Button>();
+            Button completeButton = uiInstance.GetComponentInChildren<Button>();
             if (completeButton != null)
             {
                 completeButton.onClick.AddListener(() =>
@@ -1263,7 +1262,7 @@ public class DragDropController : MonoBehaviour
             Vector3 screenPos = mainCamera.WorldToScreenPoint(worldPos);
 
             // 줌 비율 계산 = 현재 줌 / 초기 줌
-            float zoomRatio = (CameraManager.instance.MaxZoomIn / 10) / mainCamera.orthographicSize;
+            float zoomRatio = initialOrthoSize / mainCamera.orthographicSize;
 
             // UI 크기를 줌 비율에 맞춰 조정, 줌 인 => UI 커짐, 줌 아웃 => UI 작아짐
             Vector2 scaledSize = newBuildingCompleteSize * zoomRatio;
@@ -1300,7 +1299,7 @@ public class DragDropController : MonoBehaviour
         // TempBuildingData 확인
         TempBuildingData tempData = tempBuilding != null ? tempBuilding.GetComponent<TempBuildingData>() : null;
         bool isFromInventory = tempData != null && tempData.isFromInventory;
-        int constructedBuildingId = tempData != null ? tempData.constructedBuildingId : -1;
+        long constructedBuildingId = tempData != null ? tempData.constructedBuildingId : -1;
 
         if (tempBuilding != null)
         {
@@ -1314,15 +1313,28 @@ public class DragDropController : MonoBehaviour
             Destroy(uiInstance);
         }
 
+        // 인스턴스 ID 결정
+        long instanceId;
+        if (isFromInventory && constructedBuildingId >= 0)
+        {
+            // 인벤토리 건물: 기존 인스턴스 ID 사용
+            instanceId = constructedBuildingId;
+        }
+        else
+        {
+            // 새 건물: 새 인스턴스 ID 생성 및 데이터 추가
+            instanceId = BuildingIDGenerator.GenerateInstanceID(buildingData.building_id);
+            BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id, cellPosition, instanceId);
+        }
+
         // BuildingFactory를 통해 실제 건물 생성
-        GameObject realBuilding = BuildingFactory.CreateBuilding(buildingData, position);
+        GameObject realBuilding = BuildingFactory.CreateBuilding(buildingData, position, instanceId);
 
         if (realBuilding != null)
         {
-            // 인벤토리에서 꺼낸 건물인지 여부에 따라 처리
+            // 인벤토리에서 꺼낸 건물인 경우 -> IsEditInventory를 false로 변경
             if (isFromInventory && constructedBuildingId >= 0)
             {
-                // 인벤토리에서 꺼낸 건물인 경우 -> IsEditInventory를 false로 변경
                 if (DataManager.Instance != null)
                 {
                     DataManager.Instance.UpdateBuildingInventoryStatus(constructedBuildingId, false);
@@ -1335,14 +1347,6 @@ public class DragDropController : MonoBehaviour
                     {
                         editScrollUI.RefreshInventoryUI();
                     }
-                }
-            }
-            else
-            {
-                // 새로 구매한 건물인 경우 -> ConstructedBuilding 데이터 생성 및 저장
-                if (DataManager.Instance.GetConstructedBuildingById(buildingData.building_id) == null)
-                {
-                    BuildingRepository.Instance.AddConstructedBuilding(buildingData.building_id, cellPosition);
                 }
             }
         }
@@ -1388,11 +1392,10 @@ public class DragDropController : MonoBehaviour
 
                     if (DataManager.Instance != null && BuildingRepository.Instance != null)
                     {
-                        ConstructedBuilding constructedBuilding = DataManager.Instance.GetConstructedBuildingById(buildingBase.ConstructedBuildingId);
+                        ConstructedBuilding constructedBuilding = DataManager.Instance.GetConstructedBuildingByInstanceId(buildingBase.ConstructedBuildingId);
                         if (constructedBuilding != null)
                         {
-                            BuildingData buildingData = BuildingRepository.Instance.GetAllBuildingData()
-                                .Find(data => data.building_id == constructedBuilding.Id);
+                            BuildingData buildingData = BuildingRepository.Instance.GetBuildingDataByTypeId(constructedBuilding.Id);
                             if (buildingData != null)
                             {
                                 buildingMarkerOffset = buildingData.MarkerPositionOffset;

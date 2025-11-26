@@ -154,7 +154,7 @@ public class ResourceBuildingController : BuildingBase
         Transform buildingImageTransform = ActiveLimitUpgradeUI.transform.Find("BuildingImage");
         if (buildingImageTransform != null && constructedBuilding != null && constructedBuilding.Icon != null)
         {
-            UnityEngine.UI.Image img = buildingImageTransform.GetComponent<UnityEngine.UI.Image>();
+            Image img = buildingImageTransform.GetComponent<Image>();
             if (img != null)
             {
                 img.sprite = constructedBuilding.Icon;
@@ -455,6 +455,11 @@ public class ResourceBuildingController : BuildingBase
         return maxProductionSlots;
     }
 
+    public ConstructedBuilding GetConstructedBuilding()
+    {
+        return constructedBuilding;
+    }
+
     public override void OpenBuildingUI()
     {
         base.OpenBuildingUI();
@@ -495,23 +500,67 @@ public class ResourceBuildingController : BuildingBase
         return earliest;
     }
 
+    /// <summary>
+    /// 게임 시작 시 저장된 생산 슬롯 정보를 복원합니다.
+    /// </summary>
     public void RestoreProductionFromSave()
     {
-        if (constructedBuilding == null || !constructedBuilding.IsProducing) return;
+        if (constructedBuilding == null) return;
 
-        // 저장된 생산 완료 시간과 현재 시간 비교
-        System.TimeSpan timeRemaining = constructedBuilding.NextProductionTime - System.DateTime.Now;
+        // DataManager에서 저장된 생산 정보 가져오기
+        ConstructedBuildingProduction savedProduction = DataManager.Instance.ConstructedBuildingProductions
+            .Find(p => p.instance_id == constructedBuilding.InstanceId);
 
-        if (timeRemaining.TotalSeconds <= 0)
+        if (savedProduction == null || savedProduction.production_slots == null ||
+            savedProduction.production_slots.Count == 0)
         {
-            Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 저장된 생산이 완료되었습니다.");
+            Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 저장된 생산 정보 없음");
+            return;
         }
-        else
+
+        int restoredCount = 0;
+        foreach (var slotData in savedProduction.production_slots)
         {
-            Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 생산 재개 (남은 시간: {timeRemaining.TotalSeconds:F1}초)");
+            // BuildingProductionInfo 조회
+            BuildingProductionInfo prodInfo = BuildingRepository.Instance
+                .GetProductionInfosForBuildingType(slotData.building_type)
+                .Find(p => p.resource_id == slotData.resource_id);
+
+            if (prodInfo == null)
+            {
+                Debug.LogWarning($"[ResourceBuildingController] resource_id {slotData.resource_id}에 대한 BuildingProductionInfo 없음");
+                continue;
+            }
+
+            // ResourceData 조회
+            ResourceData resData = ResourceRepository.Instance.GetResourceById(slotData.resource_id);
+            if (resData == null)
+            {
+                Debug.LogWarning($"[ResourceBuildingController] resource_id {slotData.resource_id}에 대한 ResourceData 없음");
+                continue;
+            }
+
+            // ProductionInfo 복원 (재화는 이미 소비된 상태이므로 다시 소비하지 않음)
+            ProductionInfo restoredProduction = new ProductionInfo(prodInfo, resData, slotData.slot_index);
+            restoredProduction.timeRemaining = slotData.time_remaining;
+            restoredProduction.totalProductionTime = slotData.total_production_time;
+
+            // 슬롯에 할당
+            if (slotData.slot_index >= 0 && slotData.slot_index < activeProductions.Count)
+            {
+                activeProductions[slotData.slot_index] = restoredProduction;
+                restoredCount++;
+            }
+        }
+
+        Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: {restoredCount}개 슬롯 복원");
+
+        // UI 업데이트
+        if (ResourceBuildingUIManager.Instance != null)
+        {
+            ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
         }
 
         ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
     }
-
 }

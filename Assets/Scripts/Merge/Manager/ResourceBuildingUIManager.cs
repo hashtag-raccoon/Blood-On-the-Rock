@@ -151,13 +151,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
         }
 
         List<BuildingProductionInfo> productionInfos =
-            BuildingRepository.Instance.GetProductionInfosForBuildingName(currentConstructedBuilding.Name);
-
-        if (productionInfos == null)
-        {
-            Debug.LogError("[ResourceBuildingUIManager] productionInfos가 null입니다."); // 빼지 말아줘
-            return;
-        }
+            BuildingRepository.Instance.GetProductionInfosForBuildingType(currentConstructedBuilding.Type);
 
         foreach (var productionInfo in productionInfos)
         {
