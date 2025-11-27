@@ -113,6 +113,9 @@ public class DataManager : MonoBehaviour
         // Repository로부터 가공된 런타임 데이터를 받아옵니다.
         ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildings();
         npcs = ArbeitRepository.Instance.GetNpcs();
+
+        // 고용된 NPC 스폰
+        ArbeitRepository.Instance.SpawnNpcs();
     }
 
     private void OnApplicationQuit()

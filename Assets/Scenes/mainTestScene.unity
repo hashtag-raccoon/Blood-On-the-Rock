@@ -36329,7 +36329,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a496111eaec6a0f46a78542bda07da2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  personalityDataSO: {fileID: 0}
+  personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
+  npcPrefabs:
+  - {fileID: 6672068367223464638, guid: 884af08f7388ead4987292eef1d04be0, type: 3}
+  - {fileID: 7769332009376783945, guid: ba63e025410bfd34f9813dd4218da1fa, type: 3}
+  - {fileID: 3374620696083767277, guid: 30515cdc05c96a9469ee818cb383f587, type: 3}
+  - {fileID: 6780479688809890403, guid: ade574aade52a3f46955f9bb30a93604, type: 3}
+  - {fileID: 973485167177090442, guid: cbcde748c218f6b41bf95dc5b979a217, type: 3}
+  - {fileID: 5552897585694388153, guid: 55e751a61e451554c8dd0199b2ef4b5b, type: 3}
+  - {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
+  - {fileID: 7998863298994752275, guid: 13bf4ced8f8c24a4a8f04bdbd30146e0, type: 3}
+  - {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
+  defaultSpawnPoint: {fileID: 1170571555}
 --- !u!224 &996990605 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6595235659272945825, guid: ae9b3438b449bc9499c4c89c57b7d9b8, type: 3}
@@ -37506,6 +37517,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d914c4c5d672f3f4a937768415a74b83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &1170571555 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1861480213676830655, guid: fd9f157c38327b94e84f1eafd69b91f6, type: 3}
+  m_PrefabInstance: {fileID: 1276274075}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1184252971
 PrefabInstance:
   m_ObjectHideFlags: 0
