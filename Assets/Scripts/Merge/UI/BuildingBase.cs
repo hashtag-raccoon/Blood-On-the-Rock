@@ -81,6 +81,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
                 }
             });
             upgradeButtonInitialized = true;
+            TargetOrthographicSize = BuildingRepository.Instance.GetBuildingDatabyConstructedBuilding(constructedBuilding).CameraOrthographicSize;
         }
     }
 

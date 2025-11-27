@@ -270,6 +270,11 @@ public class BuildingRepository : MonoBehaviour, IRepository
         return upgradeDataList.Find(data => data.level == level);
     }
 
+    public BuildingData GetBuildingDatabyConstructedBuilding(ConstructedBuilding constructedBuilding)
+    {
+        return GetBuildingDataByTypeId(constructedBuilding.Id);
+    }
+
     /// <summary>
     /// 새로운 건물을 건설 목록에 추가하거나, 이미 존재하면 위치만 업데이트합니다.
     /// </summary>
