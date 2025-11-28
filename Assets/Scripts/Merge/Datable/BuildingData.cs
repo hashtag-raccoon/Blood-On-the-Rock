@@ -40,6 +40,7 @@ public class BuildingData : ScriptableObject, IScrollItemData
     public BuildingType buildingType; // 건물의 타입 ex)생성형,유틸형(대형 시계탑 등)
     public CameraPositionOffset cameraPositionOffset; // 건물 클릭 시 카메라 오프셋 위치
     public float MarkerPositionOffset; // 건물 배치 시 프리뷰 마커 오프셋 높이
+    public float CameraOrthographicSize; // 건물 클릭 시 카메라 줌 크기(ZoomIn Size)
 }
 
 /// <summary>
