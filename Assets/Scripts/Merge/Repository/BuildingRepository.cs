@@ -230,6 +230,7 @@ public class BuildingRepository : MonoBehaviour, IRepository
         {
             return new List<BuildingProductionInfo>();
         }
+        Debug.Log(buildingProductionInfoSO.productionInfos.Where(info => info.building_type == buildingType).ToList().Count);
         return buildingProductionInfoSO.productionInfos.Where(info => info.building_type == buildingType).ToList();
     }
     /// <summary>

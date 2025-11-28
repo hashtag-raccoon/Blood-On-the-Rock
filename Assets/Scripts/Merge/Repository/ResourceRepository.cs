@@ -20,7 +20,7 @@ public class ResourceRepository : MonoBehaviour, IRepository
     public bool IsInitialized { get; private set; } = false;
 
     private const string GoodsPath = "Data/Resource";
-    private List<ResourceData> _resourceDatas = new List<ResourceData>();
+    [SerializeField] private List<ResourceData> _resourceDatas = new List<ResourceData>();
     private Dictionary<string, ResourceData> _resourceDataByName = new Dictionary<string, ResourceData>();
     private Dictionary<int, ResourceData> _resourceDataById = new Dictionary<int, ResourceData>();
 
