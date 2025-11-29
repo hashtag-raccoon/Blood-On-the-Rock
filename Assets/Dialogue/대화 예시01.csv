@@ -1,0 +1,9 @@
+﻿ID,Index,Name,Context,Portrait,NextIndex,EventName,ChoiceA_Text,ChoiceA_Next,ChoiceB_Text,ChoiceB_Next,ChoiceC_Text,ChoiceC_Next
+0,0,TestHuman,테스트입니다,TestHuman_0,1,,,,,,,
+0,1,TestHuman,선택 테스트입니다,TestHuman_1,,,테스트A,101,테스트 B,102,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+0,101,TestHuman,테스트 A 성공,TestHuman_2,-1,,,,,,,
+0,102,TestHuman,테스트 B 진행중,TestHuman_0,107,,,,,,,
+0,107,TestHuman,테스트 B 성공,TestHuman_0,-1,,,,,,,
+,,,,,,,,,,,,

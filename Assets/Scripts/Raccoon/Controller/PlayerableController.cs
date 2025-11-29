@@ -8,7 +8,6 @@ public class PlayerableController : MonoBehaviour
     [Range(1.0f, 10.0f)]
     [SerializeField] private float moveSpeed; // 이동속도
 
-    public bool isSelected = false;
     [HideInInspector]
     public bool PlzStop = false;
 
@@ -19,9 +18,14 @@ public class PlayerableController : MonoBehaviour
 
     void Update()
     {
-        if (isSelected && !PlzStop) // 플레이어블로 선택되었을때, 이동 가능
+        if (!PlzStop) // 플레이어블로 선택되었을때, 이동 가능
         {
             Move();
+        }
+
+        if (Input.GetKeyDown(KeyCode.P)) // P키 입력 시 칵테일 제작 UI 오픈
+        {
+            OpenCocktailMakingUI();
         }
     }
 
@@ -45,7 +49,7 @@ public class PlayerableController : MonoBehaviour
         {
             moveDirection += new Vector3(1.0f, 0.0f, 0.0f);
         }
-        
+
         if (moveDirection != Vector3.zero)
         {
             moveDirection.Normalize();
@@ -60,5 +64,13 @@ public class PlayerableController : MonoBehaviour
 
             transform.position += moveDirection * moveSpeed * Time.deltaTime;
         }
+    }
+
+    /// <summary>
+    /// 칵테일 제작 작업을 여는 함수
+    /// </summary>
+    private void OpenCocktailMakingUI()
+    {
+        CocktailMakingManager._instance.MakingStart();
     }
 }

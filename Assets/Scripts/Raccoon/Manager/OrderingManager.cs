@@ -22,6 +22,9 @@ public class OrderingManager : MonoBehaviour
     [SerializeField] private Vector2 taskPanelSize; // 업무 UI 패널 크기
 
     public ArbeitController[] Arbiets;
+    // 현재 접수된 칵테일 주문 리스트
+    // 해당 주문을 바탕으로 플레이어가 칵테일 제조해야함
+    public List<CocktailRecipeScript> CocktailOrders = new List<CocktailRecipeScript>();
 
 
     public static OrderingManager Instance
@@ -341,43 +344,64 @@ public class OrderingManager : MonoBehaviour
     }
     #endregion
 
-    #region 칵테일 주문 처리
+    #region 칵테일 주문 처리 | 대화창 열기
     /// <summary>
     /// 주문 완료 처리 (대화창에서 주문 수락 시 호출)
-    /// 추후 구현 예정
     /// </summary>
     public void AcceptOrder(GameObject arbeit, TaskInfo task)
     {
+        Debug.Log($"[Order] orderedCocktail: {(task != null && task.orderedCocktail != null ? task.orderedCocktail.CocktailName : "NULL")}");
+
         if (task == null || task.orderedCocktail == null)
         {
-            Debug.LogError("유효하지 않은 주문입니다.");
+            Debug.LogError("task 또는 orderedCocktail이 null");
             return;
         }
-
-        Debug.Log($"주문 수락: {task.orderedCocktail.CocktailName}");
-
-        // 후에 해야할 일 : 주문 데이터를 저장하는 로직 추가
-        // 예: 주문 테이블, 칵테일 정보, 개수 등을 별도 리스트나 딕셔너리에 저장
+        
+        // 주문받은 칵테일을 CocktailOrders 리스트에 추가
+        CocktailOrders.Add(task.orderedCocktail);
+        Debug.Log($"[Order] CocktailOrders.Contains 체크: {CocktailOrders.Contains(task.orderedCocktail)}");
 
         // 대화창 닫기
         CloseDialog();
 
-        // 알바생의 현재 업무 완료 처리
+        // 알바생의 EndTakeOrder(주문 완료) 호출
         var arbeitController = arbeit.GetComponent<ArbeitController>();
         if (arbeitController != null)
         {
-            arbeitController.CompleteCurrentTask();
+            arbeitController.EndTakeOrder();
         }
     }
 
     /// <summary>
     /// 대화창 열기 (대화창 구현 시 호출)
-    /// 추후 구현 예정
     /// </summary>
-    public void OpenDialog(GameObject TargetObj)
+    public void OpenDialog(GameObject arbeitObj, TaskInfo task, Vector2? panelSize = null)
     {
+        if (arbeitObj == null || task == null)
+        {
+            Debug.LogError("arbeitObj 또는 task가 null");
+            return;
+        }
+
         isDialogOpen = true;
-        //dialogOwner = ???;
+        dialogOwner = arbeitObj;
+
+        // DialogueUI를 통해 대화 시작 (대화 종료 시 => AcceptOrder 호출)
+        if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueUI != null)
+        {
+            // 대화 종료 콜백으로 주문 완료 처리 메소드 추가
+            System.Action onDialogueEnd = () => AcceptOrder(arbeitObj, task);
+
+            string cocktailName = null;
+            if (task.orderedCocktail != null)
+            {
+                cocktailName = task.orderedCocktail.CocktailName;
+            }
+
+            // 대화 시작 (첫 번째 대화 ID는 0으로 가정, panelSize는 ArbietController에서 목적지 도착할때 호출함)
+            DialogueManager.Instance.dialogueUI.StartOrderDialogue(0, panelSize, onDialogueEnd, cocktailName, null);
+        }
     }
 
     /// <summary>

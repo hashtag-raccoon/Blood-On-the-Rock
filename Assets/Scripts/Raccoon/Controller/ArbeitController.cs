@@ -163,6 +163,22 @@ public class ArbeitController : MonoBehaviour
         // 목적지 도착 시 로직
         // 목적지 도착 시 처리할 추가 로직이 있으면 여기에 작성할 것
         Debug.Log($"Arbeit {myNpcData?.part_timer_name} reached destination.");
+
+        if (currentTask != null && currentTask.taskType == TaskType.TakeOrder)
+        {
+            // 대화 CSV 로드, 무조건 로드 후 대화 시작해야함
+            DialogueManager.Instance.LoadDialogue("대화 예시01");
+
+            // OrderingManager를 통해 대화 시작, 대화 종료 시 주문 수락 처리
+            if (OrderingManager.Instance != null)
+            {
+                OrderingManager.Instance.OpenDialog(this.gameObject, currentTask, new Vector2(700, 500));
+            }
+            else
+            {
+                Debug.LogError("OrderingManager.Instance가 null입니다.");
+            }
+        }
     }
     #endregion
 
@@ -177,8 +193,8 @@ public class ArbeitController : MonoBehaviour
             return false;
         }
 
-        taskQueue.Add(task);
-        UpdateTaskUI();
+        taskQueue.Add(task); // 업무 큐에 추가
+        UpdateTaskUI(); // 큐에 추가 후 TaskUI 업데이트하여 표시함
 
         // 현재 업무가 없으면 바로 시작
         if (currentTask == null)
@@ -190,7 +206,7 @@ public class ArbeitController : MonoBehaviour
     }
 
     /// <summary>
-    /// 다음 업무 시작
+    /// 다음 업무 시작, 현재 업무가 없을 때 호출됨
     /// </summary>
     private void StartNextTask()
     {
@@ -209,7 +225,7 @@ public class ArbeitController : MonoBehaviour
     }
 
     /// <summary>
-    /// 업무 처리
+    /// 업무 처리, 업무 타입에 따라 바로 일을 수행함
     /// </summary>
     private void ProcessTask(TaskInfo task)
     {
@@ -235,8 +251,14 @@ public class ArbeitController : MonoBehaviour
     private void ProcessTakeOrder(TaskInfo task)
     {
         Debug.Log($"{myNpcData?.part_timer_name}이(가) 주문을 받으러 갑니다.");
-        // 추후 추가할 일: 손님에게 이동 후 대화창 열기
-        SetTarget(task.targetObject.transform);
+
+        SetTarget(task.targetObject.transform); // Target을 향해 이동 시작함
+    }
+
+    // 대화창 종료 후 호출할 예정
+    public void EndTakeOrder()
+    {
+        CompleteCurrentTask(); // 현재 업무 완료 처리, 완료한 업무는 모든 알바생도 제거됨
     }
 
     /// <summary>
@@ -268,7 +290,7 @@ public class ArbeitController : MonoBehaviour
         {
             OrderingManager.Instance.RemoveTask(currentTask);
             currentTask = null;
-            StartNextTask();
+            StartNextTask(); // 다음 업무 시작
         }
     }
 

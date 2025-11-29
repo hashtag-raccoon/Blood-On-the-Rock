@@ -26,4 +26,4 @@ MonoBehaviour:
   buildingType: 1
   cameraPositionOffset: 1
   MarkerPositionOffset: -2.5
-  CameraOrthographicSize: 4
+  CameraOrthographicSize: 3
