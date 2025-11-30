@@ -202,16 +202,13 @@ public class ArbeitController : MonoBehaviour
 
             // 대화 CSV 로드
             DialogueManager.Instance.LoadDialogue(csvName);
-            Debug.Log($"CSV 로드 완료: {csvName}, 로드된 대화 개수: {DialogueManager.Instance.dialogueDic.Count}");
 
             // 대화 인덱스에 해당하는 Portrait 이름 가져옴 => 그 후 OrderingManager로 전달 => 대화창에서 사용
             string portraitName = null;
             DialogueData dialogueData = DialogueManager.Instance.GetDialogue(dialogueIndex);
-            Debug.Log($"dialogueIndex: {dialogueIndex}, dialogueData is null: {dialogueData == null}");
             if (dialogueData != null)
             {
                 portraitName = dialogueData.Portrait;
-                Debug.Log($"Portrait: {portraitName}");
             }
 
             // OrderingManager를 통해 대화 시작

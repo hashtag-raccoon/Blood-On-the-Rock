@@ -14,6 +14,16 @@ public class DialogueManager : MonoBehaviour
     [Header("대화창 UI 할당")]
     public DialogueUI dialogueUI; // UI 프리팹 할당
 
+    [Header("UI 설정")]
+    public int paddingLeft = 180;
+    public int paddingRight = 20;
+    public int paddingTop = 20;
+    public int paddingBottom = 20;
+    public Vector3 namePanelOffset = Vector3.zero;
+    public Vector3 portraitOffset = new Vector3(-10, 10, 0);
+    public float nameTextMaxSize = 50f;
+    public float contextTextMaxSize = 34f;
+
     private void Awake()
     {
         if (Instance == null)
