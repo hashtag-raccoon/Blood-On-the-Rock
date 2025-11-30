@@ -26,6 +26,9 @@ public class OrderingManager : MonoBehaviour
     // 해당 주문을 바탕으로 플레이어가 칵테일 제조해야함
     public List<CocktailRecipeScript> CocktailOrders = new List<CocktailRecipeScript>();
 
+    // 제작 완료된 칵테일 레시피 저장
+    public List<CocktailRecipeScript> CompletedCocktails = new List<CocktailRecipeScript>();
+
 
     public static OrderingManager Instance
     {
@@ -412,6 +415,30 @@ public class OrderingManager : MonoBehaviour
             isDialogOpen = false;
             dialogOwner = null;
         }
+    }
+    #endregion
+
+    #region 칵테일 제작 완료 및 제거
+    /// <summary>
+    /// 칵테일 제작 완료 표시
+    /// </summary>
+    public void MarkCocktailAsCompleted(CocktailRecipeScript recipe)
+    {
+        if (CocktailOrders.Contains(recipe) && !CompletedCocktails.Contains(recipe))
+        {
+            CompletedCocktails.Add(recipe);
+            Debug.Log($"칵테일 제작 완료: {recipe.CocktailName}");
+        }
+    }
+
+    /// <summary>
+    /// 칵테일 서빙 시 주문 목록에서 제거
+    /// </summary>
+    public void RemoveCocktailOrder(CocktailRecipeScript recipe)
+    {
+        CocktailOrders.Remove(recipe);
+        CompletedCocktails.Remove(recipe);
+        Debug.Log($"칵테일 주문 제거: {recipe.CocktailName}");
     }
     #endregion
 }

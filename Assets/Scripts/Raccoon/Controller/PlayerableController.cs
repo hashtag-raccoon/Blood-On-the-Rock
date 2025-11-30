@@ -23,10 +23,18 @@ public class PlayerableController : MonoBehaviour
             Move();
         }
 
-        if (Input.GetKeyDown(KeyCode.P)) // P키 입력 시 칵테일 제작 UI 오픈
+        if(Input.GetKeyDown(KeyCode.P))
         {
-            OpenCocktailMakingUI();
+           if (CocktailMakingManager._instance.GetActiveObject() == false) // P키 입력 시 칵테일 제작 UI 오픈
+            {
+                OpenCocktailMakingUI();
+            }
+            else
+            {
+                CloseCocktailMakingUI();
+            }
         }
+        
     }
 
     private void Move() // 플레이어블 캐릭터 이동 함수
@@ -72,5 +80,10 @@ public class PlayerableController : MonoBehaviour
     private void OpenCocktailMakingUI()
     {
         CocktailMakingManager._instance.MakingStart();
+    }
+
+    private void CloseCocktailMakingUI()
+    {
+        CocktailMakingManager._instance.MakingStop();
     }
 }

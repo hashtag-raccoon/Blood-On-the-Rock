@@ -151,7 +151,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
         }
 
         List<BuildingProductionInfo> productionInfos =
-            BuildingRepository.Instance.GetProductionInfosForBuildingType(currentConstructedBuilding.Type);
+            BuildingRepository.Instance.GetProductionInfosForBuildingType(currentConstructedBuilding.Name);
         Debug.LogWarning("[ResourceBuildingUIManager] 생산 정보 개수: " + productionInfos.Count);
         foreach (var productionInfo in productionInfos)
         {

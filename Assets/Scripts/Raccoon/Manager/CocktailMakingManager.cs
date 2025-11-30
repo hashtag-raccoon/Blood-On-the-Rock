@@ -19,4 +19,13 @@ public class CocktailMakingManager : MonoBehaviour
         cocktailMakingUI.OpenCocktailMakingUI();
     }
 
+    public void MakingStop()
+    {
+        cocktailMakingUI.CloseCocktailMakingUI();
+    }
+
+    public bool GetActiveObject()
+    {
+        return cocktailMakingUI.GestActive();
+    }
 }

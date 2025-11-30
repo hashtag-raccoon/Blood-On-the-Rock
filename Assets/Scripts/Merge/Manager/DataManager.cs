@@ -36,6 +36,8 @@ public class DataManager : MonoBehaviour
     [SerializeField] private BuildingDataSO buildingDataSO;
     [Tooltip("건물의 생산 관련 고정 정보(생산품, 시간 등)를 담고 있는 ScriptableObject")]
     [SerializeField] private BuildingProductionInfoSO buildingProductionInfoSO;
+    [Tooltip("재료 정보(술, 음료, 얼음, 가니쉬)를 담고 있는 ScriptableObject")]
+    [SerializeField] private IngridiantSO ingridiantSO;
     #endregion
 
     #region Raw Data Lists (원본 데이터 - 일부는 Repository로 이전)
@@ -44,6 +46,7 @@ public class DataManager : MonoBehaviour
     // 현재 건설된 건물의 생산 상태 (플레이어 세이브 파일에서 로드)
     public List<ConstructedBuildingProduction> ConstructedBuildingProductions = new List<ConstructedBuildingProduction>();
     public List<ConstructedBuildingPos> ConstructedBuildingPositions = new List<ConstructedBuildingPos>();
+    public List<CocktailData> cocktails = new List<CocktailData>();
     #endregion
 
     #region Runtime Data Lists (가공된 런타임 데이터)
@@ -52,7 +55,6 @@ public class DataManager : MonoBehaviour
 
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
-    [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
     [SerializeField] public List<OrderedCocktail> OrderedCocktails = new List<OrderedCocktail>();
     [SerializeField] public List<ConstructedBuilding> EditMode_InventoryBuildings = new List<ConstructedBuilding>();
     #endregion
@@ -493,6 +495,16 @@ public class DataManager : MonoBehaviour
             }
         }
         return null;
+    }
+    #endregion
+
+    #region ScriptableObject Getter Methods
+    /// <summary>
+    /// 재료 정보(술, 음료, 얼음, 가니쉬)를 담고 있는 ScriptableObject를 반환합니다.
+    /// </summary>
+    public IngridiantSO GetIngridiantSO()
+    {
+        return ingridiantSO;
     }
     #endregion
 }
