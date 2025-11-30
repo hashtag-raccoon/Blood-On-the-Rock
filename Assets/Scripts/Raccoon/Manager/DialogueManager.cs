@@ -105,16 +105,17 @@ public class DialogueManager : MonoBehaviour
             string line = lines[i];
             if (string.IsNullOrWhiteSpace(line)) continue;
 
-            string[] data = line.Split(',');
+            // CSV 파싱: 큰따옴표로 감싼 필드 처리
+            List<string> data = ParseCSVLine(line);
 
-            // 총 13개의 열이 있는데, 해당 열이 부족할 경우 건너뜀
-            if (data.Length < 13)
+            // 총 12개의 열이 있는데, 해당 열이 부족할 경우 건너뜀
+            if (data.Count < 12)
             {
                 continue; // 데이터 부족한 행은 건너뜀 (헤더나 빈 행일 가능성)
             }
 
-            // 첫 번째 열(ID)이 숫자가 아니면 헤더나 설명 행이므로 건너뜀
-            if (!int.TryParse(data[0], out int id))
+            // 첫 번째 열(Index)이 숫자가 아니면 헤더나 설명 행이므로 건너뜀
+            if (!int.TryParse(data[0].Trim(), out int index))
             {
                 continue;
             }
@@ -122,36 +123,77 @@ public class DialogueManager : MonoBehaviour
             // 데이터 찾아서 불러옴, 편의를 위해 빈 데이터는 -1로 처리함
             try
             {
-                int index = int.Parse(data[1]);
-                string name = data[2];
-                string context = data[3];
-                string portrait = data[4];
-                int nextIndex = string.IsNullOrWhiteSpace(data[5]) ? -1 : int.Parse(data[5]);
+                string name = data[1].Trim().Trim('"');
+                string context = data[2].Trim().Trim('"');
+                string portrait = data[3].Trim().Trim('"');
+                int nextIndex = string.IsNullOrWhiteSpace(data[4]) ? -1 : int.Parse(data[4].Trim());
 
-                string eventName = data[6];
-                string choiceA_Text = data[7];
-                int choiceA_Next = string.IsNullOrWhiteSpace(data[8]) ? -1 : int.Parse(data[8]);
+                string eventName = data[5].Trim().Trim('"');
+                string choiceA_Text = data[6].Trim().Trim('"');
+                int choiceA_Next = string.IsNullOrWhiteSpace(data[7]) ? -1 : int.Parse(data[7].Trim());
 
-                string choiceB_Text = data[9];
-                int choiceB_Next = string.IsNullOrWhiteSpace(data[10]) ? -1 : int.Parse(data[10]);
+                string choiceB_Text = data[8].Trim().Trim('"');
+                int choiceB_Next = string.IsNullOrWhiteSpace(data[9]) ? -1 : int.Parse(data[9].Trim());
 
-                string choiceC_Text = data[11];
-                int choiceC_Next = string.IsNullOrWhiteSpace(data[12]) ? -1 : int.Parse(data[12]);
+                string choiceC_Text = data[10].Trim().Trim('"');
+                int choiceC_Next = string.IsNullOrWhiteSpace(data[11]) ? -1 : int.Parse(data[11].Trim());
 
                 // DialogueData 객체 생성 및 딕셔너리에 추가
-                DialogueData dialogue = new DialogueData(id, index, name, context, portrait, nextIndex, eventName,
+                DialogueData dialogue = new DialogueData(index, name, context, portrait, nextIndex, eventName,
                     choiceA_Text, choiceA_Next, choiceB_Text, choiceB_Next, choiceC_Text, choiceC_Next);
 
                 if (!dialogueDic.ContainsKey(index))
                 {
                     dialogueDic.Add(index, dialogue);
                 }
+                else
+                {
+                    Debug.LogWarning($"Line {i}: 중복된 Index '{index}'는 무시됩니다.");
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError($"잘못된 데이터 형식: Line{i}: {e.Message}");
+                Debug.LogError($"잘못된 데이터 형식: Line{i}: {e.Message}\n데이터: {string.Join(", ", data)}");
             }
         }
+    }
+
+    /// <summary>
+    /// CSV 줄을 파싱하여 필드 리스트 반환
+    /// 큰따옴표로 감싼 필드 내의 쉼표는 구분자로 취급하지 않음
+    /// </summary>
+    private List<string> ParseCSVLine(string line)
+    {
+        List<string> fields = new List<string>();
+        string field = "";
+        bool insideQuotes = false;
+
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+
+            if (c == '"')
+            {
+                insideQuotes = !insideQuotes;
+            }
+            else if (c == ',' && !insideQuotes)
+            {
+                fields.Add(field);
+                field = "";
+            }
+            else
+            {
+                field += c;
+            }
+        }
+
+        // 마지막 필드 추가
+        if (!string.IsNullOrEmpty(field) || line.EndsWith(","))
+        {
+            fields.Add(field);
+        }
+
+        return fields;
     }
 
     /// <summary>
@@ -172,7 +214,6 @@ public class DialogueManager : MonoBehaviour
     /// <param name="id">대화 인덱스</param>
     public void StartDialogue(int id)
     {
-        Debug.Log("대화를 시작합니다. ID: " + id);
         if (dialogueUI != null)
         {
             if (dialogueDic.Count == 0)
@@ -192,7 +233,6 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(int id, Vector2? panelSize = null)
     {
-        Debug.Log("대화를 시작합니다. ID: " + id);
         if (dialogueUI != null)
         {
             if (dialogueDic.Count == 0)

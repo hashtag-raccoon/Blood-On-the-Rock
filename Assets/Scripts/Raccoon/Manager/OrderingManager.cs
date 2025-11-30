@@ -350,8 +350,6 @@ public class OrderingManager : MonoBehaviour
     /// </summary>
     public void AcceptOrder(GameObject arbeit, TaskInfo task)
     {
-        Debug.Log($"[Order] orderedCocktail: {(task != null && task.orderedCocktail != null ? task.orderedCocktail.CocktailName : "NULL")}");
-
         if (task == null || task.orderedCocktail == null)
         {
             Debug.LogError("task 또는 orderedCocktail이 null");
@@ -360,7 +358,6 @@ public class OrderingManager : MonoBehaviour
         
         // 주문받은 칵테일을 CocktailOrders 리스트에 추가
         CocktailOrders.Add(task.orderedCocktail);
-        Debug.Log($"[Order] CocktailOrders.Contains 체크: {CocktailOrders.Contains(task.orderedCocktail)}");
 
         // 대화창 닫기
         CloseDialog();
@@ -376,7 +373,7 @@ public class OrderingManager : MonoBehaviour
     /// <summary>
     /// 대화창 열기 (대화창 구현 시 호출)
     /// </summary>
-    public void OpenDialog(GameObject arbeitObj, TaskInfo task, Vector2? panelSize = null)
+    public void OpenDialog(GameObject arbeitObj, TaskInfo task, Vector2? panelSize = null, int startIndex = 0, string portraitName = null)
     {
         if (arbeitObj == null || task == null)
         {
@@ -399,8 +396,8 @@ public class OrderingManager : MonoBehaviour
                 cocktailName = task.orderedCocktail.CocktailName;
             }
 
-            // 대화 시작 (첫 번째 대화 ID는 0으로 가정, panelSize는 ArbietController에서 목적지 도착할때 호출함)
-            DialogueManager.Instance.dialogueUI.StartOrderDialogue(0, panelSize, onDialogueEnd, cocktailName, null);
+            // 대화 시작 (startIndex를 사용, 주문용 치환 텍스트는 칵테일명, 초상화는 portraitName)
+            DialogueManager.Instance.dialogueUI.StartOrderDialogue(startIndex, panelSize, onDialogueEnd, cocktailName, portraitName);
         }
     }
 
@@ -412,7 +409,6 @@ public class OrderingManager : MonoBehaviour
     {
         if (isDialogOpen)
         {
-            Debug.Log($"{dialogOwner?.name}의 대화창이 닫혔습니다.");
             isDialogOpen = false;
             dialogOwner = null;
         }

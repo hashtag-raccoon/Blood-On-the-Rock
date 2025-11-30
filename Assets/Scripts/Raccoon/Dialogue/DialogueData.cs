@@ -13,7 +13,6 @@ public class DialogueData
     public int NextIndex; // 다음 대화의 인덱스
     public string EventName;
 
-    // Choices
     public string ChoiceA_Text;
     public int ChoiceA_Next;
     public string ChoiceB_Text;
@@ -24,23 +23,21 @@ public class DialogueData
     /// <summary>
     /// DialogueData 클래스의 생성자
     /// </summary>
-    /// <param name="id">대화의 고유 ID</param>
     /// <param name="index">현재 대화의 인덱스</param>
-    /// <param name="name">화자 이름</param>
+    /// <param name="name">화자의 이름</param>
     /// <param name="context">대화 내용</param>
-    /// <param name="portrait">화자 초상화</param>
-    /// <param name="nextIndex">다음 인덱스</param>
-    /// <param name="eventName">호출될 메소드 이름</param>
+    /// <param name="portrait">화자의 초상화</param>
+    /// <param name="nextIndex">다음 대화의 인덱스</param>
+    /// <param name="eventName">이벤트로 호출될 메소드 이름</param>
     /// <param name="choiceA_Text">선택지 A 내용</param>
     /// <param name="choiceA_Next">선택지 A 다음 인덱스</param>
     /// <param name="choiceB_Text">선택지 B 내용</param>
     /// <param name="choiceB_Next">선택지 B 다음 인덱스</param>
     /// <param name="choiceC_Text">선택지 C 내용</param>
     /// <param name="choiceC_Next">선택지 C 다음 인덱스</param>
-    public DialogueData(int id, int index, string name, string context, string portrait, int nextIndex, string eventName,
+    public DialogueData(int index, string name, string context, string portrait, int nextIndex, string eventName,
                         string choiceA_Text, int choiceA_Next, string choiceB_Text, int choiceB_Next, string choiceC_Text, int choiceC_Next)
     {
-        ID = id;
         Index = index;
         Name = name;
         Context = context;

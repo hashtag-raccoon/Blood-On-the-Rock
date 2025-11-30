@@ -12,7 +12,7 @@ public class DialogueUI : MonoBehaviour
     public TextMeshProUGUI contextText;
     public Image portraitImage;
 
-    [Header("선택지 버튼 (Context 하단에 자동 배치)")]
+    [Header("선택지 버튼")]
     public Button choiceA_Button;
     public TextMeshProUGUI choiceA_Text;
     public Button choiceB_Button;
@@ -31,44 +31,40 @@ public class DialogueUI : MonoBehaviour
 
     private void Start()
     {
-        // UI 초기화 및 안전성 체크
-        if (dialoguePanel != null)
+        // UI 안전성 체크
+        if (dialoguePanel == null)
         {
-            dialoguePanel.SetActive(false);
-        }
-        else
-        {
+
             Debug.LogError("DialoguePanel이 할당되지 않았습니다!");
         }
 
-        // 선택지 버튼 초기 비활성화
+        // 선택지 버튼들 비활성화
         if (choiceA_Button != null)
         {
-            choiceA_Button.gameObject.SetActive(false);
             choiceA_Button.onClick.AddListener(() => OnChoiceSelected(0));
         }
         if (choiceB_Button != null)
         {
-            choiceB_Button.gameObject.SetActive(false);
             choiceB_Button.onClick.AddListener(() => OnChoiceSelected(1));
         }
         if (choiceC_Button != null)
         {
-            choiceC_Button.gameObject.SetActive(false);
             choiceC_Button.onClick.AddListener(() => OnChoiceSelected(2));
         }
     }
 
     private void Update()
     {
-        // 선택지 버튼이 활성화되지 않았을 때만 입력 대기
+        // 선택지 버튼이 활성화되어 있지 않은 경우에만 입력 대기
         bool anyChoiceActive = (choiceA_Button != null && choiceA_Button.gameObject.activeSelf) ||
                                (choiceB_Button != null && choiceB_Button.gameObject.activeSelf) ||
                                (choiceC_Button != null && choiceC_Button.gameObject.activeSelf);
 
+        // 입력 대기 중이고 선택지 버튼이 활성화되어 있지 않으면
+        // => 즉, 선택지 있는 대화가 아닌 일반 대화 진행 중일 때 다음 대화로 진행
         if (isWaitingForInput && !anyChoiceActive)
         {
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0))
             {
                 DisplayNextContext();
             }
@@ -79,32 +75,23 @@ public class DialogueUI : MonoBehaviour
     private string currentReplacementPortrait;
 
     /// <summary>
-    /// Index에 해당하는 대화를 시작함 (기본)
+    /// Id에 해당하는 대화를 시작함 (일반 대화 시작)
     /// </summary>
     /// <param name="id">대화 딕셔너리 중 n번째의 키(Index)</param>
-    /// <param name="panelSize">대화창 크기 (선택적, 기본값은 현재 크기 유지)</param>
+    /// <param name="panelSize">대화창 크기</param>
     /// <param name="onEndCallback">대화 종료 시 호출할 콜백 함수</param>
     public void StartDialogue(int id, Vector2? panelSize = null, System.Action onEndCallback = null)
     {
-        Debug.Log("대화 시작 ID: " + id);
+        if (this.gameObject.activeSelf == false)
+        {
+            this.gameObject.SetActive(true);
+        }
         currentDialogueID = id;
         
-        // 기본 대화 시작 시 치환 변수 초기화 (이어지는 대화가 아닐 경우)
-        // 단, 내부적으로 NextIndex로 넘어갈 때도 이 함수를 호출하므로, 
-        // 여기서 무조건 초기화하면 안됨.
-        // StartOrderDialogue를 통해 시작된 경우, 이 변수들이 설정되어 있을 것임.
-        // 따라서 여기서는 초기화하지 않음. 
-        // 대신 EndDialogue에서 초기화함.
-
-        // 콜백이 제공된 경우에만 업데이트 (대화 진행 중 내부 호출 시 기존 콜백 유지)
+        // 콜백이 있는 경우에만 업데이트
         if (onEndCallback != null)
         {
             onDialogueEndCallback = onEndCallback;
-            Debug.Log("[StartDialogue] 대화 종료 콜백이 설정되었습니다.");
-        }
-        else
-        {
-            Debug.Log($"[StartDialogue] 콜백 없이 호출됨. 기존 콜백 유지: {(onDialogueEndCallback != null ? "있음" : "없음")}");
         }
 
         // 패널 설정 (크기가 제공되면 전체 설정, 아니면 위치만 설정)
@@ -113,53 +100,52 @@ public class DialogueUI : MonoBehaviour
             RectTransform rectTransform = dialoguePanel.GetComponent<RectTransform>();
             if (rectTransform != null)
             {
+                // 패널 크기 설정 시
                 if (panelSize.HasValue)
                 {
-                    // 크기가 제공되면: 앵커, 크기, 위치 모두 설정
                     rectTransform.anchorMin = new Vector2(0, 0);
                     rectTransform.anchorMax = new Vector2(0, 0);
                     rectTransform.pivot = new Vector2(0, 0);
                     rectTransform.anchoredPosition = new Vector2(0, 0);
 
                     // Layout 컴포넌트가 크기를 변경하지 못하도록 비활성화
+                    // 패널 크기로 조정 되는 것이 아닌, 자동으로 크기가 조정 되는 것을 방지하기 위함
                     var layoutElement = dialoguePanel.GetComponent<LayoutElement>();
                     if (layoutElement != null)
                     {
                         layoutElement.ignoreLayout = true;
                     }
-
+                    // ContentSizeFitter 비활성화
+                    // 패널 크기로 조정 되는 것이 아닌, 자동으로 크기가 조정 되는 것을 방지하기 위함
                     var contentSizeFitter = dialoguePanel.GetComponent<ContentSizeFitter>();
                     if (contentSizeFitter != null)
                     {
                         contentSizeFitter.enabled = false;
                     }
-
+                    
                     // 크기 강제 설정
                     rectTransform.sizeDelta = panelSize.Value;
 
                     // 한 프레임 뒤에 다시 크기 확인
                     Canvas.ForceUpdateCanvases();
-
-                    Debug.Log($"[패널 설정] 크기={panelSize.Value}, 실제 크기={rectTransform.sizeDelta}, 앵커=(0,0), 위치=(0,0)");
                 }
                 else
                 {
-                    // 크기가 없으면: 위치만 재설정 (앵커와 크기는 유지)
+                    // 크기가 없으면: 위치만 재설정
                     rectTransform.anchoredPosition = new Vector2(0, 0);
-                    Debug.Log($"[패널 설정] 위치만 재설정=(0,0), 현재 크기={rectTransform.sizeDelta}");
                 }
             }
         }
-
+        // 대화 데이터 로드
         LoadDialogueData(id);
     }
 
     /// <summary>
-    /// 주문용 대화 시작 (텍스트 및 초상화 치환 지원)
+    /// 주문용 대화 시작 (이때, 텍스트랑 초상화 치환 가능)
     /// </summary>
     public void StartOrderDialogue(int id, Vector2? panelSize = null, System.Action onEndCallback = null, string replacementName = null, string replacementPortrait = null)
     {
-        // 치환 변수 설정
+        // 화자 이름 및 초상화 설정
         currentReplacementName = replacementName;
         currentReplacementPortrait = replacementPortrait;
 
@@ -173,41 +159,39 @@ public class DialogueUI : MonoBehaviour
     /// <param name="id">대화 인덱스</param>
     private void LoadDialogueData(int id)
     {
-        Debug.Log("LoadDialogueData 호출, ID: " + id);
         currentData = DialogueManager.Instance.GetDialogue(id);
-
+        // 대화 데이터가 없으면 경고 출력 후 종료
         if (currentData == null)
         {
             Debug.LogWarning("대화 데이터가 없습니다. ID: " + id);
             EndDialogue();
             return;
         }
-
-        //  안전성 체크
+        //  패널 할당 X 시 종료
         if (dialoguePanel == null)
         {
             Debug.LogError("DialoguePanel이 null입니다!");
             return;
         }
 
+        // 이전 선택 버튼들 모두 비활성화
+        if (choiceA_Button != null) choiceA_Button.gameObject.SetActive(false);
+        if (choiceB_Button != null) choiceB_Button.gameObject.SetActive(false);
+        if (choiceC_Button != null) choiceC_Button.gameObject.SetActive(false);
+
         // 모든 텍스트 컴포넌트를 AutoSize로 설정
         SetTextAutoSize();
-
         dialoguePanel.SetActive(true);
-        Debug.Log("DialoguePanel 활성화됨");
-
         if (nameText != null)
         {
             nameText.text = currentData.Name;
         }
 
-        Debug.Log("Displaying dialogue for: " + currentData.Name + ", Context: " + currentData.Context);
-
         // 현재 인물 이미지는 Image 또는 Sprite로 저장이 되어 있지만
         // csv 파일 내에는 String으로 저장이 되어 있기 때문에
         // 인물 이미지를 Resources - Portraits 폴더 내에서 불러옴
-        
         string portraitName = currentData.Portrait;
+
         // 치환할 초상화가 있다면 교체
         if (!string.IsNullOrEmpty(currentReplacementPortrait))
         {
@@ -227,48 +211,39 @@ public class DialogueUI : MonoBehaviour
             }
             else
             {
-                // 만약 해당 이름의 이미지가 없을 경우, 그냥 비활성화
-                portrait = Resources.Load<Sprite>(portraitName);
-                if (portrait != null)
-                {
-                    portraitImage.sprite = portrait;
-                    portraitImage.gameObject.SetActive(true);
-                    UpdatePortraitPosition();
-                }
-                else
-                {
-                    portraitImage.gameObject.SetActive(false);
-                }
+                Debug.LogWarning("초상화를 Resources/Dialogue/Portraits 폴더에서 찾을 수 없습니다: " + portraitName);
+                portraitImage.gameObject.SetActive(false);
             }
         }
         else
         {
+            //Debug.LogWarning("초상화 이름이 비어있습니다."); // 우선 필요없을거 같아서 비활성화 했는데,, 우선 필요하면 다시 살릴 것
             portraitImage.gameObject.SetActive(false); // 초상화가 없을 경우 이미지 비활성화
         }
 
         // 이벤트 트리거
+        // 해당 Index에서 대화 시작 시 한 번만 호출
         if (!string.IsNullOrEmpty(currentData.EventName))
         {
             Debug.Log($"Triggering Event: {currentData.EventName}");
             // 메시지 또는 전용 이벤트 매니저를 사용할 수 있음
             // 후에 사용할 예정
-            // this.SendMessage(currentData.EventName);
         }
 
         // 대화 내용 분할 및 큐에 저장
         contextQueue.Clear();
 
         string context = currentData.Context;
-        // 치환 텍스트가 있다면 { }를 치환
+        // 치환 텍스트가 있다면 { }를 치환 텍스트로 치환
         if (!string.IsNullOrEmpty(currentReplacementName))
         {
             context = context.Replace("{ }", currentReplacementName);
         }
-
+        // '/' 기준으로 대화 내용 분할
         string[] parts = context.Split('/');
         foreach (string part in parts)
         {
-            contextQueue.Enqueue(part.Trim());
+            contextQueue.Enqueue(part.Trim()); // 공백 제거 후 큐에 추가
         }
 
         DisplayNextContext(); // 다음 대화 내용 표시
@@ -292,11 +267,9 @@ public class DialogueUI : MonoBehaviour
             // 해당 ID의 모든 대화 내용이 끝남
             // 선택지가 있는지 확인
             bool hasChoices = HasChoices();
-            Debug.Log($"대화 내용 끝, 선택지 존재 여부: {hasChoices}");
 
             if (hasChoices)
             {
-                Debug.Log($"ChoiceA: '{currentData.ChoiceA_Text}', ChoiceB: '{currentData.ChoiceB_Text}', ChoiceC: '{currentData.ChoiceC_Text}'");
                 // Context는 그대로 유지하고 선택지를 그 아래에 표시
                 ShowChoices();
             }
@@ -334,7 +307,6 @@ public class DialogueUI : MonoBehaviour
     private void ShowChoices()
     {
         isWaitingForInput = false;
-        Debug.Log("선택지 표시 중...");
 
         // 레이아웃 자동 조정
         if (dialoguePanel != null)
@@ -378,7 +350,7 @@ public class DialogueUI : MonoBehaviour
         if (dialoguePanel != null)
         {
             Canvas.ForceUpdateCanvases();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(dialoguePanel.GetComponent<RectTransform>());
+            LayoutRebuilder.ForceRebuildLayoutImmediate(dialoguePanel.GetComponent<RectTransform>()); // 강제 레이아웃 갱신
         }
     }
 
@@ -443,44 +415,91 @@ public class DialogueUI : MonoBehaviour
     /// </summary>
     private void SetTextAutoSize()
     {
+        // 이름, 내용, 선택지 텍스트들에 대해 AutoSize 설정
+        // Overflow 모드 사용 => 내용이 패널 내에서 줄바꿈되도록 설정
         if (nameText != null)
         {
             nameText.enableAutoSizing = true;
             nameText.fontSizeMin = 10;
             nameText.fontSizeMax = 50;
-            nameText.overflowMode = TextOverflowModes.Truncate; // 패널 밖으로 나가면 자르기
+            nameText.overflowMode = TextOverflowModes.Ellipsis;
+            
+            // RectTransform 크기 제한
+            RectTransform nameRect = nameText.GetComponent<RectTransform>();
+            if (nameRect != null)
+            {
+                nameRect.sizeDelta = new Vector2(300, 50);
+            }
+            
+            // Margin(여백) 설정
+            nameText.margin = new Vector4(10, 10, 10, 10);
         }
 
         if (contextText != null)
         {
             contextText.enableAutoSizing = true;
-            contextText.fontSizeMin = 10;
-            contextText.fontSizeMax = 50;
-            contextText.overflowMode = TextOverflowModes.Truncate;
+            contextText.fontSizeMin = 8;
+            contextText.fontSizeMax = 40;
+            contextText.overflowMode = TextOverflowModes.Overflow;
+            
+            // RectTransform 크기 제한
+            // TODO : 추후 패널 크기에 맞게 동적으로 조정하는 기능 추가 고려
+            RectTransform contextRect = contextText.GetComponent<RectTransform>();
+            if (contextRect != null)
+            {
+                contextRect.sizeDelta = new Vector2(450, 200);
+            }
+            
+            // Margin(여백) 설정
+            contextText.margin = new Vector4(15, 10, 15, 10);
         }
 
         if (choiceA_Text != null)
         {
             choiceA_Text.enableAutoSizing = true;
-            choiceA_Text.fontSizeMin = 10;
-            choiceA_Text.fontSizeMax = 50;
-            choiceA_Text.overflowMode = TextOverflowModes.Truncate;
+            choiceA_Text.fontSizeMin = 8;
+            choiceA_Text.fontSizeMax = 35;
+            choiceA_Text.overflowMode = TextOverflowModes.Overflow;
+            
+            RectTransform choiceARect = choiceA_Text.GetComponent<RectTransform>();
+            if (choiceARect != null)
+            {
+                choiceARect.sizeDelta = new Vector2(400, 80);
+            }
+            
+            choiceA_Text.margin = new Vector4(10, 5, 10, 5);
         }
 
         if (choiceB_Text != null)
         {
             choiceB_Text.enableAutoSizing = true;
-            choiceB_Text.fontSizeMin = 10;
-            choiceB_Text.fontSizeMax = 50;
-            choiceB_Text.overflowMode = TextOverflowModes.Truncate;
+            choiceB_Text.fontSizeMin = 8;
+            choiceB_Text.fontSizeMax = 35;
+            choiceB_Text.overflowMode = TextOverflowModes.Overflow;
+            
+            RectTransform choiceBRect = choiceB_Text.GetComponent<RectTransform>();
+            if (choiceBRect != null)
+            {
+                choiceBRect.sizeDelta = new Vector2(400, 80);
+            }
+            
+            choiceB_Text.margin = new Vector4(10, 5, 10, 5);
         }
 
         if (choiceC_Text != null)
         {
             choiceC_Text.enableAutoSizing = true;
-            choiceC_Text.fontSizeMin = 10;
-            choiceC_Text.fontSizeMax = 50;
-            choiceC_Text.overflowMode = TextOverflowModes.Truncate;
+            choiceC_Text.fontSizeMin = 8;
+            choiceC_Text.fontSizeMax = 35;
+            choiceC_Text.overflowMode = TextOverflowModes.Overflow;
+            
+            RectTransform choiceCRect = choiceC_Text.GetComponent<RectTransform>();
+            if (choiceCRect != null)
+            {
+                choiceCRect.sizeDelta = new Vector2(400, 80);
+            }
+            
+            choiceC_Text.margin = new Vector4(10, 5, 10, 5);
         }
     }
 
@@ -504,7 +523,6 @@ public class DialogueUI : MonoBehaviour
         // 대화 종료 콜백 호출
         if (onDialogueEndCallback != null)
         {
-            Debug.Log("대화 종료 콜백 호출");
             onDialogueEndCallback.Invoke();
             onDialogueEndCallback = null; // 콜백 초기화
         }
