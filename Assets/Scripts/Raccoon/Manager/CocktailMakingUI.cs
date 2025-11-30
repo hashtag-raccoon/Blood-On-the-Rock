@@ -74,6 +74,45 @@ public class CocktailMakingUI : MonoBehaviour
 
         if (glassSelectionUI != null)
             glassSelectionUI.Initialize(cocktailSystem);
+
+        // [FIX] 주문 목록 UI 겹침 문제 해결을 위한 레이아웃 컴포넌트 자동 설정
+        if (orderListContent != null)
+        {
+            // HorizontalLayoutGroup 확인 및 추가 (가로 배치로 변경)
+            HorizontalLayoutGroup hlg = orderListContent.GetComponent<HorizontalLayoutGroup>();
+            if (hlg == null)
+            {
+                // 혹시 VerticalLayoutGroup이 있다면 제거 (충돌 방지)
+                VerticalLayoutGroup vlg = orderListContent.GetComponent<VerticalLayoutGroup>();
+                if (vlg != null) DestroyImmediate(vlg);
+
+                hlg = orderListContent.gameObject.AddComponent<HorizontalLayoutGroup>();
+                hlg.childAlignment = TextAnchor.MiddleLeft;
+                hlg.childControlHeight = false; // 아이템 자체 높이 사용
+                hlg.childControlWidth = false;  // 아이템 자체 너비 사용
+                hlg.childForceExpandHeight = false;
+                hlg.childForceExpandWidth = false;
+                hlg.spacing = 20f; // 적절한 간격
+            }
+
+            // ContentSizeFitter 확인 및 추가
+            ContentSizeFitter csf = orderListContent.GetComponent<ContentSizeFitter>();
+            if (csf == null)
+            {
+                csf = orderListContent.gameObject.AddComponent<ContentSizeFitter>();
+                // 가로 방향으로 늘어나도록 설정
+                csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                csf.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+            }
+
+            // [FIX] 세로 스크롤 비활성화 (가로 스크롤만 허용)
+            ScrollRect scrollRect = orderListContent.GetComponentInParent<ScrollRect>();
+            if (scrollRect != null)
+            {
+                scrollRect.vertical = false;
+                scrollRect.horizontal = true; // 가로 스크롤은 확실하게 켜둠
+            }
+        }
     }
 
     /// <summary>
@@ -191,6 +230,12 @@ public class CocktailMakingUI : MonoBehaviour
         foreach (var recipe in orders)
         {
             CreateOrderItem(recipe);
+        }
+
+        // [FIX] 레이아웃 강제 갱신 (프리팹 생성 직후 위치가 꼬이는 문제 방지)
+        if (orderListContent != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(orderListContent as RectTransform);
         }
     }
 

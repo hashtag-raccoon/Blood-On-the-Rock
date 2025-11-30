@@ -116,7 +116,7 @@ public class IsometricPathfinder : MonoBehaviour
         }
         if (!IsWalkable(target, targetTilemap, targetTilemap_index))
         {
-            Debug.LogWarning($"[Pathfinder] 목표 위치가 이동 불가능한 타일입니다: {target}");
+            //Debug.LogWarning($"[Pathfinder] 목표 위치가 이동 불가능한 타일입니다: {target}");
             return null;
         }
 
