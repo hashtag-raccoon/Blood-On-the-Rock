@@ -17,6 +17,9 @@ public class GuestController : MonoBehaviour
     [HideInInspector]
     public GameObject groupPartner;
 
+    [HideInInspector]
+    public CustomerData customerData;
+
     private Transform Target;
     private List<Vector3Int> currentPath;
     private int currentPathIndex;
@@ -437,8 +440,18 @@ public class GuestController : MonoBehaviour
                 /// 손님이 좌석에 앉았을 때 추가 로직 작성 가능
                 /// </summary>
                 
-                // 착석 후 몇 초 뒤에 Task UI 생성
-                StartCoroutine(ShowTaskUIAfterDelay(UIDelay));
+                // 착석 후 CustomerData의 order_speed에 따라 Task UI 생성 지연 시간 결정
+                float delay = 3.0f;
+                if (customerData != null)
+                {
+                    switch (customerData.order_speed)
+                    {
+                        case "Fast": delay = 2.0f; break;
+                        case "Normal": delay = 4.0f; break;
+                        case "Slow": delay = 6.0f; break;
+                    }
+                }
+                StartCoroutine(ShowTaskUIAfterDelay(delay));
             } 
         }
         // 2. 대기열에 있는 상태로 도착했을 경우
@@ -453,7 +466,6 @@ public class GuestController : MonoBehaviour
     #endregion
 
     #region 2인 파티
-    /// <summary>
     /// 2인 파티 처리를 담당하는 메서드
     /// </summary>
     void HandleTwoPersonParty()
@@ -508,7 +520,7 @@ public class GuestController : MonoBehaviour
             if (newTask != null)
             {
                 // 업무 UI는 OrdeeringManager에서 생성함
-                Debug.Log($"손님이 {newTask.orderedCocktail?.CocktailName} 주문 대기 중");
+                // 추후 필요한게 있다면 여기에 작성
             }
         }
     }

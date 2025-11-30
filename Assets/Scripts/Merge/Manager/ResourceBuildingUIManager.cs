@@ -151,8 +151,8 @@ public class ResourceBuildingUIManager : MonoBehaviour
         }
 
         List<BuildingProductionInfo> productionInfos =
-            BuildingRepository.Instance.GetProductionInfosForBuildingType(currentConstructedBuilding.Name);
-
+            BuildingRepository.Instance.GetProductionInfosForBuildingType(currentConstructedBuilding.Type);
+        Debug.LogWarning("[ResourceBuildingUIManager] 생산 정보 개수: " + productionInfos.Count);
         foreach (var productionInfo in productionInfos)
         {
             CreateProductionItem(productionInfo);
@@ -161,6 +161,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
 
     private void CreateProductionItem(BuildingProductionInfo productionData)
     {
+        Debug.Log("[ResourceBuildingUIManager] CreateProductionItem 호출됨 for Resource ID: " + productionData.resource_id);
         GameObject itemObj = Instantiate(productionItemPrefab, productionListContent);
         ProductionCreateButton createButton = itemObj.GetComponent<ProductionCreateButton>();
 

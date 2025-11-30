@@ -160,9 +160,63 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     void OnReachedDestination()
     {
-        // 목적지 도착 시 로직
-        // 목적지 도착 시 처리할 추가 로직이 있으면 여기에 작성할 것
-        Debug.Log($"Arbeit {myNpcData?.part_timer_name} reached destination.");
+        if (currentTask != null && currentTask.taskType == TaskType. TakeOrder)
+        {
+            GuestController guest = currentTask.targetObject. GetComponent<GuestController>();
+            string csvName = "Human_OrderDialogue";
+            int dialogueIndex = 0;
+
+            if (guest != null && guest.customerData != null)
+            {
+                // 종족에 따라 다른 CSV 파일과 이름, 인덱스를 설정하고 로드함
+                string[] names = null;
+                switch (guest.customerData.race_id)
+                {
+                    case 0: // Human
+                        csvName = "Human_OrderDialogue";
+                        names = new string[] { "교섭관", "농부", "기사단장", "계약중개인", "무역감시관", "일반 시민" };
+                        break;
+                    case 1: // Orc
+                        csvName = "Oak_OrderDialogue";
+                        names = new string[] { "전투 우두머리", "고기 사냥꾼", "혈투 전사", "부족 수호자", "전투 요리사", "일반 오크" };
+                        break;
+                    case 2: // Vampire
+                        csvName = "Vampire_OrderDialogue";
+                        names = new string[] { "혈맹 장군", "순혈 집행관", "가문 감시자", "전통 심판자", "고문헌 수호자", "일반 뱀파이어" };
+                        break;
+                }
+
+                // 그 후 손님 이름에 해당하는 Index 찾아서 후에 그 Index로 대화 시작
+                if (names != null)
+                {
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        if (names[i] == guest.customerData.customer_name)
+                        {
+                            dialogueIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 대화 CSV 로드
+            DialogueManager.Instance.LoadDialogue(csvName);
+            Debug.Log($"CSV 로드 완료: {csvName}, 로드된 대화 개수: {DialogueManager.Instance.dialogueDic.Count}");
+
+            // 대화 인덱스에 해당하는 Portrait 이름 가져옴 => 그 후 OrderingManager로 전달 => 대화창에서 사용
+            string portraitName = null;
+            DialogueData dialogueData = DialogueManager.Instance.GetDialogue(dialogueIndex);
+            Debug.Log($"dialogueIndex: {dialogueIndex}, dialogueData is null: {dialogueData == null}");
+            if (dialogueData != null)
+            {
+                portraitName = dialogueData.Portrait;
+                Debug.Log($"Portrait: {portraitName}");
+            }
+
+            // OrderingManager를 통해 대화 시작
+            OrderingManager.Instance.OpenDialog(this.gameObject, currentTask, new Vector2(700, 500), dialogueIndex, portraitName);
+        }
     }
     #endregion
 
@@ -177,8 +231,8 @@ public class ArbeitController : MonoBehaviour
             return false;
         }
 
-        taskQueue.Add(task);
-        UpdateTaskUI();
+        taskQueue.Add(task); // 업무 큐에 추가
+        UpdateTaskUI(); // 큐에 추가 후 TaskUI 업데이트하여 표시함
 
         // 현재 업무가 없으면 바로 시작
         if (currentTask == null)
@@ -190,7 +244,7 @@ public class ArbeitController : MonoBehaviour
     }
 
     /// <summary>
-    /// 다음 업무 시작
+    /// 다음 업무 시작, 현재 업무가 없을 때 호출됨
     /// </summary>
     private void StartNextTask()
     {
@@ -209,7 +263,7 @@ public class ArbeitController : MonoBehaviour
     }
 
     /// <summary>
-    /// 업무 처리
+    /// 업무 처리, 업무 타입에 따라 바로 일을 수행함
     /// </summary>
     private void ProcessTask(TaskInfo task)
     {
@@ -234,9 +288,15 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     private void ProcessTakeOrder(TaskInfo task)
     {
-        Debug.Log($"{myNpcData?.part_timer_name}이(가) 주문을 받으러 갑니다.");
-        // 추후 추가할 일: 손님에게 이동 후 대화창 열기
-        SetTarget(task.targetObject.transform);
+        // TODO: 후에 섬 -> 씬으로 Npc 데이터 전달할때, 밑에 Debug.Log 삭제
+        Debug.Log($"{myNpcData?.part_timer_name}이(가) 주문을 받습니다.");
+        SetTarget(task.targetObject.transform); // Target을 향해 이동 시작함
+    }
+
+    // 대화창 종료 후 호출할 예정
+    public void EndTakeOrder()
+    {
+        CompleteCurrentTask(); // 현재 업무 완료 처리, 완료한 업무는 모든 알바생도 제거됨
     }
 
     /// <summary>
@@ -244,7 +304,6 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     private void ProcessServeOrder(TaskInfo task)
     {
-        Debug.Log($"{myNpcData?.part_timer_name}이(가) 서빙을 시작합니다.");
         // 추후 추가할 일: 칵테일 제조 후 테이블로 이동
         CompleteCurrentTask();
     }
@@ -254,7 +313,6 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     private void ProcessCleanTable(TaskInfo task)
     {
-        Debug.Log($"{myNpcData?.part_timer_name}이(가) 테이블을 청소합니다.");
         // 추후 추가할 일: 테이블로 이동 후 청소
         CompleteCurrentTask();
     }
@@ -268,7 +326,7 @@ public class ArbeitController : MonoBehaviour
         {
             OrderingManager.Instance.RemoveTask(currentTask);
             currentTask = null;
-            StartNextTask();
+            StartNextTask(); // 다음 업무 시작
         }
     }
 

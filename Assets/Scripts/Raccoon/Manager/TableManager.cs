@@ -4,6 +4,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+// race_id = 종족ID
+// 임시로 0 = 인간, 1 = 오크, 2 = 뱀파이어
+
 public enum waitingDirectionSelection
 {
     Up,
@@ -11,7 +14,6 @@ public enum waitingDirectionSelection
     Left,
     Right
 }
-
 
 public class TableManager : MonoBehaviour
 {
@@ -76,6 +78,12 @@ public class TableManager : MonoBehaviour
     [HideInInspector]
     public List<GameObject> waitingForPartner = new List<GameObject>();
 
+    private List<CustomerData> Customers = new List<CustomerData>();
+
+    private readonly List<string> humanNames = new List<string> { "교섭관", "농부", "기사단장", "계약중개인", "무역감시관", "일반 인간" };
+    private readonly List<string> orcNames = new List<string> { "전투 우두머리", "고기 사냥꾼", "혈투 전사", "부족 수호자", "전투 요리사", "일반 오크" };
+    private readonly List<string> vampireNames = new List<string> { "혈맹 장군", "순혈 집행관", "가문 감시자", "전통 심판자", "고문헌 수호자", "일반 뱀파이어" };
+
     void Awake()
     {
         // 대기열 방향 벡터 설정
@@ -108,6 +116,7 @@ public class TableManager : MonoBehaviour
         }
     }
 
+    #region 손님 스폰(Update에서 처리)
     void Update()
     {
         // 테이블 상태 업데이트
@@ -131,14 +140,14 @@ public class TableManager : MonoBehaviour
         /// <summary>
         /// 손님 스폰 로직
         /// </summary>
-        if (CustomerCount > 0 && waitingCustomerCount < maxWaitingCustomers)
+        if (CustomerCount > 0 && waitingCustomerCount < maxWaitingCustomers) // 손님이 남아있고 대기열이 가득 차지 않았을 때
         {
-            if (Time.time >= nextSpawnTime)
+            if (Time.time >= nextSpawnTime) // 스폰 시간 도달 시
             {
                 nextSpawnTime = Time.time + spawnInterval;
-                int spawnCount = Mathf.Min(1, maxWaitingCustomers - waitingCustomerCount);
+                int spawnCount = Mathf.Min(1, maxWaitingCustomers - waitingCustomerCount); // 한 번에 스폰할 손님 수(1 or 2) 결정
 
-                for (int i = 0; i < spawnCount; i++)
+                for (int i = 0; i < spawnCount; i++) // 1명씩 or 2명씩 스폰함
                 {
                     PartySize = Random.Range(1, 3); // 1인 또는 2인 파티 랜덤 결정
                     if(PartySize == 2 && CustomerCount < 2)
@@ -153,7 +162,8 @@ public class TableManager : MonoBehaviour
                             GuestController guestController = customer.GetComponent<GuestController>();
                             guestController.tableManager = this;
                             guestController.pathfinder = CustomerPath;
-
+                            guestController.customerData = new CustomerData(CustomerCount, "Guest" + CustomerCount, Random.Range(0,3), null, false,
+                            null, 0, 0, 1, "Normal", 5);
                             guestController.desiredPartySize = 1;
                             CustomerCount -= 1;
                             break;
@@ -164,7 +174,8 @@ public class TableManager : MonoBehaviour
                                 GuestController guestController_party = customer_party.GetComponent<GuestController>();
                                 guestController_party.tableManager = this;
                                 guestController_party.pathfinder = CustomerPath;
-
+                                guestController_party.customerData = new CustomerData(CustomerCount - 1 + j, "Guest" + (CustomerCount -1 + j), Random.Range(0,3), null, false,
+                                null, 0, 0, 1, "Normal", 5);
                                 guestController_party.desiredPartySize = 2;
                             }
                             CustomerCount -= 2;
@@ -173,9 +184,10 @@ public class TableManager : MonoBehaviour
                 }
             }
         }
-
         CleanupWaitingLine();
     }
+    #endregion
+
     #region 테이블 상태 업데이트
     /// <summary>
     /// 테이블 상태 업데이트
