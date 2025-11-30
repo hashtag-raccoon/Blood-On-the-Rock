@@ -81,9 +81,20 @@ public class ArbeitRepository : MonoBehaviour, IRepository
     private void InitializeNpcPrefabDictionary()
     {
         _npcPrefabDict.Clear();
+        
+        if (npcPrefabs == null || npcPrefabs.Count == 0)
+        {
+            Debug.LogWarning("npcPrefabs 리스트가 비어있거나 null입니다. Inspector에서 프리팹을 할당해주세요.");
+            return;
+        }
+
         foreach (var prefab in npcPrefabs)
         {
-            if (prefab == null) continue;
+            if (prefab == null)
+            {
+                Debug.LogWarning("npcPrefabs 리스트에 null 프리팹이 포함되어 있습니다.");
+                continue;
+            }
 
             if (!_npcPrefabDict.ContainsKey(prefab.name))
             {
@@ -216,6 +227,12 @@ public class ArbeitRepository : MonoBehaviour, IRepository
             return null;
         }
 
+        if (string.IsNullOrEmpty(npcData.prefab_name))
+        {
+            Debug.LogWarning($"NPC '{npcData.part_timer_name}'(ID: {npcData.part_timer_id})의 prefab_name이 비어있습니다.");
+            return null;
+        }
+
         // prefab_name에서 실제 프리팹 이름으로 변환 (예: "Human_1" -> "Human1")
         string actualPrefabName = ConvertPrefabName(npcData.prefab_name);
         GameObject prefab = GetNpcPrefab(actualPrefabName);
@@ -226,8 +243,9 @@ public class ArbeitRepository : MonoBehaviour, IRepository
             return null;
         }
 
-        // 스폰 위치 결정
-        Vector3 spawnPosition = defaultSpawnPoint != null ? defaultSpawnPoint.position : Vector3.zero;
+        // 스폰 위치 결정 (각 NPC마다 약간씩 오프셋을 주어 겹치지 않도록)
+        Vector3 baseSpawnPosition = defaultSpawnPoint != null ? defaultSpawnPoint.position : Vector3.zero;
+        Vector3 spawnPosition = baseSpawnPosition + new Vector3(_spawnedNpcs.Count * 1.5f, 0, 0); // X축으로 1.5씩 간격
 
         // 프리팹 인스턴스화
         GameObject spawnedNpc = Instantiate(prefab, spawnPosition, Quaternion.identity);
@@ -242,21 +260,51 @@ public class ArbeitRepository : MonoBehaviour, IRepository
         controller.Initialize(npcData);
 
         _spawnedNpcs.Add(spawnedNpc);
-        Debug.Log($"NPC '{npcData.part_timer_name}' 스폰 완료. 프리팹: {actualPrefabName}");
 
         return spawnedNpc;
     }
 
     /// <summary>
     /// prefab_name을 실제 프리팹 파일 이름으로 변환합니다.
-    /// 예: "Human_1" -> "Human1"
+    /// 예: "Human_1" -> "Human1", "Vampire_3" -> "Vam3"
     /// </summary>
     private string ConvertPrefabName(string prefabName)
     {
         if (string.IsNullOrEmpty(prefabName)) return string.Empty;
 
-        // '_'를 제거하여 실제 프리팹 이름으로 변환
-        return prefabName.Replace("_", "");
+        // 종족 이름 매핑 (JSON의 race/prefab_name -> 실제 프리팹 이름)
+        // 예: "Vampire" -> "Vam", "Elf" -> "Oak" 등
+        Dictionary<string, string> raceMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Vampire", "Vam" },
+            { "Elf", "Oak" },
+            { "Human", "Human" },
+            { "Oak", "Oak" },
+            { "Vam", "Vam" } // 이미 줄여진 경우도 지원
+        };
+
+        // prefab_name을 '_' 기준으로 분리 (예: "Vampire_3" -> ["Vampire", "3"])
+        string[] parts = prefabName.Split('_');
+        if (parts.Length != 2)
+        {
+            // '_'가 없거나 형식이 맞지 않으면 그대로 반환 (기존 동작 유지)
+            return prefabName.Replace("_", "");
+        }
+
+        string race = parts[0];
+        string id = parts[1];
+
+        // 종족 이름 매핑 적용
+        if (raceMapping.TryGetValue(race, out string mappedRace))
+        {
+            // 매핑된 종족 이름 + ID 조합 (예: "Vam" + "3" -> "Vam3")
+            return mappedRace + id;
+        }
+        else
+        {
+            // 매핑이 없으면 원래 종족 이름 사용 (예: "Human_1" -> "Human1")
+            return race + id;
+        }
     }
 
     /// <summary>
