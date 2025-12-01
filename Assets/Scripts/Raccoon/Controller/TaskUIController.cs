@@ -16,7 +16,7 @@ public class TaskUIController : MonoBehaviour
 
     [SerializeField] private float customXOffset = 0.9f; // 커스텀 X 오프셋 (필요시 사용)
     private GameObject targetObject; // 타겟 오브젝트 (손님, 테이블, 알바생 등)
-    private TaskInfo assignedTask; // 할당된 업무
+    public TaskInfo assignedTask; // 할당된 업무
     private bool isArbeitUI = false; // 알바생 UI인지 여부
 
     private void Awake()
@@ -26,14 +26,23 @@ public class TaskUIController : MonoBehaviour
         if (rectTransform == null)
             rectTransform = GetComponent<RectTransform>();
         if (taskIcon == null)
-            taskIcon = GetComponentInChildren<UnityEngine.UI.Image>().transform.Find("TaskIcon")
-            .GetComponent<UnityEngine.UI.Image>();
+        {
+            UnityEngine.UI.Image[] images = GetComponentsInChildren<UnityEngine.UI.Image>();
+            foreach (var img in images)
+            {
+                if (img.name == "TaskIcon")
+                {
+                    taskIcon = img;
+                    break;
+                }
+            }
+        }
     }
 
     /// <summary>
     /// 손님/테이블용 업무 UI 초기화
     /// </summary>
-    public void InitializeTargetUI(GameObject target, Vector3 offset, Vector2 uiSize, Vector3 scale)
+    public void InitializeTargetUI(GameObject target, TaskInfo taskInfo, Vector3 offset, Vector2 uiSize, Vector3 scale)
     {
         targetObject = target;
         isArbeitUI = false;
@@ -55,11 +64,17 @@ public class TaskUIController : MonoBehaviour
         // 클릭 이벤트 설정 (알바생에게 업무 할당)
         SetupClickEvent(() => OrderingManager.Instance.OnTargetTaskUIClicked(this.gameObject, targetObject));
 
-        // 타겟의 TaskInfo에서 TaskType을 가져와서 아이콘 업데이트
-        TaskInfo targetTask = OrderingManager.Instance.GetTaskByTarget(target);
-        if (targetTask != null)
+        // 전달받은 TaskInfo 사용
+        if (taskInfo != null)
         {
-            UpdateTaskIcon(targetTask.taskType);
+            assignedTask = taskInfo;
+            // TaskInfo의 targetUI에 할당
+            taskInfo.targetUI = this.gameObject;
+            UpdateTaskIcon(taskInfo.taskType);
+        }
+        else
+        {
+            Debug.LogError($"[InitializeTargetUI] taskInfo가 null입니다! target: {target.name}");
         }
     }
 
@@ -71,6 +86,12 @@ public class TaskUIController : MonoBehaviour
         targetObject = arbeit;
         assignedTask = task;
         isArbeitUI = true;
+
+        // TaskInfo의 arbeitUI에 할당
+        if (task != null)
+        {
+            task.arbeitUI = this.gameObject;
+        }
 
         // 알바생의 자식으로 설정 (이동 시 따라다니게)
         transform.SetParent(arbeit.transform);
@@ -118,7 +139,7 @@ public class TaskUIController : MonoBehaviour
     }
 
     /// <summary>
-    /// 타겟 오브젝트 설정 (기존 코드와 호환성 유지)
+    /// 타겟 오브젝트 설정
     /// </summary>
     public void SetTargetGuest(GameObject target)
     {
@@ -162,5 +183,10 @@ public class TaskUIController : MonoBehaviour
                 taskIcon.sprite = iconSprite;
             }
         }
+    }
+
+    public void Destroy()
+    {
+        Destroy(this.gameObject);
     }
 }

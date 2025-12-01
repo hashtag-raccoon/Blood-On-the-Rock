@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -11,7 +12,7 @@ public class OrderingManager : MonoBehaviour
     [Header("선택 시 외곽선/기본 마테리얼 할당")]
     [SerializeField] private Material selectedOutlineMaterial;
     [SerializeField] private Material DefaultMaterial;
-    [Header("업무 UI 프리펜")]
+    [Header("업무 UI 프리팹")]
     [SerializeField] private GameObject TaskUIPrefab;
 
     [Header("업무 타입별 아이콘")]
@@ -20,12 +21,14 @@ public class OrderingManager : MonoBehaviour
     [SerializeField] private Sprite cleanTableIcon; // 청소 아이콘
     [Header("업무 UI 패널 크기")]
     [SerializeField] private Vector2 taskPanelSize; // 업무 UI 패널 크기
-
+    [Header("알바 리스트")]
     public ArbeitController[] Arbiets;
     // 현재 접수된 칵테일 주문 리스트
     // 해당 주문을 바탕으로 플레이어가 칵테일 제조해야함
+    [Header("칵테일 주문 리스트")]
     public List<CocktailRecipeScript> CocktailOrders = new List<CocktailRecipeScript>();
-
+    [Header("칵테일 주문창 UI 크기")]
+    public Vector2 orderDialogPanelSize = new Vector2(1200, 800); // ArbeitController 에서 사용
 
     public static OrderingManager Instance
     {
@@ -178,8 +181,8 @@ public class OrderingManager : MonoBehaviour
                     newTask = new TaskInfo(TaskType.TakeOrder, TargetObj, randomCocktail);
                     allTasks.Add(newTask);
 
-                    // 업무 UI 생성
-                    TaskUIInstantiate(TargetObj);
+                    // 업무 UI 생성 (생성된 TaskInfo 전달)
+                    TaskUIInstantiate(TargetObj, newTask);
                 }
                 else
                 {
@@ -214,7 +217,7 @@ public class OrderingManager : MonoBehaviour
     /// ex) 손님 위에 주문 UI 띄우기
     /// ex) 테이블 위에 청소 UI 띄우기
     /// </summary>
-    public void TaskUIInstantiate(GameObject TargetObj)
+    public void TaskUIInstantiate(GameObject TargetObj, TaskInfo taskInfo)
     {
         GameObject TaskUIObj = Instantiate(TaskUIPrefab);
 
@@ -229,7 +232,7 @@ public class OrderingManager : MonoBehaviour
         Vector2 uiSize = taskPanelSize;
         Vector3 scale = new Vector3(0.01f, 0.01f, 0.01f);
 
-        uiController.InitializeTargetUI(TargetObj, offset, uiSize, scale);
+        uiController.InitializeTargetUI(TargetObj, taskInfo, offset, uiSize, scale);
     }
 
     /// <summary>
@@ -273,7 +276,7 @@ public class OrderingManager : MonoBehaviour
         var selectedArbeit = CurrentSelected.GetComponent<ArbeitController>();
 
         // 알바생이 업무를 추가할 수 있는지 확인
-        if (!selectedArbeit.CanAddTask())
+        if (!selectedArbeit.CanAddTask(taskUI))
         {
             return;
         }
@@ -332,7 +335,18 @@ public class OrderingManager : MonoBehaviour
     /// </summary>
     public TaskInfo GetTaskByTarget(GameObject target)
     {
-        return allTasks.Find(task => task.targetObject == target && !task.isCompleted);
+        TaskInfo result = allTasks.Find(task => task.targetObject == target && !task.isCompleted);
+        return result;
+    }
+
+    public GameObject GetTartgetByTask(TaskInfo task)
+    {
+        return task.targetObject;
+    }
+
+    public GameObject GetUIByTask(TaskInfo task)
+    {
+        return task.targetUI;
     }
 
     /// <summary>
@@ -341,6 +355,11 @@ public class OrderingManager : MonoBehaviour
     public List<TaskInfo> GetAllTasks()
     {
         return allTasks;
+    }
+
+    public bool HasTask(TaskInfo task)
+    {
+        return GetAllTasks().Contains(task);
     }
     #endregion
 
@@ -355,7 +374,7 @@ public class OrderingManager : MonoBehaviour
             Debug.LogError("task 또는 orderedCocktail이 null");
             return;
         }
-        
+
         // 주문받은 칵테일을 CocktailOrders 리스트에 추가
         CocktailOrders.Add(task.orderedCocktail);
 

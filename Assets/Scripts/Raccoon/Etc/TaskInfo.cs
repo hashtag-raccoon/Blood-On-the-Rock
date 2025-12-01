@@ -20,7 +20,8 @@ public class TaskInfo
     public GameObject targetObject;     // 업무 대상 오브젝트 (손님, 테이블 등)
     public CocktailRecipeScript orderedCocktail; // 주문한 칵테일 (업무 - 칵테일 주문일 경우)
     public bool isCompleted = false;    // 업무 완료 여부
-    public GameObject taskUI;           // 업무 UI 오브젝트
+    public GameObject targetUI;         // 타겟(손님/테이블) 위의 업무 UI
+    public GameObject arbeitUI;         // 알바생 위의 업무 UI
 
     /// <summary>
     /// 업무 - 칵테일 주문용 생성자
@@ -41,10 +42,20 @@ public class TaskInfo
     public void CompleteTask()
     {
         isCompleted = true;
-        // UI 제거
-        if (taskUI != null)
+
+        // Target UI 제거
+        if (targetUI != null && targetUI)
         {
-            Object.Destroy(taskUI);
+            Object.Destroy(targetUI);
+            targetUI = null;
+        }
+
+        // Arbeit UI 제거
+        if (arbeitUI != null && arbeitUI)
+        {
+            Object.Destroy(arbeitUI);
+            arbeitUI = null;
         }
     }
+
 }

@@ -29,7 +29,7 @@ public class GuestController : MonoBehaviour
     private int myWaitingPosition = -1;
     private GameObject waitingTargetObject;
     private bool isSeated = false;
-    private Transform assignedSeat; 
+    private Transform assignedSeat;
     [SerializeField] private float UIDelay = 3.0f; // Task UI 생성 지연 시간
 
     void Start()
@@ -114,7 +114,7 @@ public class GuestController : MonoBehaviour
             DestroyImmediate(waitingTargetObject); // 대기 타겟 오브젝트 제거
         }
     }
-    
+
     #region 테이블 & 좌석 할당
     /// <summary>
     /// 테이블과 좌석을 할당하는 메서드
@@ -142,7 +142,7 @@ public class GuestController : MonoBehaviour
         if (desiredPartySize == 2 && groupPartner == null)
         {
             GameObject partner = tableManager.FindPartnerForTwoPersonParty(this.gameObject);
-            
+
             if (partner != null)
             {
                 groupPartner = partner;
@@ -161,7 +161,7 @@ public class GuestController : MonoBehaviour
                     return;
                 }
             }
-            
+
             return;
         }
 
@@ -172,7 +172,7 @@ public class GuestController : MonoBehaviour
             TableClass tableComp = partialTable.GetComponent<TableClass>();
             int seatedCount = tableComp.Seated_Customer.Count; // 해당 테이블의 현재 앉아있는 수와
             // // 예약된 수를 확인함, 만약 테이블 예약 리스트의 해당 테이블에 대한 예약이 없으면 해당 테이블의 예약 수를 0으로 간주
-            int reservedCount = tableManager.tableReservations.ContainsKey(partialTable) ? 
+            int reservedCount = tableManager.tableReservations.ContainsKey(partialTable) ?
                                 tableManager.tableReservations[partialTable].Count : 0;
 
             if (seatedCount + reservedCount < tableComp.MAX_Capacity) // 앉아있는 수 + 예약된 수 < 테이블의 최대 수용량일 경우
@@ -200,7 +200,7 @@ public class GuestController : MonoBehaviour
         GameObject availableTable = tableManager.GetAvailableTable(desiredPartySize); // 완전히 비어있는 테이블 탐색
         if (availableTable != null) // 사용 가능한 테이블이 있으면
         {
-            TableClass tableComp = availableTable.GetComponent<TableClass>(); 
+            TableClass tableComp = availableTable.GetComponent<TableClass>();
             // 해당 테이블의 예약된 수를 확인, 만약 테이블 예약 리스트의 해당 테이블에 대한 예약이 없으면 해당 테이블의 예약 수를 0으로 간주
             int reservedCount = tableManager.tableReservations.ContainsKey(availableTable) ?
                                 tableManager.tableReservations[availableTable].Count : 0;
@@ -439,7 +439,7 @@ public class GuestController : MonoBehaviour
                 ///<summary>
                 /// 손님이 좌석에 앉았을 때 추가 로직 작성 가능
                 /// </summary>
-                
+
                 // 착석 후 CustomerData의 order_speed에 따라 Task UI 생성 지연 시간 결정
                 float delay = 3.0f;
                 if (customerData != null)
@@ -452,7 +452,7 @@ public class GuestController : MonoBehaviour
                     }
                 }
                 StartCoroutine(ShowTaskUIAfterDelay(delay));
-            } 
+            }
         }
         // 2. 대기열에 있는 상태로 도착했을 경우
         else if (myWaitingPosition != -1)
@@ -516,7 +516,7 @@ public class GuestController : MonoBehaviour
         {
             // 랜덤 칵테일 주문 업무 생성
             TaskInfo newTask = OrderingManager.Instance.CreateTask(this.gameObject, TaskType.TakeOrder);
-            
+
             if (newTask != null)
             {
                 // 업무 UI는 OrdeeringManager에서 생성함

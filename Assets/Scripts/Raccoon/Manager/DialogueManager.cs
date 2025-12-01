@@ -20,9 +20,13 @@ public class DialogueManager : MonoBehaviour
     public int paddingTop = 20;
     public int paddingBottom = 20;
     public Vector3 namePanelOffset = Vector3.zero;
-    public Vector3 portraitOffset = new Vector3(-10, 10, 0);
+    public Vector3 portraitOffset = Vector3.zero;
     public float nameTextMaxSize = 50f;
     public float contextTextMaxSize = 34f;
+
+    [Header("타이핑 애니메이션 설정")]
+    [Tooltip("글자 출력 속도 (초 단위). 작을수록 빠름")]
+    public float typingSpeed = 0.05f;
 
     private void Awake()
     {
@@ -257,6 +261,26 @@ public class DialogueManager : MonoBehaviour
         else
         {
             Debug.LogError("대화창 UI가 현재 할당되지 않았음");
+        }
+    }
+
+    // 종족에 따른 타이핑 속도, 글자 크기 조절
+    public void RaceToTyping(int race_id)
+    {
+        switch (race_id)
+        {
+            // 인간
+            case 0:
+                typingSpeed = 0.1f;
+                break;
+            // 오크
+            case 1:
+                typingSpeed = 0.02f;
+                break;
+            // 뱀파이어
+            case 2:
+                typingSpeed = 0.15f;
+                break;
         }
     }
 }

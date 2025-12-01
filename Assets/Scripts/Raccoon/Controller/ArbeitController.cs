@@ -160,9 +160,9 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     void OnReachedDestination()
     {
-        if (currentTask != null && currentTask.taskType == TaskType. TakeOrder)
+        if (currentTask != null && currentTask.taskType == TaskType.TakeOrder)
         {
-            GuestController guest = currentTask.targetObject. GetComponent<GuestController>();
+            GuestController guest = currentTask.targetObject.GetComponent<GuestController>();
             string csvName = "Human_OrderDialogue";
             int dialogueIndex = 0;
 
@@ -212,7 +212,9 @@ public class ArbeitController : MonoBehaviour
             }
 
             // OrderingManager를 통해 대화 시작
-            OrderingManager.Instance.OpenDialog(this.gameObject, currentTask, new Vector2(700, 500), dialogueIndex, portraitName);
+            OrderingManager.Instance.OpenDialog(this.gameObject, currentTask, OrderingManager.Instance.orderDialogPanelSize, dialogueIndex, portraitName);
+            DialogueManager.Instance.RaceToTyping(guest.customerData.race_id);
+
         }
     }
     #endregion
@@ -321,9 +323,24 @@ public class ArbeitController : MonoBehaviour
     {
         if (currentTask != null)
         {
-            OrderingManager.Instance.RemoveTask(currentTask);
+            // OrderingManager에서 업무 제거 (RemoveTask 내부에서 CompleteTask 호출됨)
+            if (OrderingManager.Instance != null)
+            {
+                OrderingManager.Instance.RemoveTask(currentTask);
+            }
+            else
+            {
+                Debug.LogError("OrderingManager.Instance가 null입니다!");
+            }
+
             currentTask = null;
-            StartNextTask(); // 다음 업무 시작
+
+            // 다음 업무 시작
+            StartNextTask();
+        }
+        else
+        {
+            Debug.LogWarning("currentTask가 null입니다!");
         }
     }
 
@@ -448,9 +465,9 @@ public class ArbeitController : MonoBehaviour
     /// <summary>
     /// 업무 추가 가능 여부 확인
     /// </summary>
-    public bool CanAddTask()
+    public bool CanAddTask(GameObject taskUI)
     {
-        return GetTaskCount() < MAX_TASKS;
+        return GetTaskCount() < MAX_TASKS || OrderingManager.Instance.HasTask(taskUI.GetComponent<TaskUIController>().assignedTask);
     }
     #endregion
 }

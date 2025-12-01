@@ -35,6 +35,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     private CinemachineVirtualCamera virtualCamera;
     private Coroutine cameraCoroutine;
+    private bool CantUpgrade = false;
 
     private float Origin_cameraOrthographicSize;
     private bool cameraInitialized = false;
@@ -83,6 +84,15 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             upgradeButtonInitialized = true;
             TargetOrthographicSize = BuildingRepository.Instance.GetBuildingDatabyConstructedBuilding(constructedBuilding).CameraOrthographicSize;
         }
+
+        if (constructedBuilding.Type == "Utility")
+        {
+            CantUpgrade = true;
+            if (BuildingUpgradeButton != null)
+            {
+                BuildingUpgradeButton.interactable = false;
+            }
+        }
     }
 
     private void InitializeCamera()
@@ -101,7 +111,15 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     protected virtual void Update()
     {
-
+        // ESC로 건물 UI 닫기
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (BuildingUI.activeSelf)
+            {
+                CloseBuildingUI();
+                AnimateCamera(false);
+            }
+        }
     }
 
     #region Click => Camera Animation & UI Open/Close

@@ -13,6 +13,7 @@ public class DialogueUI : MonoBehaviour
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI contextText;
     public Image portraitImage;
+    public Transform portraitTransform;
 
     [Header("선택지 버튼")]
     public Button choiceA_Button;
@@ -61,10 +62,25 @@ public class DialogueUI : MonoBehaviour
                     layoutGroup.padding = new RectOffset(0, 0, 0, 0);
                     layoutGroup.spacing = 10;
                     layoutGroup.childAlignment = TextAnchor.UpperLeft;
-                    layoutGroup.childControlHeight = true;
+                    layoutGroup.childControlHeight = false; // ContextText가 위에서 시작하도록 false로 변경
                     layoutGroup.childControlWidth = true;
-                    layoutGroup.childForceExpandHeight = true; // 이거 없으면 ContextText가 남은 공간을 못 채움..
+                    layoutGroup.childForceExpandHeight = false; // ContextText가 필요한 만큼만 차지하도록 false로 변경
                     layoutGroup.childForceExpandWidth = true;
+                }
+
+                // ContextText를 왼쪽 위에서 시작하도록 정렬 설정
+                if (contextText != null)
+                {
+                    contextText.alignment = TextAlignmentOptions.TopLeft;
+
+                    // LayoutElement 추가하여 높이를 콘텐츠 크기에 맞춤
+                    LayoutElement contextLayout = contextText.GetComponent<LayoutElement>();
+                    if (contextLayout == null)
+                    {
+                        contextLayout = contextText.gameObject.AddComponent<LayoutElement>();
+                    }
+                    contextLayout.flexibleHeight = 0; // 유연한 높이 비활성화
+                    contextLayout.preferredHeight = -1; // 자동 높이
                 }
             }
             else // 사실 없어도 되는데 없으면 진짜 난리나서 경고 출력
@@ -130,14 +146,14 @@ public class DialogueUI : MonoBehaviour
             this.gameObject.SetActive(true);
         }
         currentDialogueID = id;
-        
+
         // 콜백이 있는 경우에만 업데이트
         if (onEndCallback != null)
         {
             onDialogueEndCallback = onEndCallback;
         }
 
-        // 패널 설정 (크기가 제공되면 전체 설정, 아니면 위치만 설정)
+        // 패널 설정
         if (dialoguePanel != null)
         {
             RectTransform rectTransform = dialoguePanel.GetComponent<RectTransform>();
@@ -285,8 +301,8 @@ public class DialogueUI : MonoBehaviour
         if (contextQueue.Count > 0) // 아직 대화 내용이 남아있으면
         {
             string text = contextQueue.Dequeue(); // 다음 대화 내용 가져오기
-            contextText.text = text;
-            isWaitingForInput = true;
+            StopAllCoroutines(); // 이전 타이핑 애니메이션 중지
+            StartCoroutine(TypeText(text));
         }
         else // 대화 내용이 모두 끝났으면
         {
@@ -314,6 +330,27 @@ public class DialogueUI : MonoBehaviour
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 텍스트를 한 글자씩 출력하는 타이핑 코루틴
+    /// 애니메이션 효과를 주고싶어 만듦, 추후 조정 가능
+    /// </summary>
+    private IEnumerator TypeText(string text)
+    {
+        isTyping = true;
+        contextText.text = "";
+
+        float typingSpeed = DialogueManager.Instance != null ? DialogueManager.Instance.typingSpeed : 0.05f;
+
+        foreach (char letter in text.ToCharArray())
+        {
+            contextText.text += letter;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        isTyping = false;
+        isWaitingForInput = true;
     }
 
     /// <summary>
@@ -419,29 +456,28 @@ public class DialogueUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Portrait 위치 정렬
+    /// Portrait 위치를 SafeArea 기준으로 정렬
     /// </summary>
     private void UpdatePortraitPosition()
     {
-        if (portraitImage != null && dialoguePanel != null)
+        if (portraitImage != null && safeArea != null)
         {
             RectTransform portraitRect = portraitImage.GetComponent<RectTransform>();
-            RectTransform panelRect = dialoguePanel.GetComponent<RectTransform>();
 
-            if (portraitRect != null && panelRect != null)
+            if (portraitRect != null)
             {
-                portraitRect.anchorMin = new Vector2(1, 1);
-                portraitRect.anchorMax = new Vector2(1, 1);
-                portraitRect.pivot = new Vector2(1, 0); // Portrait 하단이 패널 상단에 닿도록 위치 잡음
-                portraitRect.pivot = new Vector2(1, 0); // Portrait 하단이 패널 상단에 닿도록 위치 잡음
-                
-                // 오프셋 적용 (DialogueManager 설정 사용)
-                Vector3 offset = new Vector3(-10, 10, 0); // 기본값
+                // SafeArea의 월드 좌표를 가져옴
+                Vector3 safeAreaPosition = safeArea.position;
+
+                // Portrait를 SafeArea 위치 기준으로 설정
+                // 오프셋을 조절하여 항상 Portrait가 원하는 위치에 있도록함
+                Vector3 offset = Vector3.zero;
                 if (DialogueManager.Instance != null)
                 {
-                    offset = DialogueManager.Instance.portraitOffset;
+                    offset = DialogueManager.Instance.portraitOffset; // DialogueManager에서 오프셋 받음
                 }
-                portraitRect.anchoredPosition = offset;
+
+                portraitRect.position = safeAreaPosition + offset;
             }
         }
     }
@@ -464,19 +500,18 @@ public class DialogueUI : MonoBehaviour
 
                 // NamePanel의 피벗을 (1, 0) [Bottom-Right]으로 설정하여
                 // NamePanel의 오른쪽 아래가 DialoguePanel의 오른쪽 위에 딱 붙게 함
-                // 필요하다면 오프셋 추가 가능
                 if (namePanel.pivot != new Vector2(1, 0))
                 {
                     namePanel.pivot = new Vector2(1, 0);
                 }
-                
+
                 // 오프셋 적용
                 Vector3 offset = Vector3.zero;
                 if (DialogueManager.Instance != null)
                 {
                     offset = DialogueManager.Instance.namePanelOffset;
                 }
-                
+
                 namePanel.position = topRight + offset;
             }
         }
@@ -502,14 +537,14 @@ public class DialogueUI : MonoBehaviour
                 nameText.fontSizeMax = 50;
             }
             nameText.overflowMode = TextOverflowModes.Ellipsis;
-            
+
             // RectTransform 크기 제한 (NamePanel 내부이므로 유지)
             RectTransform nameRect = nameText.GetComponent<RectTransform>();
             if (nameRect != null)
             {
                 nameRect.sizeDelta = new Vector2(300, 50);
             }
-            
+
             // Margin(여백) 설정
             nameText.margin = new Vector4(5, 2, 5, 2);
         }
@@ -528,8 +563,7 @@ public class DialogueUI : MonoBehaviour
             }
             contextText.enableWordWrapping = true;
             contextText.overflowMode = TextOverflowModes.Ellipsis;
-            
-            // LayoutGroup에 의해 제어되도록 sizeDelta 강제 설정 제거
+
             // Margin(여백) 설정
             contextText.margin = new Vector4(15, 10, 15, 10);
         }
@@ -540,7 +574,7 @@ public class DialogueUI : MonoBehaviour
             choiceA_Text.fontSize = 20;
             choiceA_Text.enableWordWrapping = true;
             choiceA_Text.overflowMode = TextOverflowModes.Overflow;
-            
+
             choiceA_Text.margin = new Vector4(10, 5, 10, 5);
         }
 
@@ -550,7 +584,7 @@ public class DialogueUI : MonoBehaviour
             choiceB_Text.fontSize = 20;
             choiceB_Text.enableWordWrapping = true;
             choiceB_Text.overflowMode = TextOverflowModes.Overflow;
-            
+
             choiceB_Text.margin = new Vector4(10, 5, 10, 5);
         }
 
@@ -560,7 +594,7 @@ public class DialogueUI : MonoBehaviour
             choiceC_Text.fontSize = 20;
             choiceC_Text.enableWordWrapping = true;
             choiceC_Text.overflowMode = TextOverflowModes.Overflow;
-            
+
             choiceC_Text.margin = new Vector4(10, 5, 10, 5);
         }
 
@@ -595,7 +629,7 @@ public class DialogueUI : MonoBehaviour
             onDialogueEndCallback.Invoke();
             onDialogueEndCallback = null; // 콜백 초기화
         }
-        
+
         currentReplacementName = null; // 치환 텍스트 초기화
         currentReplacementPortrait = null; // 치환 초상화 초기화
     }
