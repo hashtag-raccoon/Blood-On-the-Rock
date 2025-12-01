@@ -1,0 +1,3462 @@
+fileFormatVersion: 2
+guid: 7dc711f5b0bfe784b9d25e1ad637e498
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 283
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70a4a9784d3fa9f4ea286c65cbf25ff5
+      internalID: 1177237557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_1
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 283
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b917744ed631854aa28a037757945ce
+      internalID: -544213137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_2
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 282
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4dcad9cf569e770459582c5525caa115
+      internalID: 1379507594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_3
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 284
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13e6da5b6066b2a49831f3ebad9f0051
+      internalID: 74057956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_4
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 283
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f808735fb84fb9c49b38874731bc3336
+      internalID: 931282510
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_5
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 283
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 18a1457fc61398743be8ed87ba76bbee
+      internalID: 1082802413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_6
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 282
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ff1a5d0198cd1e4c930881c3e7ed3f3
+      internalID: 911424836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_7
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 284
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82235291765f48c479f5f248cde4a561
+      internalID: 111486968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_8
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 283
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 464d4c9c387ef404ab43f8bcdb8bd805
+      internalID: 889153120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_9
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 283
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 937b47a27e5511b4bbb3f4488203927a
+      internalID: 311217925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_10
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 282
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0b876e009ed1d949845d5bd6eb0c2f9
+      internalID: 72181146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_11
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 284
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da1e7143d917e7b4194b1bb85d23fe84
+      internalID: -457505532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_12
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 294
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3a44a7df62fa6742b14f4804c15f978
+      internalID: -1705754465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_13
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 294
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8587f0f5e9b85fc4693166cade57a8c1
+      internalID: -1949818059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_14
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 294
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 80558561b36ade54c84f4a70ec83223a
+      internalID: -1312681295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_15
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 298
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b42024616dae1a46898f12b8cbb7000
+      internalID: -1699132458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_16
+      rect:
+        serializedVersion: 2
+        x: 481
+        y: 298
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6533f2970d2ab574caea048e4f727a1c
+      internalID: 162434342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_17
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 248
+        width: 32
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c43a0954c5ff6d04e8b9c1283131a09c
+      internalID: -2037497691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_18
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 246
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a91d559c87fb9c4c8b7fe6eaeaea8c1
+      internalID: -1857895922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_19
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 246
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7e4e76a30c283fb4eae62a284c3a440b
+      internalID: -1835789287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_20
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 248
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d2c4020f854dd042b3681d2d86f1439
+      internalID: 496340
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_21
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 248
+        width: 32
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a64c50e1938db848a316372ec1418d1
+      internalID: -925330186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_22
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 246
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 45ba0c23f70c21d4c9fe0501058eb63e
+      internalID: -413924521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_23
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 246
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61762527c68eda1418efb44da0a9c8f1
+      internalID: -1351279291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_24
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 248
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb9d4d617f78b01429b047f7dcb52550
+      internalID: -1437287420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_25
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 248
+        width: 32
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 675016408275f334f9dad580fe842adb
+      internalID: 337885730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_26
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 246
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ffa07d0651d6a1d448f8bb2618d0aeb7
+      internalID: 1550108963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_27
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 246
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a24212e7580f69b46a4a8cb521404577
+      internalID: 469561131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_28
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 248
+        width: 32
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0272502306aae54db420d941f01bad9
+      internalID: -1159198040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_29
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 267
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53f6200b8eb12b94bbb41850ce9edb2a
+      internalID: -8437558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_30
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 267
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a4b27ef7ec6ee04e88bd67e630d6c2e
+      internalID: 1036713804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_31
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 267
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20a89c88ef0c150419d72f2ed19924a5
+      internalID: 1651901404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_32
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 275
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2f033372b9396a644a5f0ddcc9cec96f
+      internalID: 1063271289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_33
+      rect:
+        serializedVersion: 2
+        x: 481
+        y: 275
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b6b54eeb9e9d8d4fa3f39de4c3319a2
+      internalID: 1860478281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_34
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 240
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd67b46128c54144c951ae367a7f75aa
+      internalID: -1503951771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_35
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 240
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62f9dcb0ec5ab964e8ed86bc5c01bbfa
+      internalID: 1667715731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_36
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 240
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d24c8daed004ef41938eed053b61d7a
+      internalID: 1888084511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_37
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 252
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c82fafb778dbff4ba6376efa37ee64f
+      internalID: 855285388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_38
+      rect:
+        serializedVersion: 2
+        x: 481
+        y: 252
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cac361c40bc920842ba6d804070fff15
+      internalID: 1019174182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_39
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 215
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 534e20c62dba7a4499296196adb0ad64
+      internalID: -230547492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_40
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 213
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13fd12a4de455234e9a565f28ca3683c
+      internalID: 1761526334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_41
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 213
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 74fdb774a08c5914dbd84c21329c347a
+      internalID: -1830044605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_42
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 215
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85628bca1780ac543997a68c4dff1278
+      internalID: 644603898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_43
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 215
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d16ef2c0e7a2be947aac79e6df1ab325
+      internalID: -577637327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_44
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 213
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b880cf14d70af4640a2f0627d4a0c65f
+      internalID: 309069999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_45
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 213
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7bc60e89aa91b3d4599210ed316c26ad
+      internalID: -1597216885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_46
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 215
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6281a973c56cf2742b8b548e43e9c7bb
+      internalID: -236715156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_47
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 215
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d68ab04154995fb47bfcc608bfade04e
+      internalID: -171313900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_48
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 213
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1bf41224b8f72394b95c1449b371c564
+      internalID: 868164122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_49
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 213
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fde5201eb32cceb4cb2df8e06e1da6d8
+      internalID: 1970482178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_50
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 215
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7c136f4f618fab8438e66045b2bc7a13
+      internalID: -1592531703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_51
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 213
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a64cdeea82d66594bad27d1b461b9060
+      internalID: -2102908495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_52
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 213
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89a32848eff256645bca09cd447be8db
+      internalID: -191751621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_53
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 213
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ffe1731607e67b44abc462ab84792085
+      internalID: -546128719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_54
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 229
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 419d06035d789c84a88ebc95727f400f
+      internalID: -406747636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_55
+      rect:
+        serializedVersion: 2
+        x: 481
+        y: 229
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57ccc943fe96ed34fb8f8eb9f747c611
+      internalID: 1371503514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_56
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 220
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: abf2f611b979cf54da741cc900b4479a
+      internalID: -1739101800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_57
+      rect:
+        serializedVersion: 2
+        x: 475
+        y: 220
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7bb356d424a41e498ebd2800ce4202e
+      internalID: -861196053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_58
+      rect:
+        serializedVersion: 2
+        x: 487
+        y: 220
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a442279bdbe1cc243a326d37d35eaf27
+      internalID: -1656788435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_59
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 182
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e82992b2fccc4284ea7e8b684e153e18
+      internalID: 2046431083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_60
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 180
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7a723ce46b8c2247928007b94f7a272
+      internalID: -792162363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_61
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 180
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e597b29638330a744bfac889b885d247
+      internalID: 1791387450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_62
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 182
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6d6d66592fb35e4291cdb1043d9b5e3
+      internalID: 732684243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_63
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 182
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab9c3ed093674784d9456f7e041442bc
+      internalID: 1648044522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_64
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 180
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b0c819c9f005f9744a7d932ec61dcda1
+      internalID: -689609416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_65
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 180
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3cb9940e393f77343a5f930cc8e5ad99
+      internalID: 2118359831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_66
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 182
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5489397d1ed5a648a78ea0599c5ba06
+      internalID: 880094611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_67
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 182
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e36620dd305749443a90137369ce51cf
+      internalID: -1426750132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_68
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 180
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c016175878a2f454e88df24b2b5f77b9
+      internalID: -1794981329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_69
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 180
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73d23d2cc823d614eb22b7f52b27e9fa
+      internalID: -1232399917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_70
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 182
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d7b6c4a9fa98484a9ba5fbe1d3189cd
+      internalID: 1460146038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_71
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 190
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3ec501495932bd45863587d7351b0ac
+      internalID: -1940431656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_72
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 190
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1c86a64532e3484b99252f60c0072fd
+      internalID: -1572300955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_73
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 178
+        width: 16
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 038db0052c453e54e8557eb2872ec83f
+      internalID: -793549364
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_74
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 178
+        width: 16
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22c57a12fe64795468766641807e37f5
+      internalID: -559561757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_75
+      rect:
+        serializedVersion: 2
+        x: 466
+        y: 178
+        width: 16
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee5594c6de1fae3498547a84d0dbdf50
+      internalID: -1544117709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_76
+      rect:
+        serializedVersion: 2
+        x: 483
+        y: 178
+        width: 16
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0bee02bb0aa149443bbccae8bde058ac
+      internalID: -616108772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_77
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 152
+        width: 32
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c07ad317b3bec974da712bf2ce53fad5
+      internalID: 1287763378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_78
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 150
+        width: 32
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c92367cc462fc5d48879a8e8ae7f46ae
+      internalID: 222483210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_79
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 149
+        width: 32
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb74c6d63a5093c41a95870934fae030
+      internalID: 1126883747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_80
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 153
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fd065c57da7a5f45898932ba33ea8d1
+      internalID: 1364752853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_81
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 152
+        width: 32
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 104cb604e04dd3240b5ecc772eaa07b8
+      internalID: 1897613769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_82
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 150
+        width: 32
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a55aa50a630e36d478998dfb0039f42a
+      internalID: 83950903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_83
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 149
+        width: 32
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c89554c08a897a489ae46fdaa8d9dbd
+      internalID: -56621528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_84
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 153
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df6e85542c86e664ea079a49d6f00503
+      internalID: 1488162000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_85
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 152
+        width: 32
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dce849b0684361142b79409c75e44db0
+      internalID: 302104202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_86
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 150
+        width: 32
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0c64e3a4a99d69479377f1322283c45
+      internalID: 1814983675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_87
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 149
+        width: 32
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8c5e68a0b2a8bd4195a296a34fc4d78
+      internalID: 798562823
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_88
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 153
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c29ce5c839709ab40a41aa9d2f5a8ba7
+      internalID: 264945301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_89
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 167
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0926e429d6b99614fa72f87f924643ed
+      internalID: -310869353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_90
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 167
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 033ba7977761df44e9658a33e59bc9cd
+      internalID: 837938015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_91
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 143
+        width: 16
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d25b5dca88f1e6046b453179c47762cd
+      internalID: -1535299341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_92
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 143
+        width: 16
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6a463a7b4856ea40a4966afcb130976
+      internalID: 1867581300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_93
+      rect:
+        serializedVersion: 2
+        x: 466
+        y: 143
+        width: 16
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad293d71e09e2294480c20f0f8b50896
+      internalID: -236771257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_94
+      rect:
+        serializedVersion: 2
+        x: 483
+        y: 143
+        width: 16
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76020a04795b87d43b82ce7f2bf668d4
+      internalID: 1831410801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_95
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 125
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61f41514bbe710341b066773d488385a
+      internalID: 910027357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_96
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 121
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a71ee8ac916686044bd6c05d8137f9ad
+      internalID: -1935969337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_97
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 121
+        width: 32
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c58168d774fbc37469abb336aa4c4e8c
+      internalID: 699233679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_98
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 125
+        width: 32
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6bf0e2444d1de75479d3e67ea784d12a
+      internalID: -888407029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_99
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 125
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc71210c07e7f434fb48e5ddc78fdcf8
+      internalID: 866678880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_100
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 121
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66f03d7e36f9e734997214f3ce8d9ef9
+      internalID: 849805020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_101
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 121
+        width: 32
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9be42b1e51cc71c468f0319007dff183
+      internalID: -1514054578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_102
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 125
+        width: 32
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0705af643b21a44eac59c39d94585af
+      internalID: 1016007373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_103
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 125
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f547f027e6493794298e681ed17499d7
+      internalID: -740426478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_104
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 121
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c68d355c785d3a498831cd8a8ac04e6
+      internalID: -916852761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_105
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 121
+        width: 32
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 708ff1196830fc84883b303a217d2d76
+      internalID: -1049845905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_106
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 125
+        width: 32
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d257a2b67139384e8215d1eb66461d4
+      internalID: 1031070604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_107
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 140
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d508515b3457c5b4da3d0d4fb634a691
+      internalID: 738385144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_108
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 140
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1563d7f65291252468831b05b22b810c
+      internalID: -23049875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_109
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 115
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfa8ad73fce31d44d96cfccd72f9bc14
+      internalID: 589814144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_110
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 115
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce9b5de91ed9fb44fb1599cf2799fd45
+      internalID: 1170623484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_111
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 100
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d783cd22c4ea1e843be91a9e63f1eb11
+      internalID: 427206668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_112
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 96
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9801de825a0865246ad3dd807dc70a9b
+      internalID: -1826390423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_113
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 96
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15d36a8c8da679644a3809f2c4c032db
+      internalID: 269004717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_114
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 100
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b6eec4c060bf364ca2f5289e767df45
+      internalID: -315728632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_115
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 100
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 552964ba1f06ae347bab11a714a30265
+      internalID: 730741226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_116
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 96
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69ed5ef555eb4ba4485b266705316810
+      internalID: -176147425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_117
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 96
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 177f3971737670b45bb50c242d04fbf9
+      internalID: 891554969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_118
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 100
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00416c3697b10414a94f85cc6e64b612
+      internalID: 1269568853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_119
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 100
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3771588b1f227504c892c1459a7b3ea0
+      internalID: -2131975981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_120
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 96
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b99bed93251d23946a35683bb373405d
+      internalID: -1481536520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_121
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 96
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 816e18ea96008814a94e693f6903f263
+      internalID: 1073818189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_122
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 100
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eeee004138f48f4489ec79eee669cc92
+      internalID: -120670437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_123
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 113
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 232fa3fecf0349546a10962d25db896f
+      internalID: 333104426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_124
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 113
+        width: 16
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 16101de4cc786aa45b9e89e2be582c51
+      internalID: -1148650285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_125
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 84
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7cde38ea0286618418240933fb67fc6b
+      internalID: 1488733657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_126
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 75
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 383168ca92485154899298a624a787b7
+      internalID: 1079292692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_127
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 71
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b00dd1fe708b32e4dac832dfbab2eda6
+      internalID: -1447804630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_128
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 71
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66aa643c98b91884d8914d42cc0d1361
+      internalID: -235086286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_129
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 75
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c183a1e149e91244fa4c1512e10b2c4c
+      internalID: -1681564075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_130
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 75
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b3dff75df5973843a1b7d266e8f816d
+      internalID: 1408617657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_131
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 71
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c020dd2cc8c863c4fa1cc2cd1dd83f9d
+      internalID: -359439326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_132
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 71
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3845d6fcdbd32c4eab028a437f0082b
+      internalID: -933553498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_133
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 75
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61b4e8aff1c98714496507b6e9110083
+      internalID: -383106213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_134
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 75
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab1a4dadd1e5f4843a8ab62e5cedde62
+      internalID: 1522404165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_135
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 71
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6921146768d205746adbdad183c78769
+      internalID: -729077186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_136
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 71
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5cf17a56c841154d9df9634807f3ab3
+      internalID: 1749260401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_137
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 75
+        width: 32
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ee3ce5a5ea51544394f2dad53c1df70
+      internalID: -766757835
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_138
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 80
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 011dc54b4c611c841b20cb400ab776ed
+      internalID: 2134398737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_139
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 80
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 615839e90131b8b42b5c466df6f51758
+      internalID: -504735397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_140
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 53
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6277b9259e7e074689eb458e389e3e8
+      internalID: -1347578778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_141
+      rect:
+        serializedVersion: 2
+        x: 272
+        y: 43
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd514db6254c8a442aaf408bdb5d33a2
+      internalID: 840988382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_142
+      rect:
+        serializedVersion: 2
+        x: 301
+        y: 43
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08e47f877a5255b4e94368e7a09c8f1f
+      internalID: -321987285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_143
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 38
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 162e8f509b8ce4b48aed21819ec46532
+      internalID: 1160176021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_144
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 38
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ebfcbdd46f841b44ab8f13a1f4e2c9e
+      internalID: 2139693036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_145
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 54
+        width: 32
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69dcee67fdc480b49adf9a43504d89d2
+      internalID: 1751707409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_146
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 54
+        width: 32
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3e03b1171ab02dc45ab71c1055a06073
+      internalID: 1931203482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_147
+      rect:
+        serializedVersion: 2
+        x: 272
+        y: 12
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c47095babeae0774fb34e968ebcab675
+      internalID: -255884582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_148
+      rect:
+        serializedVersion: 2
+        x: 301
+        y: 12
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a62a4f4cd9902304e81a48f2f9c764b2
+      internalID: -1426518074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_149
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 12
+        width: 32
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b484568583919df43bce102886f4cd09
+      internalID: -1640486736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spirithome_terrain_noguide_export_150
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 12
+        width: 32
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37b5ab8985e2b7f41b650dcca82a58da
+      internalID: 159121856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      spirithome_terrain_noguide_export_0: 1177237557
+      spirithome_terrain_noguide_export_1: -544213137
+      spirithome_terrain_noguide_export_10: 72181146
+      spirithome_terrain_noguide_export_100: 849805020
+      spirithome_terrain_noguide_export_101: -1514054578
+      spirithome_terrain_noguide_export_102: 1016007373
+      spirithome_terrain_noguide_export_103: -740426478
+      spirithome_terrain_noguide_export_104: -916852761
+      spirithome_terrain_noguide_export_105: -1049845905
+      spirithome_terrain_noguide_export_106: 1031070604
+      spirithome_terrain_noguide_export_107: 738385144
+      spirithome_terrain_noguide_export_108: -23049875
+      spirithome_terrain_noguide_export_109: 589814144
+      spirithome_terrain_noguide_export_11: -457505532
+      spirithome_terrain_noguide_export_110: 1170623484
+      spirithome_terrain_noguide_export_111: 427206668
+      spirithome_terrain_noguide_export_112: -1826390423
+      spirithome_terrain_noguide_export_113: 269004717
+      spirithome_terrain_noguide_export_114: -315728632
+      spirithome_terrain_noguide_export_115: 730741226
+      spirithome_terrain_noguide_export_116: -176147425
+      spirithome_terrain_noguide_export_117: 891554969
+      spirithome_terrain_noguide_export_118: 1269568853
+      spirithome_terrain_noguide_export_119: -2131975981
+      spirithome_terrain_noguide_export_12: -1705754465
+      spirithome_terrain_noguide_export_120: -1481536520
+      spirithome_terrain_noguide_export_121: 1073818189
+      spirithome_terrain_noguide_export_122: -120670437
+      spirithome_terrain_noguide_export_123: 333104426
+      spirithome_terrain_noguide_export_124: -1148650285
+      spirithome_terrain_noguide_export_125: 1488733657
+      spirithome_terrain_noguide_export_126: 1079292692
+      spirithome_terrain_noguide_export_127: -1447804630
+      spirithome_terrain_noguide_export_128: -235086286
+      spirithome_terrain_noguide_export_129: -1681564075
+      spirithome_terrain_noguide_export_13: -1949818059
+      spirithome_terrain_noguide_export_130: 1408617657
+      spirithome_terrain_noguide_export_131: -359439326
+      spirithome_terrain_noguide_export_132: -933553498
+      spirithome_terrain_noguide_export_133: -383106213
+      spirithome_terrain_noguide_export_134: 1522404165
+      spirithome_terrain_noguide_export_135: -729077186
+      spirithome_terrain_noguide_export_136: 1749260401
+      spirithome_terrain_noguide_export_137: -766757835
+      spirithome_terrain_noguide_export_138: 2134398737
+      spirithome_terrain_noguide_export_139: -504735397
+      spirithome_terrain_noguide_export_14: -1312681295
+      spirithome_terrain_noguide_export_140: -1347578778
+      spirithome_terrain_noguide_export_141: 840988382
+      spirithome_terrain_noguide_export_142: -321987285
+      spirithome_terrain_noguide_export_143: 1160176021
+      spirithome_terrain_noguide_export_144: 2139693036
+      spirithome_terrain_noguide_export_145: 1751707409
+      spirithome_terrain_noguide_export_146: 1931203482
+      spirithome_terrain_noguide_export_147: -255884582
+      spirithome_terrain_noguide_export_148: -1426518074
+      spirithome_terrain_noguide_export_149: -1640486736
+      spirithome_terrain_noguide_export_15: -1699132458
+      spirithome_terrain_noguide_export_150: 159121856
+      spirithome_terrain_noguide_export_16: 162434342
+      spirithome_terrain_noguide_export_17: -2037497691
+      spirithome_terrain_noguide_export_18: -1857895922
+      spirithome_terrain_noguide_export_19: -1835789287
+      spirithome_terrain_noguide_export_2: 1379507594
+      spirithome_terrain_noguide_export_20: 496340
+      spirithome_terrain_noguide_export_21: -925330186
+      spirithome_terrain_noguide_export_22: -413924521
+      spirithome_terrain_noguide_export_23: -1351279291
+      spirithome_terrain_noguide_export_24: -1437287420
+      spirithome_terrain_noguide_export_25: 337885730
+      spirithome_terrain_noguide_export_26: 1550108963
+      spirithome_terrain_noguide_export_27: 469561131
+      spirithome_terrain_noguide_export_28: -1159198040
+      spirithome_terrain_noguide_export_29: -8437558
+      spirithome_terrain_noguide_export_3: 74057956
+      spirithome_terrain_noguide_export_30: 1036713804
+      spirithome_terrain_noguide_export_31: 1651901404
+      spirithome_terrain_noguide_export_32: 1063271289
+      spirithome_terrain_noguide_export_33: 1860478281
+      spirithome_terrain_noguide_export_34: -1503951771
+      spirithome_terrain_noguide_export_35: 1667715731
+      spirithome_terrain_noguide_export_36: 1888084511
+      spirithome_terrain_noguide_export_37: 855285388
+      spirithome_terrain_noguide_export_38: 1019174182
+      spirithome_terrain_noguide_export_39: -230547492
+      spirithome_terrain_noguide_export_4: 931282510
+      spirithome_terrain_noguide_export_40: 1761526334
+      spirithome_terrain_noguide_export_41: -1830044605
+      spirithome_terrain_noguide_export_42: 644603898
+      spirithome_terrain_noguide_export_43: -577637327
+      spirithome_terrain_noguide_export_44: 309069999
+      spirithome_terrain_noguide_export_45: -1597216885
+      spirithome_terrain_noguide_export_46: -236715156
+      spirithome_terrain_noguide_export_47: -171313900
+      spirithome_terrain_noguide_export_48: 868164122
+      spirithome_terrain_noguide_export_49: 1970482178
+      spirithome_terrain_noguide_export_5: 1082802413
+      spirithome_terrain_noguide_export_50: -1592531703
+      spirithome_terrain_noguide_export_51: -2102908495
+      spirithome_terrain_noguide_export_52: -191751621
+      spirithome_terrain_noguide_export_53: -546128719
+      spirithome_terrain_noguide_export_54: -406747636
+      spirithome_terrain_noguide_export_55: 1371503514
+      spirithome_terrain_noguide_export_56: -1739101800
+      spirithome_terrain_noguide_export_57: -861196053
+      spirithome_terrain_noguide_export_58: -1656788435
+      spirithome_terrain_noguide_export_59: 2046431083
+      spirithome_terrain_noguide_export_6: 911424836
+      spirithome_terrain_noguide_export_60: -792162363
+      spirithome_terrain_noguide_export_61: 1791387450
+      spirithome_terrain_noguide_export_62: 732684243
+      spirithome_terrain_noguide_export_63: 1648044522
+      spirithome_terrain_noguide_export_64: -689609416
+      spirithome_terrain_noguide_export_65: 2118359831
+      spirithome_terrain_noguide_export_66: 880094611
+      spirithome_terrain_noguide_export_67: -1426750132
+      spirithome_terrain_noguide_export_68: -1794981329
+      spirithome_terrain_noguide_export_69: -1232399917
+      spirithome_terrain_noguide_export_7: 111486968
+      spirithome_terrain_noguide_export_70: 1460146038
+      spirithome_terrain_noguide_export_71: -1940431656
+      spirithome_terrain_noguide_export_72: -1572300955
+      spirithome_terrain_noguide_export_73: -793549364
+      spirithome_terrain_noguide_export_74: -559561757
+      spirithome_terrain_noguide_export_75: -1544117709
+      spirithome_terrain_noguide_export_76: -616108772
+      spirithome_terrain_noguide_export_77: 1287763378
+      spirithome_terrain_noguide_export_78: 222483210
+      spirithome_terrain_noguide_export_79: 1126883747
+      spirithome_terrain_noguide_export_8: 889153120
+      spirithome_terrain_noguide_export_80: 1364752853
+      spirithome_terrain_noguide_export_81: 1897613769
+      spirithome_terrain_noguide_export_82: 83950903
+      spirithome_terrain_noguide_export_83: -56621528
+      spirithome_terrain_noguide_export_84: 1488162000
+      spirithome_terrain_noguide_export_85: 302104202
+      spirithome_terrain_noguide_export_86: 1814983675
+      spirithome_terrain_noguide_export_87: 798562823
+      spirithome_terrain_noguide_export_88: 264945301
+      spirithome_terrain_noguide_export_89: -310869353
+      spirithome_terrain_noguide_export_9: 311217925
+      spirithome_terrain_noguide_export_90: 837938015
+      spirithome_terrain_noguide_export_91: -1535299341
+      spirithome_terrain_noguide_export_92: 1867581300
+      spirithome_terrain_noguide_export_93: -236771257
+      spirithome_terrain_noguide_export_94: 1831410801
+      spirithome_terrain_noguide_export_95: 910027357
+      spirithome_terrain_noguide_export_96: -1935969337
+      spirithome_terrain_noguide_export_97: 699233679
+      spirithome_terrain_noguide_export_98: -888407029
+      spirithome_terrain_noguide_export_99: 866678880
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
