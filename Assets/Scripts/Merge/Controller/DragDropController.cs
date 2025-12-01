@@ -40,7 +40,10 @@ public class DragDropController : MonoBehaviour
     [SerializeField] private Tilemap ExistingTilemap; // 기존 건물들의 타일맵
     [SerializeField] private Tilemap ExistingInteriorTilemap; // 기존 인테리어들의 타일
     [SerializeField] private Tilemap favorCheckTilemap; // 인테리어 배치 시에만 활성화
+    [SerializeField] private TileBase[] favorRewardTiles;
+    [SerializeField] private TileBase interiorMarkerTile;
     [SerializeField] private TileBase markerTile; // 건물 배치 시 나오는 프리뷰 타일
+
 
     [Header("드래그 설정")]
     [SerializeField] private Camera mainCamera;
@@ -736,6 +739,9 @@ public class DragDropController : MonoBehaviour
     /// </summary>
     private bool CanPlaceWithSize(Vector3Int startCell, Vector2Int tileSize)
     {
+        bool isInterior = draggedSpriteObject != null &&
+                          (draggedSpriteObject.GetComponent<InteriorBase>() != null ||
+                           draggedSpriteObject.GetComponent<TempInteriorData>() != null);
         // 타일 크기만큼 모든 셀 확인
         for (int x = 0; x < tileSize.x; x++)
         {
@@ -968,7 +974,7 @@ public class DragDropController : MonoBehaviour
                     if (building != null)
                     {
                         building.Position = dropCell;
-                        Debug.Log($"건물 ID {building.IsntanceId}의 위치를 {dropCell}로 업데이트했습니다.");
+                        Debug.Log($"건물 ID {building.InstanceId}의 위치를 {dropCell}로 업데이트했습니다.");
                     }
                 }
 

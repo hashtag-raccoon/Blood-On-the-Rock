@@ -181,4 +181,11 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     {
         OnCloseButtonClicked();
     }
+
+    public virtual void OpenUI()
+    {
+        OnOpenButtonClicked();
+    }
 }
+
+
