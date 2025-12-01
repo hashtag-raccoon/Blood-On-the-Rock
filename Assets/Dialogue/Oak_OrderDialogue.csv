@@ -1,0 +1,7 @@
+﻿Index,Name,Context,Portrait,NextIndex,EventName,ChoiceA_Text,ChoiceA_Next,ChoiceB_Text,ChoiceB_Next,ChoiceC_Text,ChoiceC_Next
+0,전투 우두머리,전투 전에 피를 끓여줄 { } ! 아주 맛있게 !,Oak0_Portrait,-1,,,,,,,
+1,고기 사냥꾼,고기 굽는 냄새엔 술이 어울리지. { } 하나 내줘 !,Oak2_Portrait,-1,,,,,,,
+2,혈투 전사,몸에 불 붙는 맛 ! 그런 칵테일 없나?,Oak2_Portrait,-1,,,,,,,
+3,부족 수호자,지친 몸 좀 풀어야겠다. { } 한 잔 부탁한다.,Oak0_Portrait,-1,,,,,,,
+4,전투 요리사,전투 준비엔 속을 달굴 한 잔이 필요하지 ! { } 한 잔 줘라 !,Oak1_Portrait,-1,,,,,,,
+5,일반 오크,{ } 하나 ! 한 잔 줘라 !,Oak1_Portrait,-1,,,,,,,

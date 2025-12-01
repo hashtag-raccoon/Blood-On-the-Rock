@@ -8,6 +8,7 @@ using UnityEditor.ShaderKeywordFilter;
 public class ArbeitData
 {
     public int part_timer_id;
+    public string prefab_name;
     public string part_timer_name;
     public string race;
     public int personality_id;
@@ -22,11 +23,10 @@ public class ArbeitData
     public int fatigue;
     public int daily_wage;
     public bool need_rest;
-    public string prefab_name;
 }
 
 [Serializable]
-public class npc
+public class npc : IScrollItemData
 {
     public int part_timer_id { get; private set; }
     public string part_timer_name { get; private set; }

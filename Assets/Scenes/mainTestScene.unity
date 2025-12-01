@@ -648,13 +648,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 65105025}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5448138c24fe95847880a6593efac764, type: 3}
+  m_Script: {fileID: 11500000, guid: 21f333c53938dcc4babf69718807a89d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   scrollUI: {fileID: 1417113731}
   scrollRect: {fileID: 1417113733}
   content: {fileID: 1713833338}
-  itemPrefab: {fileID: 3792382315192386905, guid: 305afcd83789ec0429b3f58804c0f483, type: 3}
+  itemPrefab: {fileID: 3792382315192386905, guid: fef2a96aece47e84cbeb104bff4bf6e6, type: 3}
   itemWidth: 100
   itemHeight: 100
   spacing: 10
@@ -32717,12 +32717,10 @@ MonoBehaviour:
   virtualCamera: {fileID: 73208573}
   OriginSize: 5
   confiner: {fileID: 73208572}
-  isMaking: 0
+  defaultCollider: {fileID: 948692793}
   isIsland: 1
   MouseFollowingObj: {fileID: 618902431}
   PlayerObj: {fileID: 0}
-  WorkspaceObj: {fileID: 0}
-  defaultCollider: {fileID: 948692793}
   DampingValue: 0.2
   MaxZoomIn: 50
   MinZoomOut: 1
@@ -36944,7 +36942,7 @@ GameObject:
   - component: {fileID: 1122641508}
   - component: {fileID: 1122641507}
   - component: {fileID: 1122641506}
-  - component: {fileID: 1122641505}
+  - component: {fileID: 1122641509}
   m_Layer: 5
   m_Name: InteriorScrollOpenButton
   m_TagString: Untagged
@@ -36972,19 +36970,6 @@ RectTransform:
   m_AnchoredPosition: {x: -800, y: -299.99994}
   m_SizeDelta: {x: 130, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1122641505
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1122641503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23b992813d664414491008d27ce30247, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interiorScrollUI: {fileID: 65105026}
 --- !u!114 &1122641506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37067,6 +37052,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1122641503}
   m_CullTransparentMesh: 1
+--- !u!114 &1122641509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1122641503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cfda5a889c31694aabb8b511463e3ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interiorScrollUI: {fileID: 65105026}
 --- !u!1 &1139278808
 GameObject:
   m_ObjectHideFlags: 0
@@ -38236,14 +38234,16 @@ MonoBehaviour:
   personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
   buildingDataSO: {fileID: 11400000, guid: 9fc70487ce8bd804aa658d37f60b1192, type: 2}
   buildingProductionInfoSO: {fileID: 11400000, guid: 506aba939074ddf41ac9b036998565c0, type: 2}
+  ingridiantSO: {fileID: 0}
   ConstructedBuildingProductions: []
   ConstructedBuildingPositions: []
+  cocktails: []
   npcs: []
   ConstructedBuildings: []
-  cocktails: []
+  OrderedCocktails: []
   EditMode_InventoryBuildings: []
   InteriorDatas:
-  - {fileID: 11400000, guid: eedea4292f3d5a3438097eb892e6bb50, type: 2}
+  - {fileID: 11400000, guid: 4e26635900067c4409b4e5de1b28b46a, type: 2}
   wood: 0
   money: 0
   storeFavor: 100
@@ -39387,12 +39387,12 @@ MonoBehaviour:
   previewTilemap: {fileID: 1576915751}
   banTilemap: {fileID: 0}
   ExistingTilemap: {fileID: 943627039}
-  markerTile: {fileID: 11400000, guid: d563889f5af2bcd439e1d8ba8e838f17, type: 2}
   ExistingInteriorTilemap: {fileID: 943627039}
-  interiorMarkerTile: {fileID: 11400000, guid: d563889f5af2bcd439e1d8ba8e838f17, type: 2}
   favorCheckTilemap: {fileID: 1990404040}
   favorRewardTiles:
   - {fileID: 11400000, guid: c6a65a99adb2dac40bb4980ad3d0aedd, type: 2}
+  interiorMarkerTile: {fileID: 11400000, guid: d563889f5af2bcd439e1d8ba8e838f17, type: 2}
+  markerTile: {fileID: 11400000, guid: d563889f5af2bcd439e1d8ba8e838f17, type: 2}
   mainCamera: {fileID: 1732335579}
   editModeProgressBar: {fileID: 1103797415}
   editScrollUI: {fileID: 931631654}

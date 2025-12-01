@@ -1260,7 +1260,6 @@ GameObject:
   - component: {fileID: 8466804503870193574}
   - component: {fileID: 3476328503621602992}
   - component: {fileID: 8652629203680195009}
-  - component: {fileID: 8330841559614155786}
   m_Layer: 0
   m_Name: Human1
   m_TagString: Untagged
@@ -1300,13 +1299,13 @@ MonoBehaviour:
   animator: {fileID: 8652629203680195009}
   forceDisableRootMotion: 1
   updateAnimatorParameters: 1
+  speedParameter: Speed
   isWalkingParameter: IsWalking
   moveYParameter: MoveY
   movementRoot: {fileID: 8466804503870193574}
   enableRightClickMove: 1
   moveSpeed: 3.5
   stoppingDistance: 0.05
-  guestController: {fileID: 0}
 --- !u!95 &8652629203680195009
 Animator:
   serializedVersion: 5
@@ -1328,22 +1327,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8330841559614155786
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6672068367223464638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ea85d792023efb459bde0008f833bca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pathfinder: {fileID: 0}
-  moveSpeed: 5
-  tableManager: {fileID: 0}
-  desiredPartySize: 1
 --- !u!1 &6851218199502552431
 GameObject:
   m_ObjectHideFlags: 0

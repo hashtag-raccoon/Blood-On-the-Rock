@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// cocktail 전체 데이터
@@ -24,4 +23,5 @@ public class CocktailData
     public int sell_price { get; private set; } // 판매가격
     public int production_cost { get; private set; } // 제작원가
     public int glass_id { get; private set; } // 잔 종류(외래키)
+    public Sprite Icon { get; private set; } // 칵테일 아이콘 (UI 표시용)
 }

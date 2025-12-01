@@ -36,6 +36,8 @@ public class DataManager : MonoBehaviour
     [SerializeField] private BuildingDataSO buildingDataSO;
     [Tooltip("건물의 생산 관련 고정 정보(생산품, 시간 등)를 담고 있는 ScriptableObject")]
     [SerializeField] private BuildingProductionInfoSO buildingProductionInfoSO;
+    [Tooltip("재료 정보(술, 음료, 얼음, 가니쉬)를 담고 있는 ScriptableObject")]
+    [SerializeField] private IngridiantSO ingridiantSO;
     #endregion
 
     #region Raw Data Lists (원본 데이터 - 일부는 Repository로 이전)
@@ -44,6 +46,7 @@ public class DataManager : MonoBehaviour
     // 현재 건설된 건물의 생산 상태 (플레이어 세이브 파일에서 로드)
     public List<ConstructedBuildingProduction> ConstructedBuildingProductions = new List<ConstructedBuildingProduction>();
     public List<ConstructedBuildingPos> ConstructedBuildingPositions = new List<ConstructedBuildingPos>();
+    public List<CocktailData> cocktails = new List<CocktailData>();
     #endregion
 
     #region Runtime Data Lists (가공된 런타임 데이터)
@@ -52,7 +55,7 @@ public class DataManager : MonoBehaviour
 
     [SerializeField] public List<npc> npcs = new List<npc>();
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
-    [SerializeField] public List<CocktailData> cocktails = new List<CocktailData>();
+    [SerializeField] public List<OrderedCocktail> OrderedCocktails = new List<OrderedCocktail>();
     [SerializeField] public List<ConstructedBuilding> EditMode_InventoryBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<InteriorData> InteriorDatas = new List<InteriorData>();
     #endregion
@@ -105,14 +108,14 @@ public class DataManager : MonoBehaviour
             }
         }
 
-        BuildingRepository.Instance.SpawnConstructedBuildings();
-
         // 초기화가 끝날 때까지 대기
         yield return new WaitUntil(() => _repositories.All(r => r.IsInitialized));
 
         // Repository로부터 가공된 런타임 데이터를 받아옵니다.
         ConstructedBuildings = BuildingRepository.Instance.GetConstructedBuildings();
         npcs = ArbeitRepository.Instance.GetNpcs();
+        OrderedCocktails = CocktailRepository.Instance.GetOrderedCocktails();
+        BuildingRepository.Instance.SpawnConstructedBuildings();
 
         // 고용된 NPC 스폰
         ArbeitRepository.Instance.SpawnNpcs();
@@ -124,6 +127,7 @@ public class DataManager : MonoBehaviour
         UpdateConstructedBuildingProductionsFromConstructedBuildings();
         UpdateConstructedBuildingPositionsFromConstructedBuildings();
         UpdateAndSaveArbeitData();
+        SaveCocktailProgress();
         SaveConstructedBuildingProductions();
         SaveConstructedBuidlingPositions();
     }
@@ -199,23 +203,23 @@ public class DataManager : MonoBehaviour
     {
         if (ConstructedBuildings == null || ConstructedBuildingProductions == null) return;
 
-        var productionDict = new Dictionary<int, ConstructedBuildingProduction>();
+        var productionDict = new Dictionary<long, ConstructedBuildingProduction>();
         foreach (var production in ConstructedBuildingProductions)
         {
-            if (!productionDict.ContainsKey(production.building_id))
+            if (!productionDict.ContainsKey(production.instance_id))
             {
-                productionDict.Add(production.building_id, production);
+                productionDict.Add(production.instance_id, production);
             }
             else
             {
-                Debug.LogWarning($"[Data Duplication] ConstructedBuildingProductions에 중복된 building_id '{production.building_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
+                Debug.LogWarning($"[Data Duplication] ConstructedBuildingProductions에 중복된 instance_id '{production.instance_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
             }
         }
 
         int updateCount = 0;
         foreach (var building in ConstructedBuildings)
         {
-            if (productionDict.TryGetValue(building.Id, out var production))
+            if (productionDict.TryGetValue(building.InstanceId, out var production))
             {
                 // 변경사항이 있는지 확인하고 업데이트
                 bool hasChanges = false;
@@ -236,6 +240,45 @@ public class DataManager : MonoBehaviour
                 {
                     production.next_production_time = building.NextProductionTime;
                     hasChanges = true;
+                }
+
+                // 생산 슬롯 정보 저장
+                if (building.IsProducing)
+                {
+                    ResourceBuildingController controller = FindResourceBuildingControllerByInstanceId(building.InstanceId);
+                    if (controller != null)
+                    {
+                        List<ProductionSlotData> slotDataList = new List<ProductionSlotData>();
+                        List<ResourceBuildingController.ProductionInfo> activeProds = controller.GetActiveProductions();
+
+                        foreach (var prod in activeProds)
+                        {
+                            if (prod != null)
+                            {
+                                ProductionSlotData slotData = new ProductionSlotData
+                                {
+                                    slot_index = prod.slotIndex,
+                                    resource_id = prod.productionData.resource_id,
+                                    building_type = prod.productionData.building_type,
+                                    time_remaining = prod.timeRemaining,
+                                    total_production_time = prod.totalProductionTime
+                                };
+                                slotDataList.Add(slotData);
+                            }
+                        }
+
+                        production.production_slots = slotDataList;
+                        hasChanges = true;
+                    }
+                }
+                else
+                {
+                    // 생산 중이 아니면 슬롯 정보 클리어
+                    if (production.production_slots != null && production.production_slots.Count > 0)
+                    {
+                        production.production_slots.Clear();
+                        hasChanges = true;
+                    }
                 }
 
                 if (hasChanges)
@@ -259,23 +302,23 @@ public class DataManager : MonoBehaviour
     {
         if (ConstructedBuildings == null || ConstructedBuildingPositions == null) return;
 
-        var positionDict = new Dictionary<int, ConstructedBuildingPos>();
+        var positionDict = new Dictionary<long, ConstructedBuildingPos>();
         foreach (var position in ConstructedBuildingPositions)
         {
-            if (!positionDict.ContainsKey(position.building_id))
+            if (!positionDict.ContainsKey(position.instance_id))
             {
-                positionDict.Add(position.building_id, position);
+                positionDict.Add(position.instance_id, position);
             }
             else
             {
-                Debug.LogWarning($"[Data Duplication] ConstructedBuildingPositions에 중복된 building_id '{position.building_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
+                Debug.LogWarning($"[Data Duplication] ConstructedBuildingPositions에 중복된 instance_id '{position.instance_id}'가 있습니다. 첫 번째 항목만 사용됩니다.");
             }
         }
 
         int updateCount = 0;
         foreach (var building in ConstructedBuildings)
         {
-            if (positionDict.TryGetValue(building.Id, out var position))
+            if (positionDict.TryGetValue(building.InstanceId, out var position))
             {
                 // 변경사항이 있는지 확인하고 업데이트
                 bool hasChanges = false;
@@ -295,7 +338,7 @@ public class DataManager : MonoBehaviour
                 if (hasChanges)
                 {
                     updateCount++;
-                    Debug.Log($"건물 ID {building.Id}의 위치 데이터를 업데이트했습니다. Position: {building.Position}, Rotation: {building.Rotation}");
+                    Debug.Log($"건물 인스턴스 ID {building.InstanceId}의 위치 데이터를 업데이트했습니다. Position: {building.Position}, Rotation: {building.Rotation}");
                 }
             }
         }
@@ -332,19 +375,30 @@ public class DataManager : MonoBehaviour
         // 최신 상태가 반영된 arbeitDatas 리스트를 파일에 저장합니다.
         jsonDataHandler.SaveArbeitData(arbeitDict.Values.ToList());
     }
+
+    /// <summary>
+    /// 칵테일 진행 정보(해금된 레시피)를 저장
+    /// </summary>
+    private void SaveCocktailProgress()
+    {
+        if (CocktailRepository.Instance == null) return;
+
+        List<int> unlockedRecipeIds = CocktailRepository.Instance.GetUnlockedRecipeIds();
+        jsonDataHandler.SaveCocktailProgress(unlockedRecipeIds);
+    }
     #endregion
 
-    public void UpgradeBuildingLevel(int buildingId)
+    public void UpgradeBuildingLevel(long instanceId)
     {
-        ConstructedBuilding building = GetConstructedBuildingById(buildingId);
+        ConstructedBuilding building = GetConstructedBuildingByInstanceId(instanceId);
         if (building != null)
         {
             building.Level += 1;
-            Debug.Log($"건물 ID:{buildingId} '{building.Name}' 레벨 업그레이드: {building.Level}");
+            Debug.Log($"건물 인스턴스 ID:{instanceId} '{building.Name}' 레벨 업그레이드: {building.Level}");
         }
         else
         {
-            Debug.LogError($"건물 ID:{buildingId}를 찾을 수 없습니다.");
+            Debug.LogError($"건물 인스턴스 ID:{instanceId}를 찾을 수 없습니다.");
         }
     }
 
@@ -355,9 +409,9 @@ public class DataManager : MonoBehaviour
         return ConstructedBuildings.Find(data => data.Name == buildingType);
     }
 
-    public ConstructedBuilding GetConstructedBuildingById(int buildingId)
+    public ConstructedBuilding GetConstructedBuildingByInstanceId(long instanceId)
     {
-        return ConstructedBuildings.Find(data => data.Id == buildingId);
+        return ConstructedBuildings.Find(data => data.InstanceId == instanceId);
     }
 
     #endregion
@@ -381,17 +435,17 @@ public class DataManager : MonoBehaviour
     /// <summary>
     /// 건물의 인벤토리 상태를 업데이트합니다.
     /// </summary>
-    public void UpdateBuildingInventoryStatus(int buildingId, bool isInInventory)
+    public void UpdateBuildingInventoryStatus(long instanceId, bool isInInventory)
     {
-        var building = ConstructedBuildings.Find(b => b.Id == buildingId);
+        var building = ConstructedBuildings.Find(b => b.InstanceId == instanceId);
         if (building != null)
         {
             building.IsEditInventory = isInInventory;
-            Debug.Log($"건물 ID '{buildingId}'의 인벤토리 상태를 업데이트했습니다: {isInInventory}");
+            Debug.Log($"건물 인스턴스 ID '{instanceId}'의 인벤토리 상태를 업데이트했습니다: {isInInventory}");
         }
         else
         {
-            Debug.LogWarning($"건물 ID '{buildingId}'를 찾을 수 없습니다.");
+            Debug.LogWarning($"건물 인스턴스 ID '{instanceId}'를 찾을 수 없습니다.");
         }
     }
 
@@ -410,7 +464,7 @@ public class DataManager : MonoBehaviour
 
         // 특정 섬에 속한 건물만 필터링
         return ConstructedBuildings.Where(b =>
-            BuildingRepository.Instance.GetBuildingDataById(b.Id)?.island_id == mainIslandId
+            BuildingRepository.Instance.GetBuildingDataByTypeId(b.Id)?.island_id == mainIslandId
         ).ToList();
     }
 
@@ -431,19 +485,30 @@ public class DataManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 랜덤으로 칵테일 데이터를 반환
+    /// Scene에서 특정 instance_id를 가진 ResourceBuildingController를 찾습니다.
     /// </summary>
-    /// <returns></returns> <summary>
-    public CocktailData RandomCocktail()
+    private ResourceBuildingController FindResourceBuildingControllerByInstanceId(long instanceId)
     {
-        int randomIndex = UnityEngine.Random.Range(0, cocktails.Count);
-        return cocktails[randomIndex];
+        ResourceBuildingController[] controllers = FindObjectsOfType<ResourceBuildingController>();
+        foreach (var controller in controllers)
+        {
+            if (controller.GetConstructedBuilding() != null &&
+                controller.GetConstructedBuilding().InstanceId == instanceId)
+            {
+                return controller;
+            }
+        }
+        return null;
     }
+    #endregion
 
-    public ResourceData GetResourceByName(string resourceName)
+    #region ScriptableObject Getter Methods
+    /// <summary>
+    /// 재료 정보(술, 음료, 얼음, 가니쉬)를 담고 있는 ScriptableObject를 반환합니다.
+    /// </summary>
+    public IngridiantSO GetIngridiantSO()
     {
-        return ResourceRepository.Instance.GetResourceByName(resourceName);
+        return ingridiantSO;
     }
-
     #endregion
 }

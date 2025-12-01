@@ -1,44 +1,67 @@
 sequenceDiagram
     participant UnityEngine as Unity Engine
     participant DataManager
+    participant JsonDataHandler
     participant Repositories as Repositories (IRepository)
     participant SO_JSON as 원본 데이터 (SO, JSON)
 
     UnityEngine->>DataManager: Awake() 호출
     activate DataManager
     DataManager->>DataManager: 싱글턴(_instance) 초기화
-    DataManager->>SO_JSON: JSON 데이터 로드 (LoadAllData)
+    DataManager->>JsonDataHandler: 생성 및 초기화 (InitializeFiles)
+    activate JsonDataHandler
+    JsonDataHandler-->>DataManager: 초기화 완료
+    deactivate JsonDataHandler
+    
+    DataManager->>JsonDataHandler: LoadAllData() 호출
+    activate JsonDataHandler
+    JsonDataHandler->>SO_JSON: JSON 데이터 로드 (BuildingProductions, Positions)
+    JsonDataHandler-->>DataManager: 로드된 데이터 반환
+    deactivate JsonDataHandler
+    
+    DataManager->>DataManager: EditMode_InventoryBuildings 초기화
     deactivate DataManager
 
     UnityEngine->>Repositories: Awake() 호출 (순서 무관)
     activate Repositories
-    Repositories->>Repositories: 싱글턴(_instance) 초기화
+    Repositories->>DataManager: 자신을 등록 (RegisterRepository(this))
     deactivate Repositories
 
     UnityEngine->>DataManager: Start() 코루틴 시작
     activate DataManager
     DataManager->>DataManager: 1프레임 대기 (yield return null)
 
-    UnityEngine->>Repositories: Start() 호출 (순서 무관)
-    activate Repositories
-    Repositories->>DataManager: 자신을 등록 (RegisterRepository(this))
-    deactivate Repositories
-
     DataManager->>Repositories: 각 Repository의 Initialize() 호출
     activate Repositories
+    Note right of DataManager: BuildingRepository는 로드된 JSON 데이터를 전달받음
     Repositories->>SO_JSON: ScriptableObject 데이터 로드
-    Repositories->>Repositories: 원본 데이터 조합하여 런타임 객체 생성<br/>(e.g., ConstructedBuilding 리스트)
-    Repositories-->>DataManager: 초기화 완료 (IsInitialized = true)
+    Repositories-->>DataManager: 초기화 완료
+    deactivate Repositories
+
+    DataManager->>Repositories: SpawnConstructedBuildings() 호출 (BuildingRepository)
+    activate Repositories
+    Repositories->>Repositories: 건물 오브젝트 생성
     deactivate Repositories
 
     DataManager->>DataManager: 모든 Repository 초기화 완료까지 대기<br/>(WaitUntil... All(r => r.IsInitialized))
     
-    DataManager->>Repositories: 가공된 런타임 데이터 요청<br/>(e.g., GetConstructedBuildings())
+    DataManager->>Repositories: 가공된 런타임 데이터 요청<br/>(GetConstructedBuildings, GetNpcs, GetOrderedCocktails)
     activate Repositories
-    Repositories-->>DataManager: 생성된 런타임 데이터 리스트 반환
+    Repositories-->>DataManager: 런타임 데이터 리스트 반환
     deactivate Repositories
     
-    DataManager->>DataManager: 런타임 데이터 리스트 저장<br/>(DataManager.ConstructedBuildings)
+    DataManager->>DataManager: 런타임 데이터 리스트 저장<br/>(ConstructedBuildings, npcs, OrderedCocktails)
+    deactivate DataManager
+
+    Note right of DataManager: 게임 플레이 진행...
+
+    UnityEngine->>DataManager: OnApplicationQuit() 호출
+    activate DataManager
+    DataManager->>DataManager: 런타임 데이터 -> 원본 데이터 동기화<br/>(UpdateConstructedBuildingProductions...)
+    DataManager->>JsonDataHandler: 데이터 저장 요청
+    activate JsonDataHandler
+    JsonDataHandler->>SO_JSON: JSON 파일 쓰기
+    deactivate JsonDataHandler
     deactivate DataManager
 
     Note right of DataManager: 모든 데이터 준비 완료!

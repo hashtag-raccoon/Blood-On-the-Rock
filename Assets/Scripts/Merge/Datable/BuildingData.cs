@@ -40,6 +40,20 @@ public class BuildingData : ScriptableObject, IScrollItemData
     public BuildingType buildingType; // 건물의 타입 ex)생성형,유틸형(대형 시계탑 등)
     public CameraPositionOffset cameraPositionOffset; // 건물 클릭 시 카메라 오프셋 위치
     public float MarkerPositionOffset; // 건물 배치 시 프리뷰 마커 오프셋 높이
+    public float CameraOrthographicSize; // 건물 클릭 시 카메라 줌 크기(ZoomIn Size)
+}
+
+/// <summary>
+/// 생산 슬롯의 저장 데이터
+/// </summary>
+[Serializable]
+public class ProductionSlotData
+{
+    public int slot_index;              // 슬롯 인덱스 (0-3)
+    public int resource_id;             // 생산 중인 자원 ID
+    public string building_type;        // 건물 타입 (BuildingProductionInfo 조회용)
+    public float time_remaining;        // 남은 시간 (초)
+    public float total_production_time; // 전체 생산 시간 (초)
 }
 
 /// <summary>
@@ -48,16 +62,23 @@ public class BuildingData : ScriptableObject, IScrollItemData
 [Serializable]
 public class ConstructedBuildingProduction
 {
-    public int building_id; // 건물 ID(PK, FK)
+    public long instance_id; // 건물 인스턴스 ID(PK, FK)
     public DateTime last_production_time; // 마지막 생산 시간
     public DateTime next_production_time; // 다음 생산 완료 시간
     public bool is_producing; // 생산 중 여부
+    public List<ProductionSlotData> production_slots; // 생산 슬롯 정보 (최대 4개)
+
+    // 기본 생성자 (기존 JSON과의 호환성을 위해 production_slots를 빈 리스트로 초기화)
+    public ConstructedBuildingProduction()
+    {
+        production_slots = new List<ProductionSlotData>();
+    }
 }
 
 [Serializable]
 public class ConstructedBuildingPos
 {
-    public int building_id;
+    public long instance_id; // 건물 인스턴스 ID
     public Vector3Int pos;
     public float rotation;
 }
@@ -70,7 +91,8 @@ public class ConstructedBuildingPos
 public class ConstructedBuilding : IScrollItemData
 {
     // BuildingData에서 가져온 정보
-    public int Id { get; private set; }
+    public int Id { get; private set; } // 건물 타입 ID (BuildingData의 building_id)
+    public long InstanceId { get; private set; } // 건물 인스턴스 ID (고유 식별자)
     public string Name { get; private set; }
     public string Type { get; private set; }
     public int Level { get; set; }
@@ -96,7 +118,8 @@ public class ConstructedBuilding : IScrollItemData
     public ConstructedBuilding(BuildingData buildingData, BuildingProductionInfo productionInfo, ConstructedBuildingProduction productionStatus, ConstructedBuildingPos constructedBuildingPos)
     {
         // 기본 정보
-        Id = buildingData.building_id;
+        Id = buildingData.building_id; // 건물 타입 ID
+        InstanceId = productionStatus.instance_id; // 건물 인스턴스 ID (고유 식별자)
         Name = buildingData.Building_Name;
         Type = buildingData.building_Type;
         Level = buildingData.level;
@@ -119,6 +142,6 @@ public class ConstructedBuilding : IScrollItemData
             NextProductionTime = productionStatus.next_production_time;
             IsProducing = productionStatus.is_producing;
         }
-        
+
     }
 }

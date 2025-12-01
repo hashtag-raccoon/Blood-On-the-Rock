@@ -1800,7 +1800,6 @@ GameObject:
   - component: {fileID: 5265661843147355125}
   - component: {fileID: 6205345938147487171}
   - component: {fileID: 967353328992575289}
-  - component: {fileID: -7004940435977739990}
   m_Layer: 0
   m_Name: Vam2
   m_TagString: Untagged
@@ -1840,13 +1839,13 @@ MonoBehaviour:
   animator: {fileID: 967353328992575289}
   forceDisableRootMotion: 1
   updateAnimatorParameters: 1
+  speedParameter: Speed
   isWalkingParameter: IsWalking
   moveYParameter: MoveY
   movementRoot: {fileID: 5265661843147355125}
   enableRightClickMove: 1
   moveSpeed: 3.5
   stoppingDistance: 0.05
-  guestController: {fileID: 0}
 --- !u!95 &967353328992575289
 Animator:
   serializedVersion: 5
@@ -1868,22 +1867,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-7004940435977739990
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7998863298994752275}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ea85d792023efb459bde0008f833bca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pathfinder: {fileID: 0}
-  moveSpeed: 5
-  tableManager: {fileID: 0}
-  desiredPartySize: 1
 --- !u!1 &8103790237597093548
 GameObject:
   m_ObjectHideFlags: 0

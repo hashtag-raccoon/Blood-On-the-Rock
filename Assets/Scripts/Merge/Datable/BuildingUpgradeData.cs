@@ -13,7 +13,7 @@ public class BuildingUpgradeData : ScriptableObject
     public List<upgrade_requirements> requirements = new List<upgrade_requirements>();
 }
 
-[System.Serializable]
+[Serializable]
 public class upgrade_requirements // 요구 조건
 {
     public string requirement_type; // 소비재화 이름
