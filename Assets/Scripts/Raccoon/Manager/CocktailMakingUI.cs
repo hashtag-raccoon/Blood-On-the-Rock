@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 /// <summary>
 /// 칵테일 제작 UI 관리 클래스
@@ -184,10 +185,11 @@ public class CocktailMakingUI : MonoBehaviour
 
         // 제작 패널 보이기, 주문 목록 패널 숨기기
         if (orderListPanel != null)
-            orderListPanel.SetActive(false);
+            orderListPanel.gameObject.SetActive(false);
 
         if (craftingPanel != null)
-            craftingPanel.SetActive(true);
+            craftingPanel.gameObject.SetActive(true);
+
 
         // 제작 화면 초기화 (칵테일 이름 표시, 재료/기법/잔 선택 UI 초기화)
         InitializeCraftingView();
