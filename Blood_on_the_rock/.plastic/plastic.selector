@@ -1,4 +1,0 @@
-repository "Blood_on_the_rock/Blood_on_the_rock@14568608413381@cloud"
-  path "/"
-    br "/main"
-    co "/main"
