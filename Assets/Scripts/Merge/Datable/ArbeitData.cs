@@ -8,6 +8,7 @@ using UnityEditor.ShaderKeywordFilter;
 public class ArbeitData
 {
     public int part_timer_id;
+    public string prefab_name;
     public string part_timer_name;
     public string race;
     public int personality_id;

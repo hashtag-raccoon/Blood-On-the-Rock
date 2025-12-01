@@ -38,6 +38,8 @@ public class DragDropController : MonoBehaviour
     [SerializeField] private Tilemap previewTilemap;
     [SerializeField] private Tilemap banTilemap; // 건물 배치 불가능한 타일맵
     [SerializeField] private Tilemap ExistingTilemap; // 기존 건물들의 타일맵
+    [SerializeField] private Tilemap ExistingInteriorTilemap; // 기존 인테리어들의 타일
+    [SerializeField] private Tilemap favorCheckTilemap; // 인테리어 배치 시에만 활성화
     [SerializeField] private TileBase markerTile; // 건물 배치 시 나오는 프리뷰 타일
 
     [Header("드래그 설정")]
@@ -581,10 +583,6 @@ public class DragDropController : MonoBehaviour
 
             // 원래 위치에 마커 복구
             PlaceTilemapMarkers(originalBuildingCell, originalBuildingTileSize, markerOffset);
-<<<<<<<<< Temporary merge branch 1
-=========
-
->>>>>>>>> Temporary merge branch 2
             // 드래그 모드 취소
             isDraggingSprite = false;
             draggedSpriteObject = null;
@@ -634,7 +632,7 @@ public class DragDropController : MonoBehaviour
         // BuildingBase 또는 InteriorBase 컴포넌트에서 타일 크기 및 데이터 가져오기
         BuildingBase buildingBase = editTargetObject.GetComponent<BuildingBase>();
         InteriorBase interiorBase = editTargetObject.GetComponent<InteriorBase>();
-        
+
         bool isInterior = interiorBase != null;
         if (buildingBase != null)
         {
@@ -783,7 +781,7 @@ public class DragDropController : MonoBehaviour
                             // 기존 인테리어 편집 중이면 원래 위치는 허용 (추후 구현 가능)
                         }
                     }
-                    
+
                     // 인테리어는 건물이 차지하는 영역 위에는 배치 불가 (선택 사항)
                     // 필요시 아래 주석 해제
                     /*
@@ -912,7 +910,7 @@ public class DragDropController : MonoBehaviour
 
                 return; // 배치 완료 후 바로 종료
             }
-            
+
             // TempInteriorData가 있는 경우 = 새 인테리어 배치
             TempInteriorData interiorTempData = draggedSpriteObject.GetComponent<TempInteriorData>();
             if (interiorTempData != null && interiorTempData.interiorData != null)
@@ -954,7 +952,7 @@ public class DragDropController : MonoBehaviour
             {
                 // 기존 건물/인테리어 이동 (편집 모드)
                 bool isInterior = draggedSpriteObject.GetComponent<InteriorBase>() != null;
-                
+
                 draggedSpriteObject.transform.position = worldPos;
 
                 if (draggedSpriteRenderer != null)
@@ -998,7 +996,7 @@ public class DragDropController : MonoBehaviour
     {
         Tilemap targetTilemap = isInterior ? ExistingInteriorTilemap : ExistingTilemap;
         TileBase targetMarker = isInterior ? (interiorMarkerTile != null ? interiorMarkerTile : markerTile) : markerTile;
-        
+
         if (targetTilemap != null && targetMarker != null)
         {
             // 드래그 중 프리뷰 마커만 삭제 (배치된 다른 건물 마커는 유지)
@@ -1246,8 +1244,8 @@ public class DragDropController : MonoBehaviour
         ClearMarkers();
         ShowMarkerRenderer();
     }
-    
-    
+
+
     /// <summary>
     /// 새로 구매한 인테리어의 배치 모드를 시작함
     /// BuildInteriorButtonUI 등에서 호출
@@ -1312,7 +1310,7 @@ public class DragDropController : MonoBehaviour
         // 렌더러 활성화 및 초기 마커 프리뷰 삭제
         ClearMarkers();
         ShowMarkerRenderer();
-        
+
         // 인테리어 배치 시 호감도 체크 타일맵 활성화
         if (favorCheckTilemapRenderer != null)
         {
