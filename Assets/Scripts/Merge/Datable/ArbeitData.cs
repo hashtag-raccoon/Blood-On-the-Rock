@@ -25,7 +25,7 @@ public class ArbeitData
 }
 
 [Serializable]
-public class npc
+public class npc : IScrollItemData
 {
     public int part_timer_id { get; private set; }
     public string part_timer_name { get; private set; }
