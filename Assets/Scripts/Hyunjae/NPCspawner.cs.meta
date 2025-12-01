@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/Merge/Datable/CustomerData.cs.meta
+guid: 3bafdf0427350ff428e1f1bef1cda605
+========
+guid: 22d32b562f260d54fb75f1d37f858538
+>>>>>>>> origin/Hyunjae:Assets/Scripts/Hyunjae/NPCspawner.cs.meta
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

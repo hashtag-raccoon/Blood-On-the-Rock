@@ -138,11 +138,21 @@ public class ResourceBuildingUIManager : MonoBehaviour
     {
         ClearProductionList();
 
-        if (currentConstructedBuilding == null) return;
+        if (currentConstructedBuilding == null)
+        {
+            Debug.LogError("[ResourceBuildingUIManager] currentConstructedBuilding이 null입니다.");
+            return;
+        }
+
+        if (BuildingRepository.Instance == null)
+        {
+            Debug.LogError("[ResourceBuildingUIManager] BuildingRepository.Instance가 null입니다."); // 빼지 말줘
+            return;
+        }
 
         List<BuildingProductionInfo> productionInfos =
-            DataManager.Instance.GetBuildingProductionInfoByType(currentConstructedBuilding.Name);
-
+            BuildingRepository.Instance.GetProductionInfosForBuildingType(currentConstructedBuilding.Name);
+        Debug.LogWarning("[ResourceBuildingUIManager] 생산 정보 개수: " + productionInfos.Count);
         foreach (var productionInfo in productionInfos)
         {
             CreateProductionItem(productionInfo);
@@ -151,6 +161,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
 
     private void CreateProductionItem(BuildingProductionInfo productionData)
     {
+        Debug.Log("[ResourceBuildingUIManager] CreateProductionItem 호출됨 for Resource ID: " + productionData.resource_id);
         GameObject itemObj = Instantiate(productionItemPrefab, productionListContent);
         ProductionCreateButton createButton = itemObj.GetComponent<ProductionCreateButton>();
 
@@ -159,7 +170,7 @@ public class ResourceBuildingUIManager : MonoBehaviour
             createButton = itemObj.AddComponent<ProductionCreateButton>();
         }
 
-        ResourceData resourceData = DataManager.Instance.GetResourceById(productionData.resource_id);
+        ResourceData resourceData = ResourceRepository.Instance.GetResourceById(productionData.resource_id);
 
         createButton.Initialize(productionData, resourceData, currentBuildingLevel);
 

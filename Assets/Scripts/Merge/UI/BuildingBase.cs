@@ -10,7 +10,7 @@ using Cinemachine;
 public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 {
     [Header("건물 데이터/UI")]
-    [SerializeField] protected int constructedBuildingId; // ConstructedBuilding ID
+    [SerializeField] protected long constructedBuildingId; // 건물 인스턴스 ID
     protected ConstructedBuilding constructedBuilding; // 런타임 건물 데이터
     [SerializeField] protected Sprite BuildingSprite;
     [SerializeField] protected GameObject BuildingUI;
@@ -19,7 +19,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     [SerializeField] protected Vector2Int tileSize = new Vector2Int(3, 2); // 가로 x 세로로, 건물이 차지하는 타일 크기
     [SerializeField] private DragDropController dragDropController;
     public Vector2Int TileSize => tileSize;
-    public int ConstructedBuildingId => constructedBuildingId; // DragDropController에서 접근 가능하도록 public 프로퍼티 추가
+    public long ConstructedBuildingId => constructedBuildingId; // DragDropController에서 접근 가능하도록 public 프로퍼티 추가
     [SerializeField] protected Button BuildingUpgradeButton;
     [SerializeField] protected GameObject UpgradeUIPrefab;
     [SerializeField] protected GameObject UpgradeBlurUI;
@@ -35,6 +35,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     private CinemachineVirtualCamera virtualCamera;
     private Coroutine cameraCoroutine;
+    private bool CantUpgrade = false;
 
     private float Origin_cameraOrthographicSize;
     private bool cameraInitialized = false;
@@ -62,7 +63,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         );
 
         // ConstructedBuilding 로드
-        constructedBuilding = DataManager.Instance.GetConstructedBuildingById(constructedBuildingId);
+        constructedBuilding = DataManager.Instance.GetConstructedBuildingByInstanceId(constructedBuildingId);
         if (constructedBuilding == null)
         {
             Debug.LogError($"ID {constructedBuildingId}에 해당하는 ConstructedBuilding을 찾을 수 없습니다."); // 당분간은 필요
@@ -81,6 +82,16 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
                 }
             });
             upgradeButtonInitialized = true;
+            TargetOrthographicSize = BuildingRepository.Instance.GetBuildingDatabyConstructedBuilding(constructedBuilding).CameraOrthographicSize;
+        }
+
+        if (constructedBuilding.Type == "Utility")
+        {
+            CantUpgrade = true;
+            if (BuildingUpgradeButton != null)
+            {
+                BuildingUpgradeButton.interactable = false;
+            }
         }
     }
 
@@ -100,7 +111,15 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     protected virtual void Update()
     {
-
+        // ESC로 건물 UI 닫기
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (BuildingUI.activeSelf)
+            {
+                CloseBuildingUI();
+                AnimateCamera(false);
+            }
+        }
     }
 
     #region Click => Camera Animation & UI Open/Close
@@ -110,33 +129,27 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
     /// </summary>
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        if (Input.GetMouseButtonDown(0) && !DragDropController.instance.isUI)
+        // 왼쪽 버튼이 아닐 경우 무시
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+
+        // dragDropController가 설정되어 있지 않다면 싱글톤 또는 씬에서 찾아서 할당
+        var dd = dragDropController ?? DragDropController.Instance ?? FindObjectOfType<DragDropController>();
+        if (dd == null) return; // 컴파일 오류 방지용, 뺴면 안됨 !!
+        if (dd.onEdit) return;  // 편집 모드 중이면 UI Open X
+
+        if (virtualCamera == null) InitializeCamera();
+
+        bool isOpening = !BuildingUI.activeSelf;
+
+        if (isOpening)
         {
-            if (dragDropController != null && dragDropController.IsEditMode)
-            {
-                return;
-            }
-
-            if (virtualCamera == null)
-            {
-                InitializeCamera();
-            }
-
-            // 건물 UI 열기, 닫기 토글 방식 => 건물 UI가 열려 있지 않다면 열기, 아니라면 닫기
-            bool isOpening = !BuildingUI.activeSelf;
-
-            if (isOpening)
-            {
-                CameraManager.instance.isBuildingUIActive = true;
-                OpenBuildingUI();
-                AnimateCamera(true); // 열기 애니메이션
-            }
-            else
-            {
-                CameraManager.instance.isBuildingUIActive = false;
-                CloseBuildingUI();
-                AnimateCamera(false); // 닫기 애니메이션
-            }
+            OpenBuildingUI();
+            AnimateCamera(true);
+        }
+        else
+        {
+            CloseBuildingUI();
+            AnimateCamera(false);
         }
     }
 
@@ -151,7 +164,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public virtual void OpenBuildingUI()
     {
-        DragDropController.instance.isUI = true;
+        DragDropController.Instance.isUI = true;
         BuildingUI?.SetActive(true);
         CameraManager.instance.isBuildingUIActive = true;
         currentActiveBuilding = this; // 현재 건물을 활성 건물로 설정
@@ -159,7 +172,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     public virtual void CloseBuildingUI()
     {
-        DragDropController.instance.isUI = false;
+        DragDropController.Instance.isUI = false;
         BuildingUI?.SetActive(false);
         CameraManager.instance.isBuildingUIActive = false;
         if (currentActiveBuilding == this)
@@ -204,7 +217,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             BuildingData buildingData = null;
             if (constructedBuilding != null)
             {
-                buildingData = DataManager.Instance.BuildingDatas.Find(bd => bd.Building_Name == constructedBuilding.Name);
+                buildingData = BuildingRepository.Instance.GetBuildingDataByTypeId(constructedBuilding.Id);
             }
 
             CameraPositionOffset offset = buildingData != null ? buildingData.cameraPositionOffset : CameraPositionOffset.Center;
@@ -308,8 +321,8 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             upgradeScript.SetData(constructedBuilding);
 
             // 다음 레벨의 업그레이드 데이터 찾기
-            BuildingUpgradeData upgradeData = DataManager.Instance.GetBuildingUpgradeDataByLevel(
-                DataManager.Instance.GetBuildingUpgradeDataByType(constructedBuilding.Name),
+            BuildingUpgradeData upgradeData = BuildingRepository.Instance.GetBuildingUpgradeDataByLevel(
+                BuildingRepository.Instance.GetBuildingUpgradeDataByType(constructedBuilding.Name),
                 constructedBuilding.Level + 1
             );
 

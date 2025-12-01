@@ -16,5 +16,5 @@ MonoBehaviour:
   resource_name: Money
   type: 4
   icon: {fileID: 21300000, guid: 394899dbf2938874ca7d1025f7598406, type: 3}
-  current_amount: 1000
+  current_amount: 5905
   max_storage: 10000

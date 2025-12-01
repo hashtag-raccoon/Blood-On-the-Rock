@@ -4,6 +4,17 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+// race_id = 종족ID
+// 임시로 0 = 인간, 1 = 오크, 2 = 뱀파이어
+
+public enum waitingDirectionSelection
+{
+    Up,
+    Down,
+    Left,
+    Right
+}
+
 public class TableManager : MonoBehaviour
 {
     [Header("탁자 오브젝트들")]
@@ -21,10 +32,11 @@ public class TableManager : MonoBehaviour
     [Range(1, 5)]
     public int waitingInterval = 2;
 
-    [Header("아이소메트릭 대기열 설정")]
-    [Tooltip("대기열 방향: (0,-1,0)=아래쪽, (0,1,0)=위쪽, (-1,0,0)=왼쪽, (1,0,0)=오른쪽")]
-    public Vector3Int waitingDirection = new Vector3Int(1, 0, 0);
+    [Header("대기열 방향 설정")]
+    public waitingDirectionSelection waitingDirectionSelect = waitingDirectionSelection.Right;
 
+    private Vector3Int waitingDirection;
+    
     [Tooltip("대기열을 여러 줄로 만들지 여부")]
     public bool useMultipleLines = false;
 
@@ -61,9 +73,37 @@ public class TableManager : MonoBehaviour
     [SerializeField] private float spawnInterval = 10f;
 
     private float nextSpawnTime = 0f;
+    private int PartySize; // 2인 파티용 변수
+
+    [HideInInspector]
+    public List<GameObject> waitingForPartner = new List<GameObject>();
+
+    private List<CustomerData> Customers = new List<CustomerData>();
+
+    private readonly List<string> humanNames = new List<string> { "교섭관", "농부", "기사단장", "계약중개인", "무역감시관", "일반 인간" };
+    private readonly List<string> orcNames = new List<string> { "전투 우두머리", "고기 사냥꾼", "혈투 전사", "부족 수호자", "전투 요리사", "일반 오크" };
+    private readonly List<string> vampireNames = new List<string> { "혈맹 장군", "순혈 집행관", "가문 감시자", "전통 심판자", "고문헌 수호자", "일반 뱀파이어" };
 
     void Awake()
     {
+        // 대기열 방향 벡터 설정
+        switch (waitingDirectionSelect)
+        {
+            case waitingDirectionSelection.Up:
+                waitingDirection = new Vector3Int(0, 1, 0);
+                break;
+            case waitingDirectionSelection.Down:
+                waitingDirection = new Vector3Int(0, -1, 0);
+                break;
+            case waitingDirectionSelection.Left:
+                waitingDirection = new Vector3Int(-1, 0, 0);
+                break;
+            case waitingDirectionSelection.Right:
+                waitingDirection = new Vector3Int(1, 0, 0);
+                break;
+        }
+
+        // 테이블 매니저 초기화
         availableTables.Clear();
         foreach (GameObject table in tables)
         {
@@ -76,8 +116,10 @@ public class TableManager : MonoBehaviour
         }
     }
 
+    #region 손님 스폰(Update에서 처리)
     void Update()
     {
+        // 테이블 상태 업데이트
         UpdateTableLists();
 
         List<GameObject> customerTables = new List<GameObject>();
@@ -95,31 +137,61 @@ public class TableManager : MonoBehaviour
 
         tablesInCustomer = customerTables.ToArray();
 
-        // 손님 스폰 로직
-        if (CustomerCount > 0 && waitingCustomerCount < maxWaitingCustomers)
+        /// <summary>
+        /// 손님 스폰 로직
+        /// </summary>
+        if (CustomerCount > 0 && waitingCustomerCount < maxWaitingCustomers) // 손님이 남아있고 대기열이 가득 차지 않았을 때
         {
-            if (Time.time >= nextSpawnTime)
+            if (Time.time >= nextSpawnTime) // 스폰 시간 도달 시
             {
                 nextSpawnTime = Time.time + spawnInterval;
-                int spawnCount = Mathf.Min(1, maxWaitingCustomers - waitingCustomerCount);
+                int spawnCount = Mathf.Min(1, maxWaitingCustomers - waitingCustomerCount); // 한 번에 스폰할 손님 수(1 or 2) 결정
 
-                for (int i = 0; i < spawnCount; i++)
+                for (int i = 0; i < spawnCount; i++) // 1명씩 or 2명씩 스폰함
                 {
-                    GameObject customer = Instantiate(CustomerPrefab, CustomerTransform.transform.position, Quaternion.identity);
-                    GuestController guestController = customer.GetComponent<GuestController>();
-                    guestController.tableManager = this;
-                    guestController.pathfinder = CustomerPath;
+                    PartySize = Random.Range(1, 3); // 1인 또는 2인 파티 랜덤 결정
+                    if(PartySize == 2 && CustomerCount < 2)
+                    {
+                        PartySize = 1; // 남은 손님 수가 1명일 때는 1인 파티로 조정
+                    }
 
-                    // desiredPartySize는 프리팹에서 설정됨 (1인 또는 2인)
-
-                    CustomerCount--;
+                    switch(PartySize)
+                    {
+                        case 1:
+                            GameObject customer = Instantiate(CustomerPrefab, CustomerTransform.transform.position, Quaternion.identity);
+                            GuestController guestController = customer.GetComponent<GuestController>();
+                            guestController.tableManager = this;
+                            guestController.pathfinder = CustomerPath;
+                            guestController.customerData = new CustomerData(CustomerCount, "Guest" + CustomerCount, Random.Range(0,3), null, false,
+                            null, 0, 0, 1, "Normal", 5);
+                            guestController.desiredPartySize = 1;
+                            CustomerCount -= 1;
+                            break;
+                        case 2:
+                            for(int j = 0; j < 2; j++)
+                            {
+                                GameObject customer_party = Instantiate(CustomerPrefab, CustomerTransform.transform.position, Quaternion.identity);
+                                GuestController guestController_party = customer_party.GetComponent<GuestController>();
+                                guestController_party.tableManager = this;
+                                guestController_party.pathfinder = CustomerPath;
+                                guestController_party.customerData = new CustomerData(CustomerCount - 1 + j, "Guest" + (CustomerCount -1 + j), Random.Range(0,3), null, false,
+                                null, 0, 0, 1, "Normal", 5);
+                                guestController_party.desiredPartySize = 2;
+                            }
+                            CustomerCount -= 2;
+                            break;
+                    }
                 }
             }
         }
-
         CleanupWaitingLine();
     }
+    #endregion
 
+    #region 테이블 상태 업데이트
+    /// <summary>
+    /// 테이블 상태 업데이트
+    /// </summary>
     void UpdateTableLists()
     {
         reservedTables.Clear();
@@ -139,8 +211,11 @@ public class TableManager : MonoBehaviour
             }
         }
     }
-
-    // 부분 점유 테이블 가져오기 (그룹 크기 고려)
+    #endregion
+    #region 테이블(부분점유/빈) 찾기
+    /// <summary>
+    /// 부분 점유 테이블 가져오기 (그룹 크기 고려)
+    /// </summary>
     public GameObject GetPartiallyOccupiedTable(int desiredSize = 0)
     {
         foreach (var kvp in reservedTables)
@@ -166,7 +241,9 @@ public class TableManager : MonoBehaviour
         return null;
     }
 
-    // 빈 테이블 가져오기 (그룹 크기 고려)
+    /// <summary>
+    /// 빈 테이블 가져오기 (그룹 크기 고려)
+    /// </summary>
     public GameObject GetAvailableTable(int desiredSize = 0)
     {
         foreach (GameObject table in availableTables)
@@ -188,8 +265,10 @@ public class TableManager : MonoBehaviour
         }
         return null;
     }
+    #endregion
 
-    public void ReserveTable(GameObject table, GameObject guest)
+    #region 테이블 예약 관리
+    public void ReserveTable(GameObject table, GameObject guest) // 손님이 테이블 예약
     {
         if (table == null || guest == null)
         {
@@ -203,83 +282,85 @@ public class TableManager : MonoBehaviour
             return;
         }
 
-        int seatedCount = tableComp.Seated_Customer.Count;
-        int reservedCount = tableReservations.ContainsKey(table) ? tableReservations[table].Count : 0;
-        int totalCount = seatedCount + reservedCount;
+        int seatedCount = tableComp.Seated_Customer.Count; // 현재 앉아있는 손님 수
+        int reservedCount = tableReservations.ContainsKey(table) ? tableReservations[table].Count : 0; // 현재 예약된 손님 수
+        int totalCount = seatedCount + reservedCount; // 총 인원 수
 
-        if (totalCount >= tableComp.MAX_Capacity)
+        if (totalCount >= tableComp.MAX_Capacity) // 테이블이 꽉 찼으면 예약 불가
         {
             return;
         }
 
-        if (!tableReservations.ContainsKey(table))
+        if (!tableReservations.ContainsKey(table)) // 테이블이 아직 예약 목록에 없으면 추가
         {
-            tableReservations[table] = new List<GameObject>();
+            tableReservations[table] = new List<GameObject>(); // 새 리스트 생성
         }
 
-        if (!tableReservations[table].Contains(guest))
+        if (!tableReservations[table].Contains(guest)) // 손님이 아직 예약하지 않았다면 추가
         {
-            tableReservations[table].Add(guest);
+            tableReservations[table].Add(guest); // 예약 추가
         }
     }
 
-    public void CancelReservation(GameObject table, GameObject guest)
+    public void CancelReservation(GameObject table, GameObject guest) // 손님이 테이블 예약 취소
     {
         if (table == null || guest == null)
         {
             return;
         }
 
-        if (tableReservations.ContainsKey(table))
+        if (tableReservations.ContainsKey(table)) // 테이블이 예약 목록에 있으면
         {
-            tableReservations[table].Remove(guest);
+            tableReservations[table].Remove(guest); // 예약 취소
 
-            if (tableReservations[table].Count == 0)
+            if (tableReservations[table].Count == 0) // 예약된 손님이 없으면 테이블 제거
             {
-                tableReservations.Remove(table);
+                tableReservations.Remove(table); // 테이블 제거
             }
         }
     }
+    #endregion
 
-    public int AddToWaitingLine(GameObject guest)
+    #region 대기열 관리
+    public int AddToWaitingLine(GameObject guest) // 손님을 대기열에 추가하고 위치 반환
     {
-        if (!waitingLine.Contains(guest))
+        if (!waitingLine.Contains(guest)) // 손님이 아직 대기열에 없으면 추가
         {
-            waitingLine.Add(guest);
-            waitingCustomerCount++;
-            int position = waitingLine.Count - 1;
+            waitingLine.Add(guest); // 대기열에 추가
+            waitingCustomerCount++; // 대기 손님 수 증가
+            int position = waitingLine.Count - 1; // 대기열 - 1 를 반환시키게 함
             return position;
         }
-        return waitingLine.IndexOf(guest);
+        return waitingLine.IndexOf(guest); // 손님의 현재 대기 위치 반환
     }
 
-    public void RemoveFromWaitingLine(GameObject guest)
+    public void RemoveFromWaitingLine(GameObject guest) // 손님을 대기열에서 제거
     {
         int removedIndex = waitingLine.IndexOf(guest);
         if (removedIndex != -1)
         {
             waitingLine.RemoveAt(removedIndex);
             waitingCustomerCount--;
-            UpdateWaitingLinePositions(removedIndex);
+            UpdateWaitingLinePositions(removedIndex); // 이후 손님들의 위치 업데이트
         }
     }
 
-    private void UpdateWaitingLinePositions(int startIndex)
+    private void UpdateWaitingLinePositions(int startIndex) // 손님들의 대기열 위치 업데이트
     {
-        for (int i = startIndex; i < waitingLine.Count; i++)
+        for (int i = startIndex; i < waitingLine.Count; i++) // 이후 손님들 위치 갱신
         {
             if (waitingLine[i] != null)
             {
                 GuestController guestController = waitingLine[i].GetComponent<GuestController>();
                 if (guestController != null)
                 {
-                    guestController.UpdateWaitingPosition(i);
+                    guestController.UpdateWaitingPosition(i); // 손님의 대기 위치 갱신
                 }
             }
         }
     }
 
-    public Vector3 CalculateIsometricWaitingPosition(int position)
+    public Vector3 CalculateIsometricWaitingPosition(int position) // 대기열에서의 Isometric Cell 좌표계로 위치 계산
     {
         if (CustomerPath == null || CustomerWaitingTransform == null)
         {
@@ -289,66 +370,27 @@ public class TableManager : MonoBehaviour
         Vector3Int baseGridPos = CustomerPath.WorldToCell(CustomerWaitingTransform.position);
         Vector3Int targetGridPos;
 
-        if (useMultipleLines && maxGuestsPerLine > 0)
+        if (useMultipleLines && maxGuestsPerLine > 0) // 여러 줄 사용 시
         {
-            int lineIndex = position / maxGuestsPerLine;
-            int posInLine = position % maxGuestsPerLine;
-            Vector3Int perpendicularDir = GetPerpendicularDirection(waitingDirection);
-            Vector3Int lineOffset = perpendicularDir * lineIndex;
-            Vector3Int positionOffset = waitingDirection * posInLine * waitingInterval;
-            targetGridPos = baseGridPos + lineOffset + positionOffset;
+            int lineIndex = position / maxGuestsPerLine; // 몇 번째 줄인지
+            int posInLine = position % maxGuestsPerLine; // 줄 내에서의 위치
+            Vector3Int perpendicularDir = GetPerpendicularDirection(waitingDirection); // 대기열에 수직인 방향
+            Vector3Int lineOffset = perpendicularDir * lineIndex; // 줄 오프셋
+            Vector3Int positionOffset = waitingDirection * posInLine * waitingInterval; // 줄 내 위치 오프셋
+            targetGridPos = baseGridPos + lineOffset + positionOffset; // 최종 타겟 그리드 위치
         }
         else
         {
-            Vector3Int gridOffset = waitingDirection * position * waitingInterval;
-            targetGridPos = baseGridPos + gridOffset;
+            Vector3Int gridOffset = waitingDirection * position * waitingInterval; // 대기열 방향으로의 오프셋
+            targetGridPos = baseGridPos + gridOffset; // 최종 타겟 그리드 위치
         }
 
-        return CustomerPath.CellToWorld(targetGridPos);
+        return CustomerPath.CellToWorld(targetGridPos); // 그리드 좌표를 월드 좌표로 변환하여 반환
     }
+    #endregion 
 
-    private Vector3Int GetPerpendicularDirection(Vector3Int direction)
-    {
-        if (direction == Vector3Int.up || direction == Vector3Int.down)
-        {
-            return Vector3Int.right;
-        }
-        else if (direction == Vector3Int.left || direction == Vector3Int.right)
-        {
-            return Vector3Int.up;
-        }
-        else
-        {
-            return Vector3Int.right;
-        }
-    }
-
-    public GameObject GetFirstWaitingGuest()
-    {
-        if (waitingLine.Count > 0 && waitingLine[0] != null)
-        {
-            return waitingLine[0];
-        }
-        return null;
-    }
-
-    [ContextMenu("아이소메트릭 대기열 상태 출력")]
-    public void PrintWaitingLineStatus()
-    {
-        Debug.Log($"🎮 현재 아이소메트릭 대기열 상황: {waitingLine.Count}명 대기 중");
-
-        for (int i = 0; i < waitingLine.Count; i++)
-        {
-            if (waitingLine[i] != null)
-            {
-                Vector3 pos = CalculateIsometricWaitingPosition(i);
-                GuestController guest = waitingLine[i].GetComponent<GuestController>();
-                int partySize = guest != null ? guest.desiredPartySize : 0;
-                Debug.Log($"  {i}번째: {waitingLine[i].name} - 위치: {pos}, 원하는 크기: {partySize}인");
-            }
-        }
-    }
-
+    #region 정리
+    // 대기열 정리 (null 참조 제거)
     public void CleanupWaitingLine()
     {
         bool needsCleanup = false;
@@ -375,17 +417,167 @@ public class TableManager : MonoBehaviour
             UpdateWaitingLinePositions(0);
         }
     }
+    #endregion
 
+    #region 유틸리티용(체킹용) 메소드
+   // 대기열 방향에 수직인 방향 벡터 가져오기 ( 손님 대기 시 사용 )
+    private Vector3Int GetPerpendicularDirection(Vector3Int direction)
+    {
+        if (direction == Vector3Int.up || direction == Vector3Int.down)
+        {
+            return Vector3Int.right;
+        }
+        else if (direction == Vector3Int.left || direction == Vector3Int.right)
+        {
+            return Vector3Int.up;
+        }
+        else
+        {
+            return Vector3Int.right;
+        }
+    }
+
+    // 대기열의 첫 번째 손님 가져오기
+    public GameObject GetFirstWaitingGuest()
+    {
+        if (waitingLine.Count > 0 && waitingLine[0] != null)
+        {
+            return waitingLine[0];
+        }
+        return null;
+    }
+
+    // 특정 손님이 어디에 대기하고 있는지 가져오기
     public int GetWaitingPosition(GameObject guest)
     {
         return waitingLine.IndexOf(guest);
     }
 
+    // 대기열이 가득 찼는지 확인하는 메소드
     public bool IsWaitingLineFull()
     {
         return waitingLine.Count >= maxWaitingCustomers;
     }
+    #endregion
 
+    #region 2인 파티용 메소드
+    /// <summary>
+    ///  2인 파티를 위한 파트너 찾기
+    /// </summary>
+    /// <returns>파트너로 삼음</returns>
+    /// <param name="guest">파트너를 찾을 손님 게임 오브젝트</param>
+    public GameObject FindPartnerForTwoPersonParty(GameObject guest)
+    {
+        // 대기 중인 손님들 중에서 파트너 찾기
+        for (int i = 0; i < waitingForPartner.Count; i++)
+        {
+            // 자기 자신이 아니고, 2인 파티를 원하는 손님이며, 아직 파트너가 없는 경우
+            if (waitingForPartner[i] != null && waitingForPartner[i] != guest)
+            {
+                GuestController partnerController = waitingForPartner[i].GetComponent<GuestController>();
+                if (partnerController != null && partnerController.desiredPartySize == 2 && partnerController.groupPartner == null)
+                {
+                    // 대기 중 인원 중 한명을 파트너로 삼음
+                    return waitingForPartner[i];
+                }
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 대기 중인 손님을 2인 파티 대기 리스트에 추가
+    /// </summary>
+    /// <param name="guest">추가할 손님 게임 오브젝트</param>
+    public void AddToPartnerWaitingList(GameObject guest)
+    {
+        if (!waitingForPartner.Contains(guest))
+        {
+            waitingForPartner.Add(guest);
+        }
+    }
+
+    /// <summary>
+    /// 대기 중인 손님을 2인 파티 대기 리스트에서 제거
+    /// </summary>
+    /// <param name="guest">제거할 손님 게임 오브젝트</param>
+    public void RemoveFromPartnerWaitingList(GameObject guest)
+    {
+        waitingForPartner.Remove(guest);
+    }
+
+    /// <summary>
+    /// 2인 파티를 위한 테이블 예약 시도
+    /// </summary>
+    /// <param name="guest1">첫 번째 손님 게임 오브젝트</param>
+    /// <param name="guest2">두 번째 손님 게임 오브젝트</param>
+    /// <returns>예약 성공 여부</returns>
+    public bool TryReserveTableForGroup(GameObject guest1, GameObject guest2)
+    {
+        GameObject table = GetAvailableTable(2);
+        if (table == null)
+        {
+            return false;
+        }
+
+        TableClass tableComp = table.GetComponent<TableClass>();
+        if (tableComp.MAX_Capacity < 2)
+        {
+            return false;
+        }
+
+        Transform seat1 = tableComp.GetAvailableSeatForGuest(guest1);
+        if (seat1 == null)
+        {
+            return false;
+        }
+
+        Transform seat2 = tableComp.GetAvailableSeatForGuest(guest2);
+        if (seat2 == null)
+        {
+            tableComp.ReleaseSeat(guest1);
+            return false;
+        }
+
+        ReserveTable(table, guest1);
+        ReserveTable(table, guest2);
+
+        GuestController controller1 = guest1.GetComponent<GuestController>();
+        GuestController controller2 = guest2.GetComponent<GuestController>();
+
+        if (controller1 != null)
+        {
+            controller1.AssignTableAndSeat(table, seat1);
+        }
+
+        if (controller2 != null)
+        {
+            controller2.AssignTableAndSeat(table, seat2);
+        }
+
+        return true;
+    }
+    #endregion
+
+    #region 디버깅 및 기즈모 출력
+    [ContextMenu("대기열 상태 출력")]
+    public void PrintWaitingLineStatus()
+    {
+        Debug.Log($"현재 아이소메트릭 대기열 상황: {waitingLine.Count}명 대기 중");
+
+        for (int i = 0; i < waitingLine.Count; i++)
+        {
+            if (waitingLine[i] != null)
+            {
+                Vector3 pos = CalculateIsometricWaitingPosition(i);
+                GuestController guest = waitingLine[i].GetComponent<GuestController>();
+                int partySize = guest != null ? guest.desiredPartySize : 0;
+                Debug.Log($"  {i}번째: {waitingLine[i].name} - 위치: {pos}, 원하는 크기: {partySize}인");
+            }
+        }
+    }
+
+    // 기즈모 - 경로 미리보기
     void OnDrawGizmosSelected()
     {
         if (!showWaitingPositions || CustomerWaitingTransform == null || CustomerPath == null)
@@ -419,4 +611,5 @@ public class TableManager : MonoBehaviour
             Gizmos.DrawWireSphere(arrowStart + direction * 2f, 0.2f);
         }
     }
+    #endregion
 }

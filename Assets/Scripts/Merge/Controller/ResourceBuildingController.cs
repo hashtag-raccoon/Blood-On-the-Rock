@@ -34,10 +34,11 @@ public class ResourceBuildingController : BuildingBase
     public Vector2 limitBuildingImageSize = new Vector2(100, 100);
     private static GameObject ActiveLimitUpgradeUI;
 
-    private GameObject activeCompleteUI; // 생산완료 UI (Canvas 포함)
+    private GameObject activeCompleteUI; // 생산완료 UI 
 
     private List<ProductionInfo> activeProductions = new List<ProductionInfo>();
 
+    #region Initialize
     protected override void Start()
     {
         base.Start();
@@ -50,11 +51,22 @@ public class ResourceBuildingController : BuildingBase
 
         // ResourceBuildingController 클래스 초기화
         InitializeProductionSlots();
-        
+
         // 재시작 시, 전 게임에서 저장된 생산 정보를 현 에 복원
-        //RestoreProductionFromSave();
+        RestoreProductionFromSave();
     }
 
+    private void InitializeProductionSlots()
+    {
+        for (int i = 0; i < maxProductionSlots; i++)
+        {
+            activeProductions.Add(null);
+        }
+    }
+
+    #endregion
+
+    #region Update
     protected override void Update()
     {
         if (GetActiveProductionCount() <= 0)
@@ -67,11 +79,39 @@ public class ResourceBuildingController : BuildingBase
             return;
         }
         UpdateAllProductions();
-        
-        // 현재 생산 정보(생산 중인 자원들 정보)를 ConstructedBuilding에 동기화
-        SyncProductionToConstructedBuilding();
-    }
 
+        // 현재 생산 정보(생산 중인 자원들 정보)를 ConstructedBuilding에 동기화
+        if (this.constructedBuilding != null)
+        {
+            bool isProducing = GetActiveProductionCount() > 0;
+
+            ProductionInfo earliestProduction = GetEarliestProduction();
+            if (earliestProduction != null && BuildingRepository.Instance != null)
+            {
+                System.DateTime now = System.DateTime.Now;
+                System.TimeSpan timeRemaining = System.TimeSpan.FromSeconds(earliestProduction.timeRemaining);
+                System.DateTime nextProductionTime = now.Add(timeRemaining);
+
+                // BuildingRepository를 통해 생산 상태 업데이트
+                BuildingRepository.Instance.UpdateBuildingProductionStatus(
+                    this.constructedBuilding.Id,
+                    isProducing,
+                    nextProductionTime
+                );
+            }
+            else if (!isProducing && BuildingRepository.Instance != null)
+            {
+                // 생산 중이 아닐 때도 상태 업데이트
+                BuildingRepository.Instance.UpdateBuildingProductionStatus(
+                    this.constructedBuilding.Id,
+                    false
+                );
+            }
+        }
+    }
+    #endregion
+
+    #region Upgrade UI
     protected override void OnUpgradeUI()
     {
         // 생산 중이면 제한 UI 표시
@@ -85,6 +125,7 @@ public class ResourceBuildingController : BuildingBase
         // 생산 중이 아니면 일반 업그레이드 UI 표시
         base.OnUpgradeUI();
     }
+
 
     private void ShowLimitUpgradeUI()
     {
@@ -113,7 +154,7 @@ public class ResourceBuildingController : BuildingBase
         Transform buildingImageTransform = ActiveLimitUpgradeUI.transform.Find("BuildingImage");
         if (buildingImageTransform != null && constructedBuilding != null && constructedBuilding.Icon != null)
         {
-            UnityEngine.UI.Image img = buildingImageTransform.GetComponent<UnityEngine.UI.Image>();
+            Image img = buildingImageTransform.GetComponent<Image>();
             if (img != null)
             {
                 img.sprite = constructedBuilding.Icon;
@@ -155,15 +196,9 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
+    #endregion
 
-    private void InitializeProductionSlots()
-    {
-        for (int i = 0; i < maxProductionSlots; i++)
-        {
-            activeProductions.Add(null);
-        }
-    }
-
+    #region Production Methods
     private void UpdateAllProductions()
     {
         bool hasCompletedProduction = false;
@@ -238,7 +273,7 @@ public class ResourceBuildingController : BuildingBase
         }
 
         // 재화 소비
-        ResourceData consumeResource = DataManager.Instance.GetResourceByName(productionData.consume_resource_type);
+        ResourceData consumeResource = ResourceRepository.Instance.GetResourceByName(productionData.consume_resource_type);
         if (consumeResource.current_amount < productionData.consume_amount)
         {
             return false;
@@ -269,7 +304,7 @@ public class ResourceBuildingController : BuildingBase
 
         // 재화 반환
         ProductionInfo production = activeProductions[slotIndex];
-        ResourceData consumeResource = DataManager.Instance.GetResourceByName(production.productionData.consume_resource_type);
+        ResourceData consumeResource = ResourceRepository.Instance.GetResourceByName(production.productionData.consume_resource_type);
         consumeResource.current_amount += production.productionData.consume_amount;
 
         activeProductions[slotIndex] = null;
@@ -302,6 +337,7 @@ public class ResourceBuildingController : BuildingBase
     }
     */
 
+    // 생산 완료 메소드
     public void CompleteProduction(int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= activeProductions.Count)
@@ -326,6 +362,7 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
+    // 생산 모두 완료시키는 메소드
     private void ALLCompleteProduction()
     {
         int completedCount = 0;
@@ -356,7 +393,7 @@ public class ResourceBuildingController : BuildingBase
         }
     }
 
-    private void CompactProductionSlots()
+    private void CompactProductionSlots() // 생산 중 슬롯 정렬
     {
         List<ProductionInfo> compactedList = new List<ProductionInfo>();
 
@@ -418,6 +455,11 @@ public class ResourceBuildingController : BuildingBase
         return maxProductionSlots;
     }
 
+    public ConstructedBuilding GetConstructedBuilding()
+    {
+        return constructedBuilding;
+    }
+
     public override void OpenBuildingUI()
     {
         base.OpenBuildingUI();
@@ -438,31 +480,8 @@ public class ResourceBuildingController : BuildingBase
         base.CloseBuildingUI();
     }
 
-    // 현재 생산 정보를 ConstructedBuilding.json에 동기화
-    private void SyncProductionToConstructedBuilding()
-    {
-        if (constructedBuilding == null) return;
 
-        bool hasActiveProduction = GetActiveProductionCount() > 0;
-        constructedBuilding.IsProducing = hasActiveProduction;
-
-        if (hasActiveProduction)
-        {
-            // 가장 먼저 완료될 생산의 시간 정보 사용
-            ProductionInfo earliestProduction = GetEarliestProduction();
-            if (earliestProduction != null)
-            {
-                constructedBuilding.LastProductionTime = System.DateTime.Now;
-                float remainingSeconds = earliestProduction.timeRemaining;
-                constructedBuilding.NextProductionTime = System.DateTime.Now.AddSeconds(remainingSeconds);
-            }
-        }
-        else
-        {
-            constructedBuilding.IsProducing = false;
-        }
-    }
-
+    #endregion
     // 가장 먼저 완료될 생산 정보 반환
     private ProductionInfo GetEarliestProduction()
     {
@@ -481,23 +500,67 @@ public class ResourceBuildingController : BuildingBase
         return earliest;
     }
 
-    /*
-    // 게임 시작 시 저장된 생산 정보를 복원
+    /// <summary>
+    /// 게임 시작 시 저장된 생산 슬롯 정보를 복원합니다.
+    /// </summary>
     public void RestoreProductionFromSave()
     {
-        if (constructedBuilding == null || !constructedBuilding.IsProducing) return;
+        if (constructedBuilding == null) return;
 
-        // 저장된 생산 완료 시간과 현재 시간 비교
-        System.TimeSpan timeRemaining = constructedBuilding.NextProductionTime - System.DateTime.Now;
+        // DataManager에서 저장된 생산 정보 가져오기
+        ConstructedBuildingProduction savedProduction = DataManager.Instance.ConstructedBuildingProductions
+            .Find(p => p.instance_id == constructedBuilding.InstanceId);
 
-        if (timeRemaining.TotalSeconds <= 0)
+        if (savedProduction == null || savedProduction.production_slots == null ||
+            savedProduction.production_slots.Count == 0)
         {
-            Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 저장된 생산이 완료되었습니다.");
+            Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 저장된 생산 정보 없음");
+            return;
         }
-        else
+
+        int restoredCount = 0;
+        foreach (var slotData in savedProduction.production_slots)
         {
-            Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: 생산 재개 (남은 시간: {timeRemaining.TotalSeconds:F1}초)");
+            // BuildingProductionInfo 조회
+            BuildingProductionInfo prodInfo = BuildingRepository.Instance
+                .GetProductionInfosForBuildingType(slotData.building_type)
+                .Find(p => p.resource_id == slotData.resource_id);
+
+            if (prodInfo == null)
+            {
+                Debug.LogWarning($"[ResourceBuildingController] resource_id {slotData.resource_id}에 대한 BuildingProductionInfo 없음");
+                continue;
+            }
+
+            // ResourceData 조회
+            ResourceData resData = ResourceRepository.Instance.GetResourceById(slotData.resource_id);
+            if (resData == null)
+            {
+                Debug.LogWarning($"[ResourceBuildingController] resource_id {slotData.resource_id}에 대한 ResourceData 없음");
+                continue;
+            }
+
+            // ProductionInfo 복원 (재화는 이미 소비된 상태이므로 다시 소비하지 않음)
+            ProductionInfo restoredProduction = new ProductionInfo(prodInfo, resData, slotData.slot_index);
+            restoredProduction.timeRemaining = slotData.time_remaining;
+            restoredProduction.totalProductionTime = slotData.total_production_time;
+
+            // 슬롯에 할당
+            if (slotData.slot_index >= 0 && slotData.slot_index < activeProductions.Count)
+            {
+                activeProductions[slotData.slot_index] = restoredProduction;
+                restoredCount++;
+            }
         }
+
+        Debug.Log($"[ResourceBuildingController] {constructedBuilding.Name}: {restoredCount}개 슬롯 복원");
+
+        // UI 업데이트
+        if (ResourceBuildingUIManager.Instance != null)
+        {
+            ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
+        }
+
+        ResourceBuildingUIManager.Instance.RefreshProductionSlots(this);
     }
-    */
 }
