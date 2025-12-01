@@ -24,6 +24,12 @@ public class GuestController : MonoBehaviour
     private List<Vector3Int> currentPath;
     private int currentPathIndex;
     private bool isMoving = false;
+    public bool IsMoving => isMoving;
+
+    // 현재 속도 추적용
+    private Vector3 previousPosition;
+    private Vector3 currentVelocity;
+    public Vector3 CurrentVelocity => currentVelocity;
     private GameObject assignedTable;
     private bool isWaiting = false;
     private int myWaitingPosition = -1;
@@ -34,6 +40,8 @@ public class GuestController : MonoBehaviour
 
     void Start()
     {
+        previousPosition = transform.position; // 속도 계산을 위한 초기 위치 설정
+
         if (pathfinder == null)
         {
             Debug.LogError("Pathfinder 컴포넌트가 할당되지 않았습니다."); // 없으면 곤란함!!!
@@ -52,6 +60,10 @@ public class GuestController : MonoBehaviour
 
     void Update()
     {
+        // 현재 속도 계산 (애니메이션용)
+        currentVelocity = (transform.position - previousPosition) / Time.deltaTime;
+        previousPosition = transform.position;
+
         if (pathfinder == null || isSeated)
         {
             return;

@@ -37,6 +37,7 @@ public class npc : IScrollItemData
     public int daily_wage { get; private set; }
     public bool need_rest { get; set; }
     public int total_ability { get; private set; }
+    public string prefab_name { get; private set; }
 
     public int personality_id { get; private set; }
     public string personality_name { get; private set; }
@@ -56,6 +57,7 @@ public class npc : IScrollItemData
         employment_state = arbeitData.employment_state; // 추가
         daily_wage = arbeitData.daily_wage;
         need_rest = false;
+        prefab_name = arbeitData.prefab_name;
 
         personality_id = personality.personality_id;
         personality_name = personality.personality_name;
@@ -66,5 +68,23 @@ public class npc : IScrollItemData
         cleaning_ability = personality.cleaning_ability;
 
         total_ability = serving_ability + cooking_ability + cleaning_ability;
+    }
+
+    /// <summary>
+    /// prefab_name에서 종족과 ID를 추출하여 비교합니다.
+    /// prefab_name 형식: "[종족]_[npc_id]" (예: "Human_1", "Oak_2")
+    /// </summary>
+    public bool MatchesPrefabName(string targetPrefabName)
+    {
+        if (string.IsNullOrEmpty(targetPrefabName)) return false;
+
+        string[] parts = targetPrefabName.Split('_');
+        if (parts.Length != 2) return false;
+
+        string prefabRace = parts[0];
+        if (!int.TryParse(parts[1], out int prefabId)) return false;
+
+        // 종족(race)과 part_timer_id를 비교
+        return race.Equals(prefabRace, StringComparison.OrdinalIgnoreCase) && part_timer_id == prefabId;
     }
 }

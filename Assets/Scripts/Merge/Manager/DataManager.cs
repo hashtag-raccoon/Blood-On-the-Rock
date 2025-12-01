@@ -57,6 +57,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] public List<ConstructedBuilding> ConstructedBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<OrderedCocktail> OrderedCocktails = new List<OrderedCocktail>();
     [SerializeField] public List<ConstructedBuilding> EditMode_InventoryBuildings = new List<ConstructedBuilding>();
+    [SerializeField] public List<InteriorData> InteriorDatas = new List<InteriorData>();
     #endregion
 
     #region Game Resources
@@ -115,6 +116,9 @@ public class DataManager : MonoBehaviour
         npcs = ArbeitRepository.Instance.GetNpcs();
         OrderedCocktails = CocktailRepository.Instance.GetOrderedCocktails();
         BuildingRepository.Instance.SpawnConstructedBuildings();
+
+        // 고용된 NPC 스폰
+        ArbeitRepository.Instance.SpawnNpcs();
     }
 
     private void OnApplicationQuit()
