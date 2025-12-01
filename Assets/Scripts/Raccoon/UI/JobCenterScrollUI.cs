@@ -4,10 +4,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class JobCenterScrollUI : BaseScrollUI<npc, JobCenterButtonUI>
+public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
 {
     private DataManager dataManager;
-    private BuildingRepository Buildinginstance;
+    private BuildingRepository buildingRepository;
     [Header("IslandManager 할당/연결")]
     [SerializeField] private IslandManager islandManager;
     [Header("UI 애니메이션 설정")]
@@ -18,37 +18,84 @@ public class JobCenterScrollUI : BaseScrollUI<npc, JobCenterButtonUI>
 
     protected override void Awake()
     {
-        base.Awake();
-
+        InitializeButtons();
+        InitializeLayout();
+        SetupScrollView();
     }
 
     private void Start()
     {
         dataManager = DataManager.Instance;
+        buildingRepository = BuildingRepository.Instance;
+        
+        // 초기 후보 생성
+        GenerateInitialCandidates();
+    }
+    
+    /// <summary>
+    /// 초기 후보 3명 생성 (씬 로드 시 호출)
+    /// </summary>
+    private void GenerateInitialCandidates()
+    {
+        if (ArbeitRepository.Instance.tempCandidateList.Count == 0)
+        {
+            List<TempNpcData> candidates = ArbeitRepository.Instance.CreateRandomTempCandidates(3);
+            ArbeitRepository.Instance.tempCandidateList.AddRange(candidates);
+        }
+    }
+    
+    /// <summary>
+    /// UI 오픈 시 후보 리스트로 갱신
+    /// </summary>
+    public void RefreshCandidateList()
+    {
+        List<TempNpcData> availableCandidates = ArbeitRepository.Instance.tempCandidateList.FindAll(c => !c.is_hired);
+        GenerateItems(availableCandidates);
     }
 
-    /*
-    // JobCenterButton 클릭 시 호출될 메소드
+    protected override void InitializeButtons()
+    {
+        openButton = null;
+        closeButton = null;
+    }
+
+    protected override void SetupLayoutGroup()
+    {
+        VerticalLayoutGroup layoutGroup = content.GetComponent<VerticalLayoutGroup>();
+        if (layoutGroup == null)
+        { 
+            layoutGroup = content.gameObject.AddComponent<VerticalLayoutGroup>(); 
+        }
+
+        layoutGroup.spacing = spacing;
+        layoutGroup.padding = padding;
+        layoutGroup.childAlignment = TextAnchor.MiddleLeft;
+        layoutGroup.childControlWidth = true;
+        layoutGroup.childControlHeight = true;
+        layoutGroup.childForceExpandWidth = false;
+        layoutGroup.childForceExpandHeight = true;
+    }
+
+    /// <summary>
+    /// JobCenterButton 클릭 시 호출될 메소드
+    /// </summary>
     protected override void OnItemClicked(IScrollItemUI clickedItem)
     {
-        npc data = clickedItem.GetData<npc>();
-        // 그 후 추가 구현 예정
+        TempNpcData data = clickedItem.GetData<TempNpcData>();
+        Debug.Log($"후보 클릭: {data.part_timer_name}");
     }
-    */
 
     protected override void OnOpenButtonClicked()
     {
+        RefreshCandidateList();
         StartCoroutine(OpenSlideCoroutine());
-        base.OnOpenButtonClicked();
-        islandManager.BlurUI.SetActive(true);
     }
 
     protected override void OnCloseButtonClicked()
     {
-        base.OnCloseButtonClicked();
         StartCoroutine(CloseSlideCoroutine());
-        islandManager.BlurUI.SetActive(false);
     }
+
     private IEnumerator OpenSlideCoroutine()
     {
         foreach (var ui in islandManager.leftUI)

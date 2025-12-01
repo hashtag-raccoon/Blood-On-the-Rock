@@ -53,7 +53,9 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
         { openButton.onClick.AddListener(OnOpenButtonClicked); }
 
         if (closeButton != null)
-        { closeButton.onClick.AddListener(OnCloseButtonClicked); }
+        { 
+            closeButton.onClick.AddListener(OnCloseButtonClicked);
+        }
     }
 
     protected virtual void InitializeLayout()
@@ -181,11 +183,4 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     {
         OnCloseButtonClicked();
     }
-
-    public virtual void OpenUI()
-    {
-        OnOpenButtonClicked();
-    }
 }
-
-

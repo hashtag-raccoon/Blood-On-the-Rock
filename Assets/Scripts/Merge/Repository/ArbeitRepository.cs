@@ -20,6 +20,8 @@ public class ArbeitRepository : MonoBehaviour, IRepository
     }
     public bool IsInitialized { get; private set; } = false;
 
+    public int maxOfferCount = 3; // 구인소 최대 알바 구인 수
+
     private JsonDataHandler _jsonDataHandler;
 
     [Header("데이터 에셋 (SO)")]
@@ -39,6 +41,10 @@ public class ArbeitRepository : MonoBehaviour, IRepository
     private readonly Dictionary<int, Personality> _personalityDict = new Dictionary<int, Personality>();
     private readonly Dictionary<string, GameObject> _npcPrefabDict = new Dictionary<string, GameObject>();
     private readonly List<GameObject> _spawnedNpcs = new List<GameObject>();
+
+    // [구인소] 임시 후보 NPC 리스트
+    // 임시 알바생들임
+    public List<TempNpcData> tempCandidateList = new List<TempNpcData>(3); // 최대 3명
 
     private void Awake()
     {
@@ -363,6 +369,142 @@ public class ArbeitRepository : MonoBehaviour, IRepository
             // 참고: ArbeitController에 part_timer_id를 반환하는 프로퍼티가 필요할 수 있습니다.
             return go.name.EndsWith($"_{partTimerId}");
         });
+    }
+    #endregion
+
+    #region 알바생 후보 생성 및 관리
+    /// <summary>
+    /// 랜덤 임시 후보 NPC 생성 (구인소용)
+    /// </summary>
+    /// <param name="count">생성할 후보 수 (기본 3명)</param>
+    /// <returns>생성된 TempNpcData 리스트</returns>
+    public List<TempNpcData> CreateRandomTempCandidates(int count = 3)
+    {
+        List<TempNpcData> candidates = new List<TempNpcData>();
+        
+        // 종족별 이름 목록 (임시로 각 종족당 6개 넣었음, 추후 다른 방식으로 수정할게)
+        Dictionary<string, string[]> namesByRace = new Dictionary<string, string[]>
+        {
+            // 인간 종족 이름
+            { "Human", new[] { "밥", "가렌", "찰리", "다이애나", "다리우스", "피오나" } },
+            // 오크 종족 이름
+            { "Orc", new[] { "그룩", "그록", "그라락", "그롸롸", "그루크", "고르크" } },
+            // 뱀파이어 종족 이름
+            { "Vampire", new[] { "블라드 3세", "셀린", "드라큘라", "카밀라", "알퀘이드", "블라디미르" } }
+        };
+        
+        string[] races = { "Human", "Orc", "Vampire" };
+        
+        for (int i = 0; i < count; i++)
+        {
+            TempNpcData candidate = new TempNpcData
+            {
+                temp_id = i + 1,
+                race = races[UnityEngine.Random.Range(0, races.Length)]
+            };
+            
+            // 종족에 맞는 랜덤 이름 선택
+            if (namesByRace.TryGetValue(candidate.race, out string[] names))
+            {
+                candidate.part_timer_name = names[UnityEngine.Random.Range(0, names.Length)];
+            }
+            else
+            {
+                candidate.part_timer_name = $"NPC_{i + 1}";
+            }
+            
+            // 기본 능력치 (1~3)
+            candidate.base_serving_ability = UnityEngine.Random.Range(1, 4);
+            candidate.base_cooking_ability = UnityEngine.Random.Range(1, 4);
+            candidate.base_cleaning_ability = UnityEngine.Random.Range(1, 4);
+            
+            // 5% 확률로 성격 부여
+            // 만약 성격 부여가 될 경우 PersoanlityDataSO에서 랜덤 성격 선택
+            if (UnityEngine.Random.Range(0f, 1f) < 0.05f && personalityDataSO != null && personalityDataSO.personalities.Count > 0)
+            {
+                // PersonalitySO에서 랜덤 성격 선택
+                Personality randomPersonality = personalityDataSO.personalities[UnityEngine.Random.Range(0, personalityDataSO.personalities.Count)];
+                
+                candidate.personality_id = randomPersonality.personality_id;
+                candidate.personality_name = randomPersonality.personality_name;
+                candidate.personality_serving_bonus = randomPersonality.serving_ability;
+                candidate.personality_cooking_bonus = randomPersonality.cooking_ability;
+                candidate.personality_cleaning_bonus = randomPersonality.cleaning_ability;
+            }
+            else
+            {
+                candidate.personality_id = -1; // 성격 없음
+                candidate.personality_name = "없음";
+                candidate.personality_serving_bonus = 0;
+                candidate.personality_cooking_bonus = 0;
+                candidate.personality_cleaning_bonus = 0;
+            }
+            
+            // TODO : 예상 일급 계산 로직 필요
+            // ex : candidate.estimated_daily_wage = ~~~
+            candidate.estimated_daily_wage = 0;
+
+            candidate.is_hired = false;
+            
+            candidates.Add(candidate);
+        }
+        
+        Debug.Log($"[ArbeitRepository] 임시 후보 {candidates.Count}명 생성 완료");
+        return candidates;
+    }
+    
+    /// <summary>
+    /// 임시 후보를 실제 NPC 데이터로 변환 및 저장
+    /// 해당 메소드는 구인소에서 알바생을 고용할 때 호출됨
+    /// </summary>
+    /// <param name="tempData">임시 후보 데이터에서 실제 NPC 데이터로 변환할 대상</param>
+    /// <returns>생성된 npc 객체</returns>
+    public npc ConvertTempToRealNpc(TempNpcData tempData)
+    {
+        if (tempData == null)
+        {
+            Debug.LogError("TempNpcData가 null입니다.");
+            return null;
+        }
+        
+        // 새로운 part_timer_id 생성 (기존 최대값 + 1)
+        int newId = _arbeitDatas.Count > 0 ? _arbeitDatas.Max(a => a.part_timer_id) + 1 : 1;
+        
+        // TempArbeitData를 토대로 ArbeitData 생성
+        ArbeitData newArbeitData = new ArbeitData
+        {
+            part_timer_id = newId,
+            part_timer_name = tempData.part_timer_name,
+            race = tempData.race,
+            personality_id = tempData.personality_id,
+            serving_ability = tempData.FinalServingAbility,
+            cooking_ability = tempData.FinalCookingAbility,
+            cleaning_ability = tempData.FinalCleaningAbility,
+            hire_date = DateTime.Now,
+            employment_state = true,
+            daily_wage = tempData.estimated_daily_wage
+        };
+        
+        // ArbeitData 리스트에 추가
+        _arbeitDatas.Add(newArbeitData);
+        
+        // npc 객체 생성
+        // Personality > 0 => 즉 성격이 있을 때만 personality 할당
+        Personality personality = null;
+        if (tempData.personality_id > 0)
+        {
+            _personalityDict.TryGetValue(tempData.personality_id, out personality);
+        }
+        
+        npc newNpc = new npc(newArbeitData, personality);
+        _npcs.Add(newNpc);
+        
+        // JSON 에 알바 데이터 저장
+        _jsonDataHandler.SaveArbeitData(_arbeitDatas);
+        
+        Debug.Log($"[ArbeitRepository] '{tempData.part_timer_name}' 고용 완료 (ID: {newId})");
+        
+        return newNpc;
     }
     #endregion
 

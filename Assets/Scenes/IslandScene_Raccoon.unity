@@ -4352,6 +4352,10 @@ MonoBehaviour:
   previewTilemap: {fileID: 92233670}
   banTilemap: {fileID: 0}
   ExistingTilemap: {fileID: 189612839}
+  ExistingInteriorTilemap: {fileID: 0}
+  favorCheckTilemap: {fileID: 0}
+  favorRewardTiles: []
+  interiorMarkerTile: {fileID: 0}
   markerTile: {fileID: 11400000, guid: d563889f5af2bcd439e1d8ba8e838f17, type: 2}
   mainCamera: {fileID: 1350856029}
   editModeProgressBar: {fileID: 524218158}
@@ -4424,6 +4428,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
+  npcPrefabs: []
+  defaultSpawnPoint: {fileID: 0}
 --- !u!1 &704879620
 GameObject:
   m_ObjectHideFlags: 0
@@ -6278,7 +6284,6 @@ GameObject:
   - component: {fileID: 1171724226}
   - component: {fileID: 1171724229}
   - component: {fileID: 1171724228}
-  - component: {fileID: 1171724227}
   - component: {fileID: 1171724230}
   m_Layer: 5
   m_Name: ArbeitOfferButton
@@ -6314,50 +6319,6 @@ RectTransform:
   m_AnchoredPosition: {x: -17.5845, y: 173.99988}
   m_SizeDelta: {x: 1400, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1171724227
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1171724225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 1171724228}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1171724228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37667,13 +37628,15 @@ MonoBehaviour:
   personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
   buildingDataSO: {fileID: 11400000, guid: 9fc70487ce8bd804aa658d37f60b1192, type: 2}
   buildingProductionInfoSO: {fileID: 11400000, guid: 506aba939074ddf41ac9b036998565c0, type: 2}
+  ingridiantSO: {fileID: 0}
   ConstructedBuildingProductions: []
   ConstructedBuildingPositions: []
+  cocktails: []
   npcs: []
   ConstructedBuildings: []
-  cocktails: []
   OrderedCocktails: []
   EditMode_InventoryBuildings: []
+  InteriorDatas: []
   wood: 0
   money: 0
   storeFavor: 100
@@ -38145,6 +38108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 362d275d9cd46dd4287b581ba7d30e74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _resourceDatas: []
 --- !u!1001 &1692569953
 PrefabInstance:
   m_ObjectHideFlags: 0
