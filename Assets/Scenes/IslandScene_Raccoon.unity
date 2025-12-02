@@ -4232,6 +4232,10 @@ MonoBehaviour:
   previewTilemap: {fileID: 92233670}
   banTilemap: {fileID: 0}
   ExistingTilemap: {fileID: 189612839}
+  ExistingInteriorTilemap: {fileID: 0}
+  favorCheckTilemap: {fileID: 0}
+  favorRewardTiles: []
+  interiorMarkerTile: {fileID: 0}
   markerTile: {fileID: 11400000, guid: d563889f5af2bcd439e1d8ba8e838f17, type: 2}
   mainCamera: {fileID: 1350856029}
   editModeProgressBar: {fileID: 524218158}
@@ -37586,6 +37590,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 362d275d9cd46dd4287b581ba7d30e74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _resourceDatas: []
 --- !u!1001 &1692569953
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39318,6 +39323,7 @@ Transform:
   - {fileID: 1588935121}
   - {fileID: 331877258}
   - {fileID: 1299714513}
+  - {fileID: 1990881373}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1987605208
@@ -39417,6 +39423,51 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ae9b3438b449bc9499c4c89c57b7d9b8, type: 3}
+--- !u!1 &1990881372
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1990881373}
+  - component: {fileID: 1990881374}
+  m_Layer: 0
+  m_Name: ArbeitManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1990881373
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990881372}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1973697523}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1990881374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990881372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9cd27f68e629c84385d3b42017e74d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arbeitSpriteReference: {fileID: 11400000, guid: 32d080fcf40d9484692df0fe79022aca, type: 2}
 --- !u!1 &2012967149
 GameObject:
   m_ObjectHideFlags: 0

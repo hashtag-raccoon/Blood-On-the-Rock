@@ -100,7 +100,7 @@ public class JobCenterButtonUI : MonoBehaviour, IScrollItemUI
 
     private void UpdateUI()
     {
-
+        ArbeitImage.sprite = currentTempData.Portrait;
         ArbeitNameText.text = currentTempData.part_timer_name;
         ArbeitPersonalityText.text = currentTempData.personality_name;
         ArbeitMoneyText.text = currentTempData.estimated_daily_wage.ToString();

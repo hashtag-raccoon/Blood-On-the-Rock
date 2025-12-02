@@ -10,20 +10,17 @@ namespace Raccoon.Manager
     /// </summary>
     public class ArbeitManager : MonoBehaviour
     {
-        public static ArbeitManager Instance { get; private set; }
-
-        private void Awake()
+        public ArbeitSpriteReference arbeitSpriteReference; // 스프라이트 레퍼런스 할당
+        private static ArbeitManager _instance;
+        public static ArbeitManager Instance
         {
-            if (Instance == null)
+            get
             {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-                Debug.Log("[ArbeitManager] 싱글톤 설정됨");
-            }
-            else
-            {
-                Debug.LogWarning("[ArbeitManager] 중복된 인스턴스 죽어잇");
-                Destroy(gameObject);
+                if (_instance == null)
+                {
+                    _instance = FindObjectOfType<ArbeitManager>();
+                }
+                return _instance;
             }
         }
 

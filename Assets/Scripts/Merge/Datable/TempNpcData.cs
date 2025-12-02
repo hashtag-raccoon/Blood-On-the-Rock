@@ -26,6 +26,8 @@ public class TempNpcData : IScrollItemData
     public int estimated_daily_wage; // 예상 일당
     public bool is_hired; // 고용 여부
 
+    public Sprite Portrait; // 초상화 스프라이트
+
     // UI 표시용 최종 능력치 (최대 5)
     public int FinalServingAbility => Mathf.Min(base_serving_ability + personality_serving_bonus, 5);
     public int FinalCookingAbility => Mathf.Min(base_cooking_ability + personality_cooking_bonus, 5);
@@ -46,6 +48,7 @@ public class TempNpcData : IScrollItemData
         personality_cleaning_bonus = 0;
         estimated_daily_wage = 0;
         is_hired = false;
+        Portrait = null;
     }
 
     public TempNpcData(int tempId, string name, string raceType) // 매개변수 생성자, 왠만하면 해당 생성자로 생성 부탁!
@@ -63,5 +66,6 @@ public class TempNpcData : IScrollItemData
         personality_cleaning_bonus = 0;
         estimated_daily_wage = 0;
         is_hired = false;
+        Portrait = null;
     }
 }
