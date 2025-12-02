@@ -107,7 +107,8 @@ MonoBehaviour:
   servingColor: {r: 1, g: 0, b: 0, a: 1}
   cookingColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   cleaningColor: {r: 0, g: 0, b: 1, a: 1}
-  bonusColor: {r: 0.19607843, g: 0.8039216, b: 0.19607843, a: 1}
+  personalityIncreaseColor: {r: 0.19607843, g: 0.8039216, b: 0.19607843, a: 1}
+  personalityDecreaseColor: {r: 0.5, g: 0, b: 0.5, a: 1}
   abilitySlotPrefab: {fileID: 0}
   OfferButton: {fileID: 2983466621328203651}
   OfferUI: {fileID: 0}

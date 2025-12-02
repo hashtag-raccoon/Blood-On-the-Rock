@@ -3692,8 +3692,9 @@ MonoBehaviour:
   paddingBottom: 10
   openButton: {fileID: 0}
   closeButton: {fileID: 0}
+  Chance: 5
   islandManager: {fileID: 470215551}
-  duration: 1
+  duration: 0.3
   ReferenceOfferUI: {fileID: 843325761}
   ReferenceOfferAcceptButton: {fileID: 376716844}
   ReferenceOfferCancelButton: {fileID: 1655812624}
@@ -6536,8 +6537,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cb9a5d49ef8a83428165abfcda268db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cocktailDataSO: {fileID: 0}
-  cocktailRecipeSO: {fileID: 0}
+  cocktailDataSO: {fileID: 11400000, guid: 302d487748edd694bbb0126e3ca82104, type: 2}
+  cocktailRecipeSO: {fileID: 11400000, guid: b9270b31092584d409cd432897a50594, type: 2}
 --- !u!1 &1299714512
 GameObject:
   m_ObjectHideFlags: 0
@@ -37226,7 +37227,7 @@ MonoBehaviour:
   personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
   buildingDataSO: {fileID: 11400000, guid: 9fc70487ce8bd804aa658d37f60b1192, type: 2}
   buildingProductionInfoSO: {fileID: 11400000, guid: 506aba939074ddf41ac9b036998565c0, type: 2}
-  ingridiantSO: {fileID: 0}
+  ingridiantSO: {fileID: 11400000, guid: 5fa4e436e75c0734a8e8636c1de938e8, type: 2}
   ConstructedBuildingProductions: []
   ConstructedBuildingPositions: []
   cocktails: []
@@ -39468,6 +39469,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arbeitSpriteReference: {fileID: 11400000, guid: 32d080fcf40d9484692df0fe79022aca, type: 2}
+  maxDeployedArbeiters: 3
+  deployedArbeiters: []
+  arbeitPrefab: {fileID: 7208843706444518864, guid: 9b75c37eaccb30943be2526b233cc32b, type: 3}
+  arbeitPoint: {fileID: 0}
+  pathfinder: {fileID: 0}
+  BarSceneName: BarScene_Raccoon
 --- !u!1 &2012967149
 GameObject:
   m_ObjectHideFlags: 0

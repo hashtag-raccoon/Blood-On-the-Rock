@@ -17,6 +17,13 @@ public class ArbeitController : MonoBehaviour
     [HideInInspector]
     public bool isSelected = false;
 
+    [Header("대기열 관리")]
+    private ArbeitPoint arbeitPoint;
+    private int myWaitingPosition = -1;
+    private GameObject waitingTargetObject;
+    private bool isWaiting = false;
+    public bool IsWaiting => isWaiting;
+
     [Header("업무 관리")]
     private const int MAX_TASKS = 3; // 최대 업무 개수
     private List<TaskInfo> taskQueue = new List<TaskInfo>(); // 업무 큐
@@ -45,6 +52,19 @@ public class ArbeitController : MonoBehaviour
         this.myNpcData = npcData;
         // 이동 속도 보정 등이 필요할 경우 여기에 추가할 것
         // ex: moveSpeed += npcData.serving_ability * 0.1f;
+    }
+
+    /// <summary>
+    /// ArbeitPoint 설정 및 대기열 추가
+    /// </summary>
+    public void SetArbeitPoint(ArbeitPoint point)
+    {
+        arbeitPoint = point;
+        if (arbeitPoint != null)
+        {
+            myWaitingPosition = arbeitPoint.AddToWaitingLine(this.gameObject);
+            SetWaitingTarget();
+        }
     }
     #endregion
 
@@ -160,6 +180,18 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     void OnReachedDestination()
     {
+        // 대기 위치에 도착한 경우
+        if (myWaitingPosition != -1 && waitingTargetObject != null)
+        {
+            Vector3 waitingPos = arbeitPoint.CalculateWaitingPosition(myWaitingPosition);
+            if (Vector3.Distance(transform.position, waitingPos) < 0.1f)
+            {
+                isWaiting = true;
+                Debug.Log($"[ArbeitController] {myNpcData?.part_timer_name}이(가) 대기 위치에 도착했습니다.");
+                return;
+            }
+        }
+
         if (currentTask != null && currentTask.taskType == TaskType.TakeOrder)
         {
             GuestController guest = currentTask.targetObject.GetComponent<GuestController>();
@@ -335,6 +367,9 @@ public class ArbeitController : MonoBehaviour
 
             currentTask = null;
 
+            // 대기 위치로 복귀
+            ReturnToWaitingPosition();
+
             // 다음 업무 시작
             StartNextTask();
         }
@@ -353,6 +388,10 @@ public class ArbeitController : MonoBehaviour
         {
             OrderingManager.Instance.RemoveTask(currentTask);
             currentTask = null;
+
+            // 대기 위치로 복귀
+            ReturnToWaitingPosition();
+
             StartNextTask();
         }
     }
@@ -468,6 +507,73 @@ public class ArbeitController : MonoBehaviour
     public bool CanAddTask(GameObject taskUI)
     {
         return GetTaskCount() < MAX_TASKS || OrderingManager.Instance.HasTask(taskUI.GetComponent<TaskUIController>().assignedTask);
+    }
+    #endregion
+
+    #region 대기열 관리
+    /// <summary>
+    /// 대기 위치 타겟 설정
+    /// </summary>
+    private void SetWaitingTarget()
+    {
+        if (arbeitPoint == null || myWaitingPosition == -1) return;
+
+        Vector3 waitingPos = arbeitPoint.CalculateWaitingPosition(myWaitingPosition);
+
+        if (waitingTargetObject == null)
+        {
+            waitingTargetObject = new GameObject($"WaitingTarget_{this.gameObject.name}");
+        }
+
+        waitingTargetObject.transform.position = waitingPos;
+        currentTarget = waitingTargetObject.transform;
+        isMoving = false;
+    }
+
+    /// <summary>
+    /// 대기 위치로 복귀
+    /// </summary>
+    public void ReturnToWaitingPosition()
+    {
+        if (arbeitPoint != null && myWaitingPosition != -1)
+        {
+            isWaiting = false;
+            SetWaitingTarget();
+            SetTarget(waitingTargetObject.transform);
+            Debug.Log($"[ArbeitController] {myNpcData?.part_timer_name}이(가) 대기 위치로 복귀합니다.");
+        }
+    }
+
+    /// <summary>
+    /// 대기 위치 업데이트 (다른 알바가 제거되었을 때 호출)
+    /// </summary>
+    public void UpdateWaitingPosition(int newPosition)
+    {
+        if (myWaitingPosition != -1)
+        {
+            myWaitingPosition = newPosition;
+
+            // 현재 업무가 없고 대기 중일 때만 위치 업데이트
+            if (currentTask == null && isWaiting)
+            {
+                SetWaitingTarget();
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // 대기 타겟 오브젝트 제거
+        if (waitingTargetObject != null)
+        {
+            DestroyImmediate(waitingTargetObject);
+        }
+
+        // 대기열에서 제거
+        if (arbeitPoint != null)
+        {
+            arbeitPoint.RemoveFromWaitingLine(this.gameObject);
+        }
     }
     #endregion
 }

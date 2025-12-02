@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: 2
   m_EditorClassIdentifier: 
   personality_id: 2
-  personality_name: 2
+  personality_name: "\uACC4\uC0B0\uC801\uC784"
   description: 2
   specificity: 2
   serving_ability: 3
-  cooking_ability: 2
-  cleaning_ability: 3
+  cooking_ability: 1
+  cleaning_ability: 2

@@ -47,6 +47,8 @@ public class npc : IScrollItemData
     public int serving_ability { get; private set; }
     public int cooking_ability { get; private set; }
     public int cleaning_ability { get; private set; }
+    // 배치되었는지 따지는 필드
+    public bool is_deployed { get; set; }
 
     public npc(ArbeitData arbeitData, Personality personality)
     {
@@ -69,6 +71,8 @@ public class npc : IScrollItemData
         cleaning_ability = personality.cleaning_ability;
 
         total_ability = serving_ability + cooking_ability + cleaning_ability;
+
+        is_deployed = false;
     }
 
     /// <summary>

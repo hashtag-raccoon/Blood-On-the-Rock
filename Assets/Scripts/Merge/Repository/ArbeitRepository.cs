@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
-using Raccoon.Manager;
 
 public class ArbeitRepository : MonoBehaviour, IRepository
 {
@@ -178,7 +177,18 @@ public class ArbeitRepository : MonoBehaviour, IRepository
                 }
                 else
                 {
-                    Debug.LogWarning($"ArbeitData '{arbeitData.part_timer_name}'(ID: {arbeitData.part_timer_id})에 대한 Personality ID '{arbeitData.personality_id}'를 찾을 수 없습니다.");
+                    //Debug.LogWarning($"ArbeitData '{arbeitData.part_timer_name}'(ID: {arbeitData.part_timer_id})에 대한 Personality ID '{arbeitData.personality_id}'를 찾을 수 없습니다.");
+                    // Personality가 없는 경우에도 npc 객체를 생성함
+                    _npcs.Add(new npc(arbeitData, new Personality
+                    {
+                        personality_id = -1,
+                        personality_name = "없음",
+                        description = "",
+                        specificity = "",
+                        serving_ability = 0,
+                        cooking_ability = 0,
+                        cleaning_ability = 0
+                    }));
                 }
             }
         }
@@ -188,6 +198,16 @@ public class ArbeitRepository : MonoBehaviour, IRepository
     public List<npc> GetNpcs()
     {
         return _npcs;
+    }
+    // 배치된 NPC 리스트 반환
+    public List<npc> GetDeployedNpcs()
+    {
+        return _npcs.Where(n => n.is_deployed).ToList();
+    }
+    // 고용된 NPC 리스트 반환
+    public List<npc> GethiredNpcs()
+    {
+        return _npcs.Where(n => n.employment_state).ToList();
     }
 
     #region NPC Spawn Methods
@@ -423,7 +443,7 @@ public class ArbeitRepository : MonoBehaviour, IRepository
 
             // 5% 확률로 성격 부여
             // 만약 성격 부여가 될 경우 PersoanlityDataSO에서 랜덤 성격 선택
-            if (UnityEngine.Random.Range(0f, 1f) < 0.05f && personalityDataSO != null && personalityDataSO.personalities.Count > 0)
+            if (UnityEngine.Random.Range(0f, 1f) < (JobCenterScrollUI.PersonalityChance / 100) && personalityDataSO != null && personalityDataSO.personalities.Count > 0)
             {
                 // PersonalitySO에서 랜덤 성격 선택
                 Personality randomPersonality = personalityDataSO.personalities[UnityEngine.Random.Range(0, personalityDataSO.personalities.Count)];
@@ -499,6 +519,21 @@ public class ArbeitRepository : MonoBehaviour, IRepository
             _personalityDict.TryGetValue(tempData.personality_id, out personality);
         }
 
+        if (personality == null)
+        {
+            // 성격이 없을 경우 기본 성격 객체 생성
+            personality = new Personality
+            {
+                personality_id = -1,
+                personality_name = "없음",
+                description = "",
+                specificity = "",
+                serving_ability = 0,
+                cooking_ability = 0,
+                cleaning_ability = 0
+            };
+        }
+        // 만약 성격이 없으면 없는 npc로 생성, 있으면 해당 성격으로 npc 생성
         npc newNpc = new npc(newArbeitData, personality);
         _npcs.Add(newNpc);
 

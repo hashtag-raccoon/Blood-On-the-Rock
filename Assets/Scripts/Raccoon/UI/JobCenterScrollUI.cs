@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using Raccoon.Manager;
 
 public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
 {
+    [Header("성격 부여 확률 설정")]
+    public int Chance = 5; // 성격 부여 확률 (%)
+    public static int PersonalityChance = 5; // 다른데서 참조될 성격 부여 확률 (%)
     private DataManager dataManager;
     private BuildingRepository buildingRepository;
     [Header("IslandManager 할당/연결")]
@@ -19,6 +21,7 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
     [SerializeField] private Button ReferenceOfferCancelButton;
     [Header("능력치 슬롯 프리팹 레퍼런스")]
     [SerializeField] private GameObject AbilitySlotPrefab; // 공통 능력치 슬롯 프리팹
+
     // UI 애니메이션용 딕셔너리임
     // ui들 원래 위치 담을 딕셔너리, 키: ui 오브젝트, 값: 원래 위치
     private Dictionary<GameObject, Vector2> UIoriginPos = new Dictionary<GameObject, Vector2>();
@@ -30,15 +33,13 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
         InitializeButtons();
         InitializeLayout();
         SetupScrollView();
+        PersonalityChance = Chance; // static 변수에 값 할당
     }
 
     private void Start()
     {
         dataManager = DataManager.Instance;
         buildingRepository = BuildingRepository.Instance;
-
-        // ArbeitManager를 통한 초기 후보자 3명 생성
-        ArbeitManager.Instance.InitializeJobCenter();
 
         // UI 초기 상태 비활성화
         if (scrollUI != null)
