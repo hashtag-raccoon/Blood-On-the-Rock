@@ -18,7 +18,7 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     where TItemUI : MonoBehaviour, IScrollItemUI
 {
     [Header("스크롤 세팅")]
-    [SerializeField] protected GameObject scrollUI;
+    public GameObject scrollUI;
     [SerializeField] protected ScrollRect scrollRect;
     [SerializeField] protected Transform content;
     [SerializeField] protected GameObject itemPrefab;
@@ -53,7 +53,7 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
         { openButton.onClick.AddListener(OnOpenButtonClicked); }
 
         if (closeButton != null)
-        { 
+        {
             closeButton.onClick.AddListener(OnCloseButtonClicked);
         }
     }

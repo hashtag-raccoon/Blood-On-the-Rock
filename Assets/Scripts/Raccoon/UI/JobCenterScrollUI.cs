@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Raccoon.Manager;
 
 public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
 {
@@ -12,9 +13,17 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
     [SerializeField] private IslandManager islandManager;
     [Header("UI 애니메이션 설정")]
     [SerializeField] float duration = 1f; // UI 팝업/종료 애니메이션 지속 시간
-
-    // ui들 원래 위치 담을 딕셔너리, 키: ui 오브젝트, 값: 원래 위치, OpenButton 누를 시 저장 및 초기화
+    [Header("UI 레퍼런스 설정")]
+    [SerializeField] private GameObject ReferenceOfferUI;
+    [SerializeField] private Button ReferenceOfferAcceptButton;
+    [SerializeField] private Button ReferenceOfferCancelButton;
+    [Header("능력치 슬롯 프리팹 레퍼런스")]
+    [SerializeField] private GameObject AbilitySlotPrefab; // 공통 능력치 슬롯 프리팹
+    // UI 애니메이션용 딕셔너리임
+    // ui들 원래 위치 담을 딕셔너리, 키: ui 오브젝트, 값: 원래 위치
     private Dictionary<GameObject, Vector2> UIoriginPos = new Dictionary<GameObject, Vector2>();
+
+    private bool isUIOpen = false; // UI 활성화 상태
 
     protected override void Awake()
     {
@@ -27,44 +36,90 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
     {
         dataManager = DataManager.Instance;
         buildingRepository = BuildingRepository.Instance;
-        
-        // 초기 후보 생성
-        GenerateInitialCandidates();
-    }
-    
-    /// <summary>
-    /// 초기 후보 3명 생성 (씬 로드 시 호출)
-    /// </summary>
-    private void GenerateInitialCandidates()
-    {
-        if (ArbeitRepository.Instance.tempCandidateList.Count == 0)
+
+        // ArbeitManager를 통한 초기 후보자 3명 생성
+        ArbeitManager.Instance.InitializeJobCenter();
+
+        // UI 초기 상태 비활성화
+        if (scrollUI != null)
         {
-            List<TempNpcData> candidates = ArbeitRepository.Instance.CreateRandomTempCandidates(3);
-            ArbeitRepository.Instance.tempCandidateList.AddRange(candidates);
+            scrollUI.SetActive(false);
         }
     }
-    
+
     /// <summary>
     /// UI 오픈 시 후보 리스트로 갱신
     /// </summary>
     public void RefreshCandidateList()
     {
-        List<TempNpcData> availableCandidates = ArbeitRepository.Instance.tempCandidateList.FindAll(c => !c.is_hired);
+        List<TempNpcData> availableCandidates = ArbeitManager.Instance.GetAvailableCandidates();
         GenerateItems(availableCandidates);
     }
 
     protected override void InitializeButtons()
     {
+        // JobCenter 건물을 클릭하여 호출되므로 버튼 불필요함. 그래서 null 처리하였음.
         openButton = null;
         closeButton = null;
     }
 
+    /// <summary>
+    /// JobCenterButtonUI 생성 시 레퍼런스 할당
+    /// base.CreateItem을 오버라이드하여 직접구현, SetData 호출 전에 프리팹을 전달하여 오류 방지함
+    /// </summary>
+    protected override void CreateItem(TempNpcData data)
+    {
+        // 1. 프리팹 인스턴스화
+        GameObject itemObj = Instantiate(itemPrefab, content);
+        itemObj.transform.SetSiblingIndex(0);
+
+        // 2. 프리팹들 정렬
+        LayoutElement layoutElement = itemObj.GetComponent<LayoutElement>();
+        if (layoutElement == null)
+        {
+            layoutElement = itemObj.AddComponent<LayoutElement>();
+        }
+        layoutElement.preferredWidth = itemWidth;
+        layoutElement.preferredHeight = itemHeight;
+        layoutElement.flexibleHeight = 1f;
+
+        // 3. JobCenterButtonUI 스크립트 가져오기
+        JobCenterButtonUI buttonUIScript = itemObj.GetComponent<JobCenterButtonUI>();
+        if (buttonUIScript != null)
+        {
+            // 4. SetData 호출 전에 레퍼런스 전달(없으면 사고남!!!!!)
+            if (ReferenceOfferUI != null)
+                buttonUIScript.OfferUI = ReferenceOfferUI;
+
+            if (ReferenceOfferAcceptButton != null)
+                buttonUIScript.OfferAcceptButton = ReferenceOfferAcceptButton;
+
+            if (ReferenceOfferCancelButton != null)
+                buttonUIScript.OfferCancelButton = ReferenceOfferCancelButton;
+            // 공통 슬롯 프리팹 전달
+            buttonUIScript.SetAbilitySlotPrefab(AbilitySlotPrefab);
+
+            // 5. 이제 SetData 호출 (이 시점에는 abilitySlotPrefab이 이미 설정되어 오류 없을거임)
+            buttonUIScript.SetData(data, OnItemClicked);
+
+            // 6. itemUIList에 추가
+            itemUIList.Add(buttonUIScript);
+        }
+        else
+        {
+            Debug.LogError($"[JobCenterScrollUI] buttonUIScript를 찾을 수 없음!");
+        }
+    }
+
+    /// <summary>
+    /// 버튼 UI 정렬
+    /// </summary>
     protected override void SetupLayoutGroup()
     {
         VerticalLayoutGroup layoutGroup = content.GetComponent<VerticalLayoutGroup>();
         if (layoutGroup == null)
-        { 
-            layoutGroup = content.gameObject.AddComponent<VerticalLayoutGroup>(); 
+        {
+            layoutGroup = content.gameObject.AddComponent<VerticalLayoutGroup>();
         }
 
         layoutGroup.spacing = spacing;
@@ -82,18 +137,45 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
     protected override void OnItemClicked(IScrollItemUI clickedItem)
     {
         TempNpcData data = clickedItem.GetData<TempNpcData>();
-        Debug.Log($"후보 클릭: {data.part_timer_name}");
     }
 
-    protected override void OnOpenButtonClicked()
+    /// <summary>
+    /// JobCenter(건물)에서 호출하여 UI 열기
+    /// </summary>
+    public void OpenUI()
     {
+        if (isUIOpen) return;
+
+        isUIOpen = true;
+        if (scrollUI != null)
+        {
+            scrollUI.SetActive(true);
+        }
         RefreshCandidateList();
         StartCoroutine(OpenSlideCoroutine());
     }
 
+    /// <summary>
+    /// UI 닫기 (ESC 키)
+    /// </summary>
+    public override void CloseUI()
+    {
+        if (!isUIOpen) return;
+
+        isUIOpen = false;
+        StartCoroutine(CloseSlideCoroutine());
+    }
+
+    protected override void OnOpenButtonClicked()
+    {
+        // 버튼을 사용하지 않으므로 OpenUI()로 대체
+        OpenUI();
+    }
+
     protected override void OnCloseButtonClicked()
     {
-        StartCoroutine(CloseSlideCoroutine());
+        // 버튼을 사용하지 않으므로 CloseUI()로 대체
+        CloseUI();
     }
 
     private IEnumerator OpenSlideCoroutine()
@@ -134,6 +216,12 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
         }
 
         yield return new WaitForSeconds(duration);
+
+        // 애니메이션 완료 후 UI 비활성화
+        if (scrollUI != null)
+        {
+            scrollUI.SetActive(false);
+        }
     }
 
     // isOpen이 true면<열기 애니메이션>, false면<닫기 애니메이션>

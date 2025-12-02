@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 public class JobCenterController : BuildingBase
 {
     [Header("구인소 UI 할당")]
-    [SerializeField] private JobCenterScrollUI jobCenterScrollUI;
+    public JobCenterScrollUI jobCenterScrollUI;
 
     protected override void Start()
     {
