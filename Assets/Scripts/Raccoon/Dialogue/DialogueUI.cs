@@ -283,6 +283,13 @@ public class DialogueUI : MonoBehaviour
         {
             context = context.Replace("{ }", currentReplacementName);
         }
+
+        // $가 있을때 해당 텍스트 줄바꿈
+        if(context.Contains("$"))
+        {
+            context = context.Replace("$", "\n");
+        }
+        
         // '/' 기준으로 대화 내용 분할
         string[] parts = context.Split('/');
         foreach (string part in parts)

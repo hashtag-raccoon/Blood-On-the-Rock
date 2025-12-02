@@ -25,5 +25,5 @@ MonoBehaviour:
   tileSize: {x: 4, y: 4}
   buildingType: 3
   cameraPositionOffset: 1
-  MarkerPositionOffset: 0
+  MarkerPositionOffset: -2
   CameraOrthographicSize: 0

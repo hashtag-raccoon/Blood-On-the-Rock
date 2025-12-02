@@ -43,6 +43,10 @@ public static class BuildingFactory
             case BuildingType.Production: // 생산형 건물일 경우
                 AddProductionBuildingComponents(buildingObj, buildingData, instanceId);
                 break;
+            case BuildingType.Utility: // 유틸리티형 건물일 경우
+                AddUtilityBuildingComponents(buildingObj, buildingData, instanceId);
+                break;
+
             // 추후 비생산형 건물 타입 추가 예정
             default: // 그 외의 건물일 경우(꾸미는 용도의 건물 등등)
                 AddNonProductionBuildingComponents(buildingObj, buildingData, instanceId);
@@ -83,6 +87,28 @@ public static class BuildingFactory
 
         // ResourceBuildingController 전용 필드 할당
         AssignProductionBuildingFields(controller);
+    }
+
+    /// <summary>
+    /// 유틸리티형 건물에 필요한 컴포넌트 추가
+    /// 건물 이름에 따라 적절한 컨트롤러를 추가함
+    /// ex) 구인소 -> JobCenterController, 시계탑 -> ClockTowerController 등. 현재는 ClockTowerController 미구현 상태
+    /// </summary>
+    private static void AddUtilityBuildingComponents(GameObject buildingObj, BuildingData buildingData, long instanceId)
+    {
+        // 건물 이름에 따라 적절한 컨트롤러 추가
+        if (buildingData.Building_Name == "구인소")
+        {
+            JobCenterController controller = buildingObj.AddComponent<JobCenterController>();
+
+            // BuildingBase 필드 자동 할당
+            AssignBuildingBaseFields(controller, buildingData, instanceId);
+        }
+        else
+        {
+            // 건물 이름 상관없는 공용 유틸리티 건물일 경우
+            AddNonProductionBuildingComponents(buildingObj, buildingData, instanceId);
+        }
     }
 
     /// <summary>

@@ -26,7 +26,7 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
 
     protected static GameObject activeUpgradeUI;
     protected static BuildingBase currentActiveBuilding; // 현재 활성화된 건물
-    private static bool upgradeButtonInitialized = false; // 버튼 리스너 초기화 여부
+    private bool upgradeButtonInitialized = false; // 버튼 리스너 초기화 여부
 
     [Header("카메라 세팅")]
     [SerializeField] protected float AnimationSpeed = 5f;
@@ -91,6 +91,14 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
             if (BuildingUpgradeButton != null)
             {
                 BuildingUpgradeButton.interactable = false;
+            }
+        }
+        else
+        {
+            CantUpgrade = false;
+            if (BuildingUpgradeButton != null)
+            {
+                BuildingUpgradeButton.interactable = true;
             }
         }
     }
@@ -168,6 +176,12 @@ public abstract class BuildingBase : MonoBehaviour, IPointerDownHandler
         BuildingUI?.SetActive(true);
         CameraManager.instance.isBuildingUIActive = true;
         currentActiveBuilding = this; // 현재 건물을 활성 건물로 설정
+
+        // 업그레이드 버튼 상태 업데이트 (현재 건물의 CantUpgrade 플래그에 따라)
+        if (BuildingUpgradeButton != null)
+        {
+            BuildingUpgradeButton.interactable = !CantUpgrade;
+        }
     }
 
     public virtual void CloseBuildingUI()

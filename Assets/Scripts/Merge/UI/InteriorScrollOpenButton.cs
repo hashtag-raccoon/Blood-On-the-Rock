@@ -10,13 +10,13 @@ public class InteriorScrollOpenButton : MonoBehaviour
     [Header("인테리어 스크롤 UI")]
     [Tooltip("열고 싶은 InteriorScrollUI GameObject를 여기에 드래그하세요")]
     [SerializeField] private InteriorScrollUI interiorScrollUI;
-    
+
     private Button button;
 
     private void Awake()
     {
         button = GetComponent<Button>();
-        
+
         // InteriorScrollUI를 자동으로 찾기 (할당되지 않은 경우)
         if (interiorScrollUI == null)
         {
@@ -44,7 +44,8 @@ public class InteriorScrollOpenButton : MonoBehaviour
         if (interiorScrollUI != null)
         {
             // InteriorScrollUI 열기
-            interiorScrollUI.OpenUI();
+            // TODO : 오류??
+            //interiorScrollUI.OpenUI();
         }
     }
 }
