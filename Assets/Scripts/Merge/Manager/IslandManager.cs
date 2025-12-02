@@ -25,6 +25,7 @@ public class IslandManager : MonoBehaviour
     [Header("하루 시간 설정(시)")]
     [SerializeField] private float SetDayTime = 3f; // 시간 기준으로 설정할 것
     [SerializeField] private float wait_convertedDayTime = 0;
+    [SerializeField] private string BarScene = "BarScene_Raccoon";
 
     [Header("화면 블러 패널")]
     public GameObject BlurUI;
@@ -71,8 +72,29 @@ public class IslandManager : MonoBehaviour
     private void OnDayEnd()
     {
         Debug.Log("하루가 종료됨");
+        
+        // IslandScene -> BarScene 전환 전에 구인소 리롤
+        // 구인소 구인 후보(알바생) 생성
+        GenerateJobCenterCandidates();
+        
         // 다음 씬으로 넘어감
-        //SceneManager.LoadScene("BarScene");
+        SceneManager.LoadScene(BarScene);
+    }
+    
+    /// <summary>
+    /// 구인소 후보 3명 생성 (Island -> Bar 씬 전환 시 호출)
+    /// </summary>
+    private void GenerateJobCenterCandidates()
+    {
+        if (ArbeitRepository.Instance != null)
+        {
+            // 기존 후보 초기화
+            ArbeitRepository.Instance.tempCandidateList.Clear();
+            
+            // 새 후보 3명 생성
+            List<TempNpcData> newCandidates = ArbeitRepository.Instance.CreateRandomTempCandidates(3);
+            ArbeitRepository.Instance.tempCandidateList.AddRange(newCandidates);
+        }
     }
 
     // 하루 종료 후 바로 바로 넘어가기 위한 함수

@@ -18,7 +18,7 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     where TItemUI : MonoBehaviour, IScrollItemUI
 {
     [Header("스크롤 세팅")]
-    [SerializeField] public GameObject scrollUI;
+    [SerializeField] protected GameObject scrollUI;
     [SerializeField] protected ScrollRect scrollRect;
     [SerializeField] protected Transform content;
     [SerializeField] protected GameObject itemPrefab;
@@ -53,13 +53,9 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
         { openButton.onClick.AddListener(OnOpenButtonClicked); }
 
         if (closeButton != null)
-<<<<<<< Updated upstream
-        { closeButton.onClick.AddListener(OnCloseButtonClicked); }
-=======
-        {
+        { 
             closeButton.onClick.AddListener(OnCloseButtonClicked);
         }
->>>>>>> Stashed changes
     }
 
     protected virtual void InitializeLayout()
@@ -140,19 +136,9 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
         TItemUI itemUI = itemObj.GetComponent<TItemUI>();
         if (itemUI != null)
         {
-            OnItemCreated(itemUI, itemObj); // 생성 직후 커스터마이징 훅
             itemUI.SetData(data, OnItemClicked);
             itemUIList.Add(itemUI);
         }
-    }
-
-    /// <summary>
-    /// 아이템 생성 직후 호출되는 메서드 (오버라이드하여 레퍼런스 할당 등 메소드 커스터마이징 가능)
-    /// </summary>
-    protected virtual void OnItemCreated(TItemUI itemUI, GameObject itemObj)
-    {
-        // 하위 클래스에서 오버라이드하여 사용
-        // 우선 JobCenterScrollUI에서 사용하기 위해 만든 메소드 추후 필요 시 사용 예정
     }
 
     public virtual void ClearItems()
@@ -197,11 +183,4 @@ public abstract class BaseScrollUI<TData, TItemUI> : MonoBehaviour
     {
         OnCloseButtonClicked();
     }
-
-    public virtual void OpenUI()
-    {
-        OnOpenButtonClicked();
-    }
 }
-
-
