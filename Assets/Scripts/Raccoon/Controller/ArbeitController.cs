@@ -197,55 +197,81 @@ public class ArbeitController : MonoBehaviour
             GuestController guest = currentTask.targetObject.GetComponent<GuestController>();
             string csvName = "Human_OrderDialogue";
             int dialogueIndex = 0;
+            string[] prefixes = null; // 스코프를 넓혀서 나중에도 사용 가능하게 함
 
             if (guest != null && guest.customerData != null)
             {
-                // 종족에 따라 다른 CSV 파일과 이름, 인덱스를 설정하고 로드함
-                string[] names = null;
+                // 종족에 따라 다른 CSV 파일과 접두사 배열 설정
                 switch (guest.customerData.race_id)
                 {
                     case 0: // Human
                         csvName = "Human_OrderDialogue";
-                        names = new string[] { "교섭관", "농부", "기사단장", "계약중개인", "무역감시관", "일반 시민" };
+                        prefixes = new string[] { "교섭관", "농부", "기사단장", "계약중개인", "무역감시관", "일반" };
                         break;
                     case 1: // Orc
                         csvName = "Oak_OrderDialogue";
-                        names = new string[] { "전투 우두머리", "고기 사냥꾼", "혈투 전사", "부족 수호자", "전투 요리사", "일반 오크" };
+                        prefixes = new string[] { "전투 우두머리", "고기 사냥꾼", "혈투 전사", "부족 수호자", "전투 요리사", "일반" };
                         break;
                     case 2: // Vampire
                         csvName = "Vampire_OrderDialogue";
-                        names = new string[] { "혈맹 장군", "순혈 집행관", "가문 감시자", "전통 심판자", "고문헌 수호자", "일반 뱀파이어" };
+                        prefixes = new string[] { "혈맹 장군", "순혈 집행관", "가문 감시자", "전통 심판자", "고문헌 수호자", "일반" };
                         break;
                 }
 
-                // 그 후 손님 이름에 해당하는 Index 찾아서 후에 그 Index로 대화 시작
-                if (names != null)
+                // 대화 CSV 로드
+                DialogueManager.Instance.LoadDialogue(csvName);
+
+                // 손님 이름에서 접두사 추출하여 대화 인덱스 찾기
+                if (prefixes != null)
                 {
-                    for (int i = 0; i < names.Length; i++)
+                    string customerName = guest.customerData.customer_name;
+                    List<int> matchingIndices = new List<int>();
+
+                    // 해당 접두사로 시작하는 모든 대화 인덱스를 찾음
+                    for (int i = 0; i < DialogueManager.Instance.dialogueDic.Count; i++)
                     {
-                        if (names[i] == guest.customerData.customer_name)
+                        DialogueData data = DialogueManager.Instance.GetDialogue(i);
+                        if (data != null)
                         {
-                            dialogueIndex = i;
-                            break;
+                            // 대화 데이터의 Name이 손님 이름의 접두사와 일치하는지 확인
+                            foreach (string prefix in prefixes)
+                            {
+                                if (customerName.StartsWith(prefix) && data.Name == prefix)
+                                {
+                                    matchingIndices.Add(i);
+                                    break;
+                                }
+                            }
                         }
+                    }
+
+                    // 매칭된 대화 중 랜덤 선택
+                    if (matchingIndices.Count > 0)
+                    {
+                        dialogueIndex = matchingIndices[Random.Range(0, matchingIndices.Count)];
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"손님 이름 '{customerName}'의 접두사를 찾을 수 없음, 기본 인덱스 0 사용.");
                     }
                 }
             }
 
-            // 대화 CSV 로드
-            DialogueManager.Instance.LoadDialogue(csvName);
+            // 종족에 맞는 타이핑 속도 설정 (대화 시작 전에 먼저 설정)
+            DialogueManager.Instance.RaceToTyping(guest.customerData.race_id);
 
-            // 대화 인덱스에 해당하는 Portrait 이름 가져옴 => 그 후 OrderingManager로 전달 => 대화창에서 사용
-            string portraitName = null;
-            DialogueData dialogueData = DialogueManager.Instance.GetDialogue(dialogueIndex);
-            if (dialogueData != null)
+            // CustomerData에 있는 Portrait 스프라이트 사용
+            Sprite portraitSprite = guest.customerData.portraitSprite;
+
+            // Portrait 스프라이트가 없으면 경고
+            if (portraitSprite == null)
             {
-                portraitName = dialogueData.Portrait;
+                Debug.LogWarning($"손님 '{guest.customerData.customer_name}'의 portraitSprite가 없습니다.");
             }
 
-            // OrderingManager를 통해 대화 시작
-            OrderingManager.Instance.OpenDialog(this.gameObject, currentTask, OrderingManager.Instance.orderDialogPanelSize, dialogueIndex, portraitName);
-            DialogueManager.Instance.RaceToTyping(guest.customerData.race_id);
+            // OrderingManager를 통해 대화 시작 (스프라이트를 직접 전달하는 방식)
+            OrderingManager.Instance.OpenDialog(this.gameObject, currentTask, OrderingManager.Instance.orderDialogPanelSize,
+            dialogueIndex, guest.customerData.customer_name, portraitSprite);
 
         }
     }
@@ -540,7 +566,6 @@ public class ArbeitController : MonoBehaviour
             isWaiting = false;
             SetWaitingTarget();
             SetTarget(waitingTargetObject.transform);
-            Debug.Log($"[ArbeitController] {myNpcData?.part_timer_name}이(가) 대기 위치로 복귀합니다.");
         }
     }
 

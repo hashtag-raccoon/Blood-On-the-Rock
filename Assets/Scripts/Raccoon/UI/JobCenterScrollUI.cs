@@ -28,12 +28,28 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
 
     private bool isUIOpen = false; // UI 활성화 상태
 
+    // 현재 선택된 JobCenterButtonUI를 추적 (공유 버튼 클릭 시 사용)
+    private JobCenterButtonUI currentSelectedItem = null;
+
     protected override void Awake()
     {
         InitializeButtons();
         InitializeLayout();
         SetupScrollView();
         PersonalityChance = Chance; // static 변수에 값 할당
+
+        // 공유 버튼 리스너를 Awake에서 한 번만 등록
+        if (ReferenceOfferAcceptButton != null)
+        {
+            ReferenceOfferAcceptButton.onClick.RemoveAllListeners();
+            ReferenceOfferAcceptButton.onClick.AddListener(OnSharedOfferAccept);
+        }
+
+        if (ReferenceOfferCancelButton != null)
+        {
+            ReferenceOfferCancelButton.onClick.RemoveAllListeners();
+            ReferenceOfferCancelButton.onClick.AddListener(OnSharedOfferCancel);
+        }
     }
 
     private void Start()
@@ -134,10 +150,15 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
 
     /// <summary>
     /// JobCenterButton 클릭 시 호출될 메소드
+    /// 클릭된 아이템을 currentSelectedItem에 저장
     /// </summary>
     protected override void OnItemClicked(IScrollItemUI clickedItem)
     {
-        TempNpcData data = clickedItem.GetData<TempNpcData>();
+        currentSelectedItem = clickedItem as JobCenterButtonUI;
+        if (currentSelectedItem == null)
+        {
+            Debug.LogWarning("[JobCenterScrollUI] OnItemClicked - clickedItem을 JobCenterButtonUI로 캐스팅 실패");
+        }
     }
 
     /// <summary>
@@ -267,5 +288,37 @@ public class JobCenterScrollUI : BaseScrollUI<TempNpcData, JobCenterButtonUI>
         }
 
         rect.anchoredPosition = endPosition;
+    }
+
+    /// <summary>
+    /// 공유 버튼 - 고용 수락 핸들러
+    /// 현재 선택된 JobCenterButtonUI의 OnOfferAccept를 호출
+    /// </summary>
+    private void OnSharedOfferAccept()
+    {
+        if (currentSelectedItem != null)
+        {
+            currentSelectedItem.OnOfferAccept();
+        }
+        else
+        {
+            Debug.LogWarning("[JobCenterScrollUI] OnSharedOfferAccept - currentSelectedItem이 null");
+        }
+    }
+
+    /// <summary>
+    /// 공유 버튼 - 고용 취소 핸들러
+    /// 현재 선택된 JobCenterButtonUI의 OnOfferCancel을 호출
+    /// </summary>
+    private void OnSharedOfferCancel()
+    {
+        if (currentSelectedItem != null)
+        {
+            currentSelectedItem.OnOfferCancel();
+        }
+        else
+        {
+            Debug.LogWarning("[JobCenterScrollUI] OnSharedOfferCancel - currentSelectedItem이 null");
+        }
     }
 }

@@ -36,7 +36,7 @@ public class TableManager : MonoBehaviour
     public waitingDirectionSelection waitingDirectionSelect = waitingDirectionSelection.Right;
 
     private Vector3Int waitingDirection;
-    
+
     [Tooltip("대기열을 여러 줄로 만들지 여부")]
     public bool useMultipleLines = false;
 
@@ -80,9 +80,15 @@ public class TableManager : MonoBehaviour
 
     private List<CustomerData> Customers = new List<CustomerData>();
 
-    private readonly List<string> humanNames = new List<string> { "교섭관", "농부", "기사단장", "계약중개인", "무역감시관", "일반 인간" };
-    private readonly List<string> orcNames = new List<string> { "전투 우두머리", "고기 사냥꾼", "혈투 전사", "부족 수호자", "전투 요리사", "일반 오크" };
-    private readonly List<string> vampireNames = new List<string> { "혈맹 장군", "순혈 집행관", "가문 감시자", "전통 심판자", "고문헌 수호자", "일반 뱀파이어" };
+    // TODO : 종족별 접두사 이름 리스트 (임시 하드코딩, 후에 다른 데이터 스크립트로 뺄 예정)
+    private readonly List<string> humanNames = new List<string> { "교섭관", "농부", "기사단장", "계약중개인", "무역감시관", "일반" };
+    private readonly List<string> oakNames = new List<string> { "전투 우두머리", "고기 사냥꾼", "혈투 전사", "부족 수호자", "전투 요리사", "일반" };
+    private readonly List<string> vampireNames = new List<string> { "혈맹 장군", "순혈 집행관", "가문 감시자", "전통 심판자", "고문헌 수호자", "일반" };
+
+    [Header("종족별 비주얼 데이터")]
+    [SerializeField] private RaceVisualData humanVisualData;
+    [SerializeField] private RaceVisualData oakVisualData;
+    [SerializeField] private RaceVisualData vampireVisualData;
 
     void Awake()
     {
@@ -122,6 +128,7 @@ public class TableManager : MonoBehaviour
         // 테이블 상태 업데이트
         UpdateTableLists();
 
+        // 현재 손님이 앉아있는 테이블 목록 업데이트
         List<GameObject> customerTables = new List<GameObject>();
         for (int i = 0; i < tables.Count; i++)
         {
@@ -135,7 +142,7 @@ public class TableManager : MonoBehaviour
             }
         }
 
-        tablesInCustomer = customerTables.ToArray();
+        tablesInCustomer = customerTables.ToArray(); // 현재 손님이 앉아있는 테이블 배열 업데이트
 
         /// <summary>
         /// 손님 스폰 로직
@@ -150,33 +157,155 @@ public class TableManager : MonoBehaviour
                 for (int i = 0; i < spawnCount; i++) // 1명씩 or 2명씩 스폰함
                 {
                     PartySize = Random.Range(1, 3); // 1인 또는 2인 파티 랜덤 결정
-                    if(PartySize == 2 && CustomerCount < 2)
+                    if (PartySize == 2 && CustomerCount < 2)
                     {
                         PartySize = 1; // 남은 손님 수가 1명일 때는 1인 파티로 조정
                     }
 
-                    switch(PartySize)
+                    switch (PartySize)
                     {
+                        /// <summary>
+                        /// 1인 파티 소환 로직
+                        /// 개개인별로 손님 데이터, 초상화, 파티사이즈(1)로 전달
+                        /// </summary>
                         case 1:
-                            GameObject customer = Instantiate(CustomerPrefab, CustomerTransform.transform.position, Quaternion.identity);
+                            int RaceID = Random.Range(0, 3);
+                            string GuestName = null;
+                            string RaceName;
+                            string prefix = null;
+                            RaceVisualData visualData = null;
+
+                            switch (RaceID)
+                            {
+                                case 0:
+                                    RaceName = "Human";
+                                    prefix = humanNames[Random.Range(0, humanNames.Count)];
+                                    GuestName = prefix + " " + IntelligentNameGenerator.Generate(RaceName);
+                                    visualData = humanVisualData;
+                                    break;
+                                case 1:
+                                    RaceName = "Oak";
+                                    prefix = oakNames[Random.Range(0, oakNames.Count)];
+                                    GuestName = prefix + " " + IntelligentNameGenerator.Generate(RaceName);
+                                    visualData = oakVisualData;
+                                    break;
+                                case 2:
+                                    RaceName = "Vampire";
+                                    prefix = vampireNames[Random.Range(0, vampireNames.Count)];
+                                    GuestName = prefix + " " + IntelligentNameGenerator.Generate(RaceName);
+                                    visualData = vampireVisualData;
+                                    break;
+                            }
+
+                            // 종족 및 접두사에 맞는 프리팹과 초상화 가져오기
+                            GameObject customerPrefab = visualData?.GetRandomCustomerPrefab(prefix);
+                            Sprite portraitSprite = visualData?.GetRandomPortraitSprite(prefix);
+
+                            if (customerPrefab == null)
+                            {
+                                Debug.LogWarning($"[TableManager] '{prefix}' 접두사의 손님 프리팹을 찾을 수 없습니다.");
+                                break;
+                            }
+
+                            // 프리팹 => 씬에서 쓰이는 실 객체로 인스턴스화
+                            GameObject customer = Instantiate(customerPrefab, CustomerTransform.transform.position, Quaternion.identity);
+                            customer.name = GuestName + Time.frameCount;
+
+                            // GuestController 자동 할당 및 초기화
                             GuestController guestController = customer.GetComponent<GuestController>();
-                            guestController.tableManager = this;
-                            guestController.pathfinder = CustomerPath;
-                            guestController.customerData = new CustomerData(CustomerCount, "Guest" + CustomerCount, Random.Range(0,3), null, false,
-                            null, 0, 0, 1, "Normal", 5);
+                            if (guestController == null)
+                            {
+                                guestController = customer.AddComponent<GuestController>();
+                            }
+
+                            // CustomerData 생성 및 할당
+                            guestController.customerData = new CustomerData(CustomerCount, GuestName, RaceID, null, false,
+                            null, 0, 0, 1, "Normal", 5, customerPrefab.name, portraitSprite);
                             guestController.desiredPartySize = 1;
+
+                            // 할당되지 않은 필드 자동 할당
+                            if (guestController.tableManager == null)
+                            {
+                                guestController.tableManager = this;
+                            }
+                            if (guestController.pathfinder == null)
+                            {
+                                guestController.pathfinder = CustomerPath;
+                            }
+
                             CustomerCount -= 1;
                             break;
+                        /// <summary>
+                        /// 2인 파티 소환 로직
+                        /// 각각의 손님에게 개개인별로 손님 데이터, 초상화, 파티사이즈(2)로 전달
+                        /// 파티 내에서 파트너 설정은 GuestController에서 처리
+                        /// </summary>
                         case 2:
-                            for(int j = 0; j < 2; j++)
+                            int RaceID_party = Random.Range(0, 3);
+                            for (int j = 0; j < 2; j++)
                             {
-                                GameObject customer_party = Instantiate(CustomerPrefab, CustomerTransform.transform.position, Quaternion.identity);
+                                string RaceName_party;
+                                string prefix_party = null;
+                                RaceVisualData visualData_party = null;
+                                GuestName = null;
+
+                                switch (RaceID_party)
+                                {
+                                    case 0:
+                                        RaceName_party = "Human";
+                                        prefix_party = humanNames[Random.Range(0, humanNames.Count)];
+                                        GuestName = prefix_party + " " + IntelligentNameGenerator.Generate(RaceName_party);
+                                        visualData_party = humanVisualData;
+                                        break;
+                                    case 1:
+                                        RaceName_party = "Oak";
+                                        prefix_party = oakNames[Random.Range(0, oakNames.Count)];
+                                        GuestName = prefix_party + " " + IntelligentNameGenerator.Generate(RaceName_party);
+                                        visualData_party = oakVisualData;
+                                        break;
+                                    case 2:
+                                        RaceName_party = "Vampire";
+                                        prefix_party = vampireNames[Random.Range(0, vampireNames.Count)];
+                                        GuestName = prefix_party + " " + IntelligentNameGenerator.Generate(RaceName_party);
+                                        visualData_party = vampireVisualData;
+                                        break;
+                                }
+
+                                // 종족 및 접두사에 맞는 프리팹과 초상화 가져오기
+                                GameObject customerPrefab_party = visualData_party?.GetRandomCustomerPrefab(prefix_party);
+                                Sprite portraitSprite_party = visualData_party?.GetRandomPortraitSprite(prefix_party);
+
+                                if (customerPrefab_party == null)
+                                {
+                                    Debug.LogWarning($"[TableManager] '{prefix_party}' 접두사의 손님 프리팹을 찾을 수 없습니다.");
+                                    continue;
+                                }
+
+                                // 프리팹 => 씬에서 쓰이는 실 객체로 인스턴스화
+                                GameObject customer_party = Instantiate(customerPrefab_party, CustomerTransform.transform.position, Quaternion.identity);
+                                customer_party.name = GuestName + Time.frameCount + "_" + j;
+
+                                // GuestController 자동 할당 및 초기화
                                 GuestController guestController_party = customer_party.GetComponent<GuestController>();
-                                guestController_party.tableManager = this;
-                                guestController_party.pathfinder = CustomerPath;
-                                guestController_party.customerData = new CustomerData(CustomerCount - 1 + j, "Guest" + (CustomerCount -1 + j), Random.Range(0,3), null, false,
-                                null, 0, 0, 1, "Normal", 5);
+                                if (guestController_party == null)
+                                {
+                                    guestController_party = customer_party.AddComponent<GuestController>();
+                                }
+
+                                // CustomerData 생성 및 할당
+                                guestController_party.customerData = new CustomerData(CustomerCount - 1 + j, GuestName, RaceID_party, null, false,
+                                null, 0, 0, 1, "Normal", 5, customerPrefab_party.name, portraitSprite_party);
                                 guestController_party.desiredPartySize = 2;
+
+                                // 할당되지 않은 필드 자동 할당
+                                if (guestController_party.tableManager == null)
+                                {
+                                    guestController_party.tableManager = this;
+                                }
+                                if (guestController_party.pathfinder == null)
+                                {
+                                    guestController_party.pathfinder = CustomerPath;
+                                }
                             }
                             CustomerCount -= 2;
                             break;
@@ -420,7 +549,7 @@ public class TableManager : MonoBehaviour
     #endregion
 
     #region 유틸리티용(체킹용) 메소드
-   // 대기열 방향에 수직인 방향 벡터 가져오기 ( 손님 대기 시 사용 )
+    // 대기열 방향에 수직인 방향 벡터 가져오기 ( 손님 대기 시 사용 )
     private Vector3Int GetPerpendicularDirection(Vector3Int direction)
     {
         if (direction == Vector3Int.up || direction == Vector3Int.down)

@@ -393,9 +393,9 @@ public class OrderingManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 대화창 열기 (대화창 구현 시 호출)
+    /// 대화창 열기 (대화창 구현 시 호출) - String으로 초상화 데이터 받는 버전
     /// </summary>
-    public void OpenDialog(GameObject arbeitObj, TaskInfo task, Vector2? panelSize = null, int startIndex = 0, string portraitName = null)
+    public void OpenDialog(GameObject arbeitObj, TaskInfo task, Vector2? panelSize = null, int startIndex = 0, string replacementName = null, string portraitName = null)
     {
         if (arbeitObj == null || task == null)
         {
@@ -418,8 +418,39 @@ public class OrderingManager : MonoBehaviour
                 cocktailName = task.orderedCocktail.CocktailName;
             }
 
-            // 대화 시작 (startIndex를 사용, 주문용 치환 텍스트는 칵테일명, 초상화는 portraitName)
-            DialogueManager.Instance.dialogueUI.StartOrderDialogue(startIndex, panelSize, onDialogueEnd, cocktailName, portraitName);
+            // 대화 시작 (startIndex를 사용, 주문용 치환 텍스트는 칵테일명, 초상화는 portraitName, 이름은 replacementName)
+            DialogueManager.Instance.dialogueUI.StartOrderDialogue(startIndex, panelSize, onDialogueEnd, replacementName, cocktailName, portraitName);
+        }
+    }
+
+    /// <summary>
+    /// 대화창 열기 (대화창 구현 시 호출) - 스프라이트로 초상화 데이터 받는 버전
+    /// </summary>
+    public void OpenDialog(GameObject arbeitObj, TaskInfo task, Vector2? panelSize, int startIndex, string replacementName, Sprite portraitSprite)
+    {
+        if (arbeitObj == null || task == null)
+        {
+            Debug.LogError("arbeitObj 또는 task가 null");
+            return;
+        }
+
+        isDialogOpen = true;
+        dialogOwner = arbeitObj;
+
+        // DialogueUI를 통해 대화 시작 (대화 종료 시 => AcceptOrder 호출)
+        if (DialogueManager.Instance != null && DialogueManager.Instance.dialogueUI != null)
+        {
+            // 대화 종료 콜백으로 주문 완료 처리 메소드 추가
+            System.Action onDialogueEnd = () => AcceptOrder(arbeitObj, task);
+
+            string cocktailName = null;
+            if (task.orderedCocktail != null)
+            {
+                cocktailName = task.orderedCocktail.CocktailName;
+            }
+
+            // 대화 시작 (startIndex를 사용, 주문용 치환 텍스트는 칵테일명, 초상화는 portraitSprite, 이름은 replacementName)
+            DialogueManager.Instance.dialogueUI.StartOrderDialogue(startIndex, panelSize, onDialogueEnd, replacementName, cocktailName, portraitSprite);
         }
     }
 

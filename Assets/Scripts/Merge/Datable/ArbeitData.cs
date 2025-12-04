@@ -38,7 +38,7 @@ public class npc : IScrollItemData
     public int daily_wage { get; private set; }
     public bool need_rest { get; set; }
     public int total_ability { get; private set; }
-    public string prefab_name { get; private set; }
+    public string prefab_name { get; set; }
 
     public int personality_id { get; private set; }
     public string personality_name { get; private set; }
@@ -49,6 +49,9 @@ public class npc : IScrollItemData
     public int cleaning_ability { get; private set; }
     // 배치되었는지 따지는 필드
     public bool is_deployed { get; set; }
+
+    // 비주얼 데이터
+    public Sprite portraitSprite { get; set; } // 초상화 스프라이트
 
     public npc(ArbeitData arbeitData, Personality personality)
     {

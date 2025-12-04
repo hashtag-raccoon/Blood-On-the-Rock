@@ -38,12 +38,6 @@ public class JobCenterButtonUI : MonoBehaviour, IScrollItemUI
         set
         {
             offerAcceptButton = value;
-            // 버튼이 할당될 때 리스너 연결
-            if (offerAcceptButton != null)
-            {
-                offerAcceptButton.onClick.RemoveAllListeners();
-                offerAcceptButton.onClick.AddListener(OnOfferAccept);
-            }
         }
     }
 
@@ -54,16 +48,10 @@ public class JobCenterButtonUI : MonoBehaviour, IScrollItemUI
         set
         {
             offerCancelButton = value;
-            // 버튼이 할당될 때 리스너 연결
-            if (offerCancelButton != null)
-            {
-                offerCancelButton.onClick.RemoveAllListeners();
-                offerCancelButton.onClick.AddListener(OnOfferCancel);
-            }
         }
     }
 
-    private TempNpcData currentTempData;
+    [SerializeField] private TempNpcData currentTempData;
     private Action<IScrollItemUI> clickCallback;
 
     /// <summary>
@@ -76,12 +64,15 @@ public class JobCenterButtonUI : MonoBehaviour, IScrollItemUI
 
     private void Awake()
     {
-        // OfferButton 리스너 설정 (SerializeField로 할당되므로 Awake에서 처리)
+        // OfferButton 리스너 설정
         if (OfferButton != null)
         {
             OfferButton.onClick.AddListener(OnOfferButtonClicked);
         }
-        // OfferAcceptButton과 OfferCancelButton은 property setter에서 처리
+        else
+        {
+            Debug.LogWarning("JobCenterButtonUI: OfferButton이 할당되지 않음");
+        }
     }
 
     public void SetData<T>(T data, Action<IScrollItemUI> onClickCallback) where T : IScrollItemData
@@ -97,12 +88,21 @@ public class JobCenterButtonUI : MonoBehaviour, IScrollItemUI
         // UI 업데이트
         UpdateUI();
     }
-
+    #region UI 업데이트
     private void UpdateUI()
     {
-        OfferButton.interactable = !currentTempData.is_hired;
-
+        //OfferButton.interactable = !currentTempData.is_hired;
         ArbeitImage.sprite = currentTempData.Portrait;
+        if (currentTempData.is_hired)
+        {
+            ArbeitImage.color = Color.gray;
+            OfferButton.interactable = false;
+        }
+        else
+        {
+            ArbeitImage.color = Color.white;
+            OfferButton.interactable = true;
+        }
         ArbeitNameText.text = "이름 : " + currentTempData.part_timer_name;
         ArbeitPersonalityText.text = "성격 : " + currentTempData.personality_name;
         ArbeitMoneyText.text = "월급 : " + currentTempData.estimated_daily_wage.ToString() + "G";
@@ -226,7 +226,9 @@ public class JobCenterButtonUI : MonoBehaviour, IScrollItemUI
             }
         }
     }
+    #endregion
 
+    #region 고용 버튼 처리
     private void OnOfferButtonClicked()
     {
         // 고용 팝업 열기
@@ -242,31 +244,46 @@ public class JobCenterButtonUI : MonoBehaviour, IScrollItemUI
         clickCallback?.Invoke(this);
     }
 
-    private void OnOfferAccept()
+    /// <summary>
+    /// 고용 수락 처리
+    /// </summary>
+    public void OnOfferAccept()
     {
-        // TempNpcData -> Real NpcData 변환
-        if (currentTempData != null && !currentTempData.is_hired)
+        if (ResourceRepository.Instance.GetResourceByName("Money").current_amount >= currentTempData.estimated_daily_wage)
         {
-            npc newNpc = ArbeitRepository.Instance.ConvertTempToRealNpc(currentTempData);
-            currentTempData.is_hired = true;
-            newNpc.employment_state = true; // 고용 상태로 설정
+            // TempNpcData -> Real NpcData 변환
+            if (currentTempData != null && !currentTempData.is_hired)
+            {
+                npc newNpc = ArbeitRepository.Instance.ConvertTempToRealNpc(currentTempData);
+                currentTempData.is_hired = true;
+                newNpc.employment_state = true; // 고용 상태로 설정
 
-            // ArbeitRepository에서 해당 임시 알바생 데이터 제거
-            ArbeitRepository.Instance.tempCandidateList.Remove(currentTempData);
+                // ArbeitRepository에서 해당 임시 알바생 데이터 제거
+                ArbeitRepository.Instance.tempCandidateList.Remove(currentTempData);
 
-            // UI 갱신 => 갱신하면서 고용 버튼 비활성화
-            UpdateUI();
+                ResourceRepository.Instance.GetResourceByName("Money").current_amount -= newNpc.daily_wage;
+
+                // UI 갱신 => 갱신하면서 고용 버튼 비활성화
+                UpdateUI();
+            }
+            else
+            {
+                Debug.LogWarning($"고용 실패 - Data: {currentTempData != null}, Hired: {currentTempData?.is_hired}");
+            }
         }
         else
         {
-            Debug.LogWarning($"고용 실패 - Data: {currentTempData != null}, Hired: {currentTempData?.is_hired}");
+            //TODO : 돈 부족하면 나오는 UI , 또는 비주얼라이징 필요
+            Debug.Log("돈이 부족합니다!");
         }
-
         // Offer 팝업 닫기
         OnOfferCancel();
     }
 
-    private void OnOfferCancel()
+    /// <summary>
+    /// 고용 취소 처리
+    /// </summary>
+    public void OnOfferCancel()
     {
         // 팝업 닫기
         if (OfferUI != null)
@@ -274,7 +291,7 @@ public class JobCenterButtonUI : MonoBehaviour, IScrollItemUI
             OfferUI.SetActive(false);
         }
     }
-
+    #endregion
     public T GetData<T>() where T : IScrollItemData
     {
         return (T)(object)currentTempData;

@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 public class ArbeitManager : MonoBehaviour
 {
     private static ArbeitManager _instance;
-    public ArbeitSpriteReference arbeitSpriteReference; // 스프라이트 레퍼런스 할당
+    public ArbeitPrefabReference arbeitPrefabReference; // 프리팹 레퍼런스 할당
 
     [Header("알바 배치 설정")]
     [Tooltip("바에서 사용할 알바의 최대 인원")]
@@ -21,8 +21,6 @@ public class ArbeitManager : MonoBehaviour
     public List<GameObject> deployedArbeiters = new List<GameObject>();
     [Space(2)]
     [Header("알바 생성 설정")]
-    [Tooltip("알바가 생성될 프리팹")]
-    [SerializeField] private GameObject arbeitPrefab;
     [Tooltip("알바가 대기할 ArbeitPoint")]
     [SerializeField] private ArbeitPoint arbeitPoint;
     [Tooltip("알바들이 사용할 Pathfinder")]
@@ -118,7 +116,7 @@ public class ArbeitManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 바 씬 초기화 (약간의 딜레이 후 실행)
+    /// 바 씬 초기화
     /// </summary>
     private System.Collections.IEnumerator InitializeBarScene()
     {
@@ -141,6 +139,8 @@ public class ArbeitManager : MonoBehaviour
         {
             DeployArbeiters();
         }
+
+        //TODO : 딜레이가 있다보니, 로딩창 필수, 그래서 후에 추가해야함
     }
 
     /// <summary>
@@ -148,9 +148,9 @@ public class ArbeitManager : MonoBehaviour
     /// </summary>
     private void DeployArbeiters()
     {
-        if (arbeitPrefab == null)
+        if (arbeitPrefabReference == null)
         {
-            Debug.LogError("[ArbeitManager] arbeitPrefab이 할당되지 않았습니다.");
+            Debug.LogError("[ArbeitManager] arbeitPrefabReference가 할당되지 않았습니다.");
             return;
         }
 
@@ -174,7 +174,7 @@ public class ArbeitManager : MonoBehaviour
 
         if (countToCreate == 0)
         {
-            Debug.LogWarning("[ArbeitManager] 배치할 알바가 없습니다. (고용된 NPC가 없음)");
+            Debug.LogWarning("[ArbeitManager] 배치할 알바가 없음 (고용된 NPC가 없음)");
             return;
         }
 
@@ -186,7 +186,7 @@ public class ArbeitManager : MonoBehaviour
 
             if (npcData == null)
             {
-                Debug.LogWarning($"[ArbeitManager] 배치 가능한 NPC를 찾을 수 없습니다. (현재 {i}명 배치됨)");
+                Debug.LogWarning($"[ArbeitManager] 배치 가능한 NPC를 찾을 수 없음 (현재 {i}명 배치됨)");
                 break;
             }
 
@@ -202,15 +202,23 @@ public class ArbeitManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 개별 알바 생성
+    /// 알바 스폰 메소드
     /// </summary>
     private GameObject CreateArbeiter(npc npcData, int waitingPosition)
     {
         // ArbeitPoint의 대기 위치 계산
         Vector3 spawnPosition = arbeitPoint.CalculateWaitingPosition(waitingPosition);
 
+        // 초상화 스프라이트로 매칭되는 프리팹 찾기
+        GameObject prefabToSpawn = GetMatchingPrefab(npcData);
+        if (prefabToSpawn == null)
+        {
+            Debug.LogError($"[ArbeitManager] '{npcData.part_timer_name}'의 초상화와 매칭되는 프리팹을 찾을 수 없음");
+            return null;
+        }
+
         // 프리팹 인스턴스화
-        GameObject arbeiterObj = Instantiate(arbeitPrefab, spawnPosition, Quaternion.identity);
+        GameObject arbeiterObj = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
         arbeiterObj.name = $"Arbeiter_{npcData.part_timer_name}";
 
         // ArbeitController 설정
@@ -230,6 +238,48 @@ public class ArbeitManager : MonoBehaviour
         controller.SetArbeitPoint(arbeitPoint);
 
         return arbeiterObj;
+    }
+
+    /// <summary>
+    /// NPC의 초상화 스프라이트와 매칭되는 프리팹을 찾습니다.
+    /// </summary>
+    private GameObject GetMatchingPrefab(npc npcData)
+    {
+        if (npcData.portraitSprite == null)
+        {
+            Debug.LogWarning($"[ArbeitManager] '{npcData.part_timer_name}'의 portraitSprite가 null임");
+            return null;
+        }
+
+        // 종족에 따라 리스트 선택
+        List<ArbeitPrefabToSpritePair> pairs = null;
+        switch (npcData.race)
+        {
+            case "Human":
+                pairs = arbeitPrefabReference.Human_Pairs;
+                break;
+            case "Oak":
+                pairs = arbeitPrefabReference.Oak_Pairs;
+                break;
+            case "Vampire":
+                pairs = arbeitPrefabReference.Vampire_Pairs;
+                break;
+            default:
+                Debug.LogWarning($"[ArbeitManager] 알 수 없는 종족: {npcData.race}");
+                return null;
+        }
+
+        // 초상화 스프라이트로 매칭되는 프리팹 찾기
+        foreach (var pair in pairs)
+        {
+            if (pair.PairPortrait == npcData.portraitSprite)
+            {
+                return pair.PairPrefab;
+            }
+        }
+
+        Debug.LogWarning($"[ArbeitManager] '{npcData.part_timer_name}'의 초상화와 매칭되는 프리팹을 찾을 수 없음 (종족: {npcData.race})");
+        return null;
     }
 
     /// <summary>
@@ -276,4 +326,100 @@ public class ArbeitManager : MonoBehaviour
         deployedArbeiters.Clear();
     }
     #endregion
+
+    /*
+    #region NPC 스폰 메서드
+    /// <summary>
+    /// Island 씬에서 고용된 모든 NPC를 스폰함
+    /// ArbeitPrefabReference를 사용하여 초상화와 매칭되는 프리팹으로 생성
+    /// </summary>
+    public List<GameObject> SpawnAllNpcs(Transform spawnPoint = null)
+    {
+        List<GameObject> spawnedNpcs = new List<GameObject>();
+
+        if (arbeitPrefabReference == null)
+        {
+            Debug.LogError("[ArbeitManager] arbeitPrefabReference가 null입니다.");
+            return spawnedNpcs;
+        }
+
+        // 고용된 NPC 목록 가져오기
+        var hiredNpcs = ArbeitRepository.Instance.GethiredNpcs();
+        if (hiredNpcs == null || hiredNpcs.Count == 0)
+        {
+            Debug.LogWarning("[ArbeitManager] 고용된 NPC가 없습니다.");
+            return spawnedNpcs;
+        }
+
+        Vector3 basePosition = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+
+        for (int i = 0; i < hiredNpcs.Count; i++)
+        {
+            npc npcData = hiredNpcs[i];
+            GameObject spawnedNpc = SpawnSingleNpc(npcData, basePosition + new Vector3(i * 1.5f, 0, 0));
+
+            if (spawnedNpc != null)
+            {
+                spawnedNpcs.Add(spawnedNpc);
+            }
+        }
+        return spawnedNpcs;
+    }
+
+    /// <summary>
+    /// NPC를 1명 스폰
+    /// </summary>
+    /// <param name="npcData">스폰할 NPC의 데이터</param>
+    /// <param name="spawnPosition">스폰 위치</param>
+    /// <returns>스폰된 GameObject (실패 시 null)</returns>
+    public GameObject SpawnSingleNpc(npc npcData, Vector3 spawnPosition)
+    {
+        if (npcData == null)
+        {
+            Debug.LogWarning("[ArbeitManager] NPC 데이터가 null입니다.");
+            return null;
+        }
+
+        if (npcData.portraitSprite == null)
+        {
+            Debug.LogWarning($"[ArbeitManager] '{npcData.part_timer_name}'의 portraitSprite가 null입니다.");
+            return null;
+        }
+
+        // 초상화 스프라이트로 매칭되는 프리팹 찾기
+        GameObject prefab = ArbeitRepository.Instance.GetMatchingPrefabByPortrait(npcData);
+        if (prefab == null)
+        {
+            Debug.LogWarning($"[ArbeitManager] '{npcData.part_timer_name}'의 초상화와 매칭되는 프리팹을 찾을 수 없습니다.");
+            return null;
+        }
+
+        // 프리팹 인스턴스화
+        GameObject spawnedNpc = Instantiate(prefab, spawnPosition, Quaternion.identity);
+        spawnedNpc.name = $"{npcData.part_timer_name}_{npcData.part_timer_id}";
+
+        // ArbeitController 자동 할당 및 초기화
+        ArbeitController controller = spawnedNpc.GetComponent<ArbeitController>();
+        if (controller == null)
+        {
+            controller = spawnedNpc.AddComponent<ArbeitController>();
+        }
+
+        // NPC 데이터 초기화
+        controller.Initialize(npcData);
+
+        // 할당되지 않은 필드 자동 할당 (예: pathfinder 등)
+        if (controller.pathfinder == null)
+        {
+            IsometricPathfinder pathfinderInScene = FindObjectOfType<IsometricPathfinder>();
+            if (pathfinderInScene != null)
+            {
+                controller.pathfinder = pathfinderInScene;
+            }
+        }
+
+        return spawnedNpc;
+    }
+    #endregion
+    */
 }

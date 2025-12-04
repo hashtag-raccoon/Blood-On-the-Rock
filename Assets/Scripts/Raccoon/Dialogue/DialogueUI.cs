@@ -130,8 +130,10 @@ public class DialogueUI : MonoBehaviour
         }
     }
 
-    private string currentReplacementName;
-    private string currentReplacementPortrait;
+    private string currentReplacementTargetName; // string로 받을 경우엔 해당 변수 사용
+    private string currentReplacementName; // string로 받을 경우엔 해당 변수 사용
+    private string currentReplacementPortrait; // string로 받을 경우엔 해당 변수 사용
+    private Sprite currentReplacementPortraitSprite; // Sprite로 직접 받을 경우엔 해당 변수 사용
 
     /// <summary>
     /// Id에 해당하는 대화를 시작함 (일반 대화 시작)
@@ -185,13 +187,30 @@ public class DialogueUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 주문용 대화 시작 (이때, 텍스트랑 초상화 치환 가능)
+    /// 주문용 대화 시작 (이때, 텍스트랑 초상화 치환 가능) - string portraitName 버전
     /// </summary>
-    public void StartOrderDialogue(int id, Vector2? panelSize = null, System.Action onEndCallback = null, string replacementName = null, string replacementPortrait = null)
+    public void StartOrderDialogue(int id, Vector2? panelSize = null, System.Action onEndCallback = null, string replacementTargetName = null, string replacementName = null, string replacementPortrait = null)
     {
+        currentReplacementTargetName = replacementTargetName;
         // 화자 이름 및 초상화 설정
         currentReplacementName = replacementName;
         currentReplacementPortrait = replacementPortrait;
+        currentReplacementPortraitSprite = null; // Sprite 버전과 구분
+
+        // 기본 대화 시작 로직 호출
+        StartDialogue(id, panelSize, onEndCallback);
+    }
+
+    /// <summary>
+    /// 주문용 대화 시작 (이때, 텍스트랑 초상화 치환 가능) - Sprite portraitSprite 버전
+    /// </summary>
+    public void StartOrderDialogue(int id, Vector2? panelSize, System.Action onEndCallback, string replacementTargetName, string replacementName, Sprite replacementPortraitSprite)
+    {
+        currentReplacementTargetName = replacementTargetName;
+        // 화자 이름 및 초상화 설정
+        currentReplacementName = replacementName;
+        currentReplacementPortrait = null; // string 버전과 구분
+        currentReplacementPortraitSprite = replacementPortraitSprite;
 
         // 기본 대화 시작 로직 호출
         StartDialogue(id, panelSize, onEndCallback);
@@ -228,40 +247,56 @@ public class DialogueUI : MonoBehaviour
         dialoguePanel.SetActive(true);
         if (nameText != null)
         {
-            nameText.text = currentData.Name;
-        }
-
-        // 현재 인물 이미지는 Image 또는 Sprite로 저장이 되어 있지만
-        // csv 파일 내에는 String으로 저장이 되어 있기 때문에
-        // 인물 이미지를 Resources - Portraits 폴더 내에서 불러옴
-        string portraitName = currentData.Portrait;
-
-        // 치환할 초상화가 있다면 교체
-        if (!string.IsNullOrEmpty(currentReplacementPortrait))
-        {
-            portraitName = currentReplacementPortrait;
-        }
-
-        if (!string.IsNullOrEmpty(portraitName))
-        {
-            Sprite portrait = Resources.Load<Sprite>($"Dialogue/Portraits/{portraitName}");
-            if (portrait != null)
+            if (currentReplacementTargetName != null)
             {
-                portraitImage.sprite = portrait;
-                portraitImage.gameObject.SetActive(true);
-
-                // Portrait 위치를 패널 왼쪽 하단에 맞춰 조정 (Ignore Layout이므로 수동 위치 조정)
-                UpdatePortraitPosition();
+                nameText.text = currentReplacementTargetName;
             }
             else
             {
-                Debug.LogWarning("초상화를 Resources/Dialogue/Portraits 폴더에서 찾을 수 없습니다: " + portraitName);
-                portraitImage.gameObject.SetActive(false);
+                nameText.text = currentData.Name;
             }
+        }
+
+        // 초상화 처리: Sprite가 직접 제공되면 우선 사용, 없으면 string 이름으로 로드
+        Sprite portrait = null;
+
+        // 1. Sprite로 직접 제공된 경우 우선 사용
+        if (currentReplacementPortraitSprite != null)
+        {
+            portrait = currentReplacementPortraitSprite;
+        }
+        // 2. string 이름으로 제공된 경우 Resources에서 로드
+        else
+        {
+            string portraitName = currentData.Portrait;
+
+            // 치환할 초상화 이름이 있다면 교체
+            if (!string.IsNullOrEmpty(currentReplacementPortrait))
+            {
+                portraitName = currentReplacementPortrait;
+            }
+
+            if (!string.IsNullOrEmpty(portraitName))
+            {
+                portrait = Resources.Load<Sprite>($"Dialogue/Portraits/{portraitName}");
+                if (portrait == null)
+                {
+                    Debug.LogWarning("초상화를 Resources/Dialogue/Portraits 폴더에서 찾을 수 없습니다: " + portraitName);
+                }
+            }
+        }
+
+        // 초상화 적용
+        if (portrait != null)
+        {
+            portraitImage.sprite = portrait;
+            portraitImage.gameObject.SetActive(true);
+
+            // Portrait 위치를 패널 왼쪽 하단에 맞춰 조정 (Ignore Layout이므로 수동 위치 조정)
+            UpdatePortraitPosition();
         }
         else
         {
-            //Debug.LogWarning("초상화 이름이 비어있습니다."); // 우선 필요없을거 같아서 비활성화 했는데,, 우선 필요하면 다시 살릴 것
             portraitImage.gameObject.SetActive(false); // 초상화가 없을 경우 이미지 비활성화
         }
 
@@ -285,11 +320,12 @@ public class DialogueUI : MonoBehaviour
         }
 
         // $가 있을때 해당 텍스트 줄바꿈
-        if(context.Contains("$"))
+        if (context.Contains("$"))
         {
             context = context.Replace("$", "\n");
+            Debug.Log("줄바꿈 수행함 : " + context);
         }
-        
+
         // '/' 기준으로 대화 내용 분할
         string[] parts = context.Split('/');
         foreach (string part in parts)
@@ -639,5 +675,7 @@ public class DialogueUI : MonoBehaviour
 
         currentReplacementName = null; // 치환 텍스트 초기화
         currentReplacementPortrait = null; // 치환 초상화 초기화
+        currentReplacementPortraitSprite = null; // 치환 초상화 Sprite 초기화
+        currentReplacementTargetName = null; // 치환 대상 이름 초기화
     }
 }

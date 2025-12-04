@@ -1570,6 +1570,8 @@ GameObject:
   - component: {fileID: 1861480213676830655}
   - component: {fileID: 465719042478643780}
   - component: {fileID: 6883435148052192852}
+  - component: {fileID: 8482574187906435891}
+  - component: {fileID: -8796951446687320044}
   m_Layer: 0
   m_Name: Player1
   m_TagString: Untagged
@@ -1609,13 +1611,9 @@ MonoBehaviour:
   animator: {fileID: 6883435148052192852}
   forceDisableRootMotion: 1
   updateAnimatorParameters: 1
-  speedParameter: Speed
   isWalkingParameter: IsWalking
   moveYParameter: MoveY
   movementRoot: {fileID: 1861480213676830655}
-  enableRightClickMove: 1
-  moveSpeed: 3.5
-  stoppingDistance: 0.05
 --- !u!95 &6883435148052192852
 Animator:
   serializedVersion: 5
@@ -1637,6 +1635,66 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!61 &8482574187906435891
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5710752896797893790}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.050953984, y: -0.2873792}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.62905717, y: 0.4252416}
+  m_EdgeRadius: 0
+--- !u!114 &-8796951446687320044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5710752896797893790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4aa23ce698d43f4cb128c7e9c7cfe4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 1
+  PlzStop: 0
+  collisionCheckDistance: 0.6
 --- !u!1 &5972250663822914733
 GameObject:
   m_ObjectHideFlags: 0

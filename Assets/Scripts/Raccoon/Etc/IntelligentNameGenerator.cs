@@ -33,19 +33,19 @@ public static class IntelligentNameGenerator
             }
         },
         {
-            "Orc", new NamePattern
+            "Oak", new NamePattern
             {
                 prefixes = new[] { "그", "크", "가", "고", "투", "부", "자", "모", "우", "쿠" },
                 middles = new[] { "로", "라", "루", "르", "아", "오", "쉬", "크", "즈", "그" },
                 suffixes = new[] { "쉬", "크", "쿠", "그", "즈", "락", "쉬", "둠", "간", "타" },
-                
+
                 goodCombinations = new[]
                 {
                     ("그", "로", "쉬"), ("크", "루", "크"), ("가", "로", "쉬"),
                     ("투", "르", "크"), ("부", "락", "간"), ("자", "고", "쉬"),
                     ("쿠", "로", "그"), ("우", "르", "둠")
                 },
-                
+
                 avoidPatterns = new[] { "ㅏㅏ", "ㅓㅓ", "ㅣㅐ" }
             }
         },
@@ -55,23 +55,23 @@ public static class IntelligentNameGenerator
                 prefixes = new[] { "블", "드", "세", "카", "알", "루", "비", "라", "밀", "베" },
                 middles = new[] { "라", "루", "카", "미", "리", "르", "레", "시", "나", "드" },
                 suffixes = new[] { "드", "스", "아", "에", "르", "라", "안", "린", "카", "니" },
-                
+
                 goodCombinations = new[]
                 {
                     ("블", "라", "드"), ("드", "라", "큐"), ("세", "레", "나"),
                     ("카", "르", "밀"), ("알", "루", "카"), ("루", "시", "안"),
                     ("비", "올", "레"), ("라", "미", "아")
                 },
-                
+
                 avoidPatterns = new[] { "ㅡㅡ", "ㄹㄹ" }
             }
         }
     };
-    
+
     // 최근 생성된 이름 캐시 (중복 방지)
     private static Dictionary<string, HashSet<string>> recentNames = new Dictionary<string, HashSet<string>>();
     private const int MAX_CACHE_SIZE = 50;
-    
+
     /// <summary>
     /// AI 스타일로 종족에 맞는 지능형 이름 생성
     /// </summary>
@@ -81,25 +81,25 @@ public static class IntelligentNameGenerator
         {
             return "알 수 없음";
         }
-        
+
         var pattern = racePatterns[race];
         string generatedName;
         int attempts = 0;
         const int maxAttempts = 20;
-        
+
         do
         {
             generatedName = GenerateWithPattern(pattern, minLength, maxLength);
             attempts++;
         }
         while (IsNameInCache(race, generatedName) && attempts < maxAttempts);
-        
+
         // 캐시에 추가
         AddToCache(race, generatedName);
-        
+
         return generatedName;
     }
-    
+
     /// <summary>
     /// 패턴 기반 지능형 이름 생성
     /// </summary>
@@ -111,19 +111,19 @@ public static class IntelligentNameGenerator
             var combo = pattern.goodCombinations[Random.Range(0, pattern.goodCombinations.Length)];
             return combo.Item1 + combo.Item2 + combo.Item3;
         }
-        
+
         StringBuilder sb = new StringBuilder();
         int targetLength = Random.Range(minLength, maxLength + 1);
-        
+
         // 1. 시작 음절 (접두사)
         string prefix = pattern.prefixes[Random.Range(0, pattern.prefixes.Length)];
         sb.Append(prefix);
-        
+
         // 2. 중간 음절들
         for (int i = 1; i < targetLength - 1; i++)
         {
             string middle = pattern.middles[Random.Range(0, pattern.middles.Length)];
-            
+
             // 피해야 할 패턴 체크
             if (!HasBadPattern(sb.ToString() + middle, pattern))
             {
@@ -136,17 +136,17 @@ public static class IntelligentNameGenerator
                 sb.Append(middle);
             }
         }
-        
+
         // 3. 끝 음절 (접미사)
         if (targetLength >= 2)
         {
             string suffix = pattern.suffixes[Random.Range(0, pattern.suffixes.Length)];
             sb.Append(suffix);
         }
-        
+
         return sb.ToString();
     }
-    
+
     /// <summary>
     /// 부자연스러운 패턴 체크
     /// </summary>
@@ -159,7 +159,7 @@ public static class IntelligentNameGenerator
         }
         return false;
     }
-    
+
     /// <summary>
     /// 캐시에 이름 추가 (중복 방지용)
     /// </summary>
@@ -169,9 +169,9 @@ public static class IntelligentNameGenerator
         {
             recentNames[race] = new HashSet<string>();
         }
-        
+
         recentNames[race].Add(name);
-        
+
         // 캐시 크기 제한
         if (recentNames[race].Count > MAX_CACHE_SIZE)
         {
@@ -179,7 +179,7 @@ public static class IntelligentNameGenerator
             recentNames[race].Remove(oldest);
         }
     }
-    
+
     /// <summary>
     /// 캐시에 이름이 있는지 확인
     /// </summary>
@@ -187,35 +187,35 @@ public static class IntelligentNameGenerator
     {
         return recentNames.ContainsKey(race) && recentNames[race].Contains(name);
     }
-    
+
     /// <summary>
     /// 특정 스타일로 이름 생성 (추가 옵션)
     /// </summary>
     public static string GenerateWithStyle(string race, NameStyle style)
     {
         string baseName = Generate(race);
-        
+
         switch (style)
         {
             case NameStyle.Noble: // 귀족풍
                 return baseName + (Random.value > 0.5f ? " 경" : " 공");
-                
+
             case NameStyle.Common: // 평민풍
                 return baseName;
-                
+
             case NameStyle.Ancient: // 고대풍
                 return "고대의 " + baseName;
-                
+
             case NameStyle.Warrior: // 전사풍
-                if (race == "Orc")
+                if (race == "Oak")
                     return baseName + " 파괴자";
                 return baseName + " 용맹";
-                
+
             default:
                 return baseName;
         }
     }
-    
+
     /// <summary>
     /// 여러 개의 이름을 한번에 생성 (선택지 제공용)
     /// </summary>
@@ -262,14 +262,14 @@ public class NameGeneratorDemo : MonoBehaviour
         // 기본 사용법
         Debug.Log("=== 기본 이름 생성 ===");
         Debug.Log("Human: " + IntelligentNameGenerator.Generate("Human"));
-        Debug.Log("Orc: " + IntelligentNameGenerator.Generate("Orc"));
+        Debug.Log("Oak: " + IntelligentNameGenerator.Generate("Oak"));
         Debug.Log("Vampire: " + IntelligentNameGenerator.Generate("Vampire"));
-        
+
         // 스타일 적용
         Debug.Log("\n=== 스타일 적용 ===");
         Debug.Log("귀족 Human: " + IntelligentNameGenerator.GenerateWithStyle("Human", NameStyle.Noble));
-        Debug.Log("전사 Orc: " + IntelligentNameGenerator.GenerateWithStyle("Orc", NameStyle.Warrior));
-        
+        Debug.Log("전사 Oak: " + IntelligentNameGenerator.GenerateWithStyle("Oak", NameStyle.Warrior));
+
         // 여러 개 생성 (선택지 제공)
         Debug.Log("\n=== 다중 생성 (선택지) ===");
         var vampireNames = IntelligentNameGenerator.GenerateMultiple("Vampire", 5);

@@ -17,8 +17,7 @@ public class GuestController : MonoBehaviour
     [HideInInspector]
     public GameObject groupPartner;
 
-    [HideInInspector]
-    public CustomerData customerData;
+    [SerializeField] public CustomerData customerData;
 
     private Transform Target;
     private List<Vector3Int> currentPath;

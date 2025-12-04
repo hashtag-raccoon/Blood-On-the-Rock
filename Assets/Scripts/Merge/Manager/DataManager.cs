@@ -116,9 +116,6 @@ public class DataManager : MonoBehaviour
         npcs = ArbeitRepository.Instance.GetNpcs();
         OrderedCocktails = CocktailRepository.Instance.GetOrderedCocktails();
         BuildingRepository.Instance.SpawnConstructedBuildings();
-
-        // 고용된 NPC 스폰
-        ArbeitRepository.Instance.SpawnNpcs();
     }
 
     private void OnApplicationQuit()

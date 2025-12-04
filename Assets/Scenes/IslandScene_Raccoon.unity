@@ -3500,7 +3500,7 @@ Transform:
   - {fileID: 1436755462}
   - {fileID: 92233672}
   - {fileID: 189612841}
-  m_Father: {fileID: 691807501}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!156049354 &441182886
 Grid:
@@ -4260,8 +4260,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 441182885}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &692713990
@@ -4310,8 +4309,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxOfferCount: 3
   personalityDataSO: {fileID: 11400000, guid: a756913e6799081438888f5ce95c68c5, type: 2}
-  npcPrefabs: []
-  defaultSpawnPoint: {fileID: 0}
   tempCandidateList: []
 --- !u!1 &704879620
 GameObject:
@@ -39468,10 +39465,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9cd27f68e629c84385d3b42017e74d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arbeitSpriteReference: {fileID: 11400000, guid: 32d080fcf40d9484692df0fe79022aca, type: 2}
+  arbeitPrefabReference: {fileID: 11400000, guid: 51c73beae47b50043886a1206ae7355c, type: 2}
   maxDeployedArbeiters: 3
   deployedArbeiters: []
-  arbeitPrefab: {fileID: 7208843706444518864, guid: 9b75c37eaccb30943be2526b233cc32b, type: 3}
   arbeitPoint: {fileID: 0}
   pathfinder: {fileID: 0}
   BarSceneName: BarScene_Raccoon
@@ -40648,3 +40644,4 @@ SceneRoots:
   - {fileID: 65266967}
   - {fileID: 393428193}
   - {fileID: 1392759038}
+  - {fileID: 441182885}

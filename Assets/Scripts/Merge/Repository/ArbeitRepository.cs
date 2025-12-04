@@ -28,19 +28,9 @@ public class ArbeitRepository : MonoBehaviour, IRepository
     [Tooltip("NPC의 고정 특성(성격, 기본 능력치 등)을 담고 있는 ScriptableObject")]
     [SerializeField] private PersonalityDataSO personalityDataSO;
 
-    [Header("NPC 프리팹")]
-    [Tooltip("NPC 프리팹 리스트 (프리팹 이름이 prefab_name과 매핑됩니다)")]
-    [SerializeField] private List<GameObject> npcPrefabs = new List<GameObject>();
-
-    [Header("NPC 스폰 설정")]
-    [Tooltip("NPC가 스폰될 기본 위치")]
-    [SerializeField] private Transform defaultSpawnPoint;
-
     private List<ArbeitData> _arbeitDatas = new List<ArbeitData>();
     private List<npc> _npcs = new List<npc>();
     private readonly Dictionary<int, Personality> _personalityDict = new Dictionary<int, Personality>();
-    private readonly Dictionary<string, GameObject> _npcPrefabDict = new Dictionary<string, GameObject>();
-    private readonly List<GameObject> _spawnedNpcs = new List<GameObject>();
 
     // [구인소] 임시 후보 NPC 리스트
     // 임시 알바생들임
@@ -74,45 +64,12 @@ public class ArbeitRepository : MonoBehaviour, IRepository
 
         // 데이터가 준비되면, 딕셔너리를 초기화하고 NPC 리스트를 생성합니다.
         InitializeDictionaries();
-        InitializeNpcPrefabDictionary();
         CreateNpcList();
         IsInitialized = true;
         Debug.Log("ArbeitRepository 초기화 완료.");
     }
 
-    /// <summary>
-    /// NPC 프리팹 리스트를 딕셔너리로 변환합니다.
-    /// 프리팹 이름(예: Human1)을 키로 사용하여 빠른 조회를 가능하게 합니다.
-    /// </summary>
-    private void InitializeNpcPrefabDictionary()
-    {
-        _npcPrefabDict.Clear();
 
-        if (npcPrefabs == null || npcPrefabs.Count == 0)
-        {
-            Debug.LogWarning("npcPrefabs 리스트가 비어있거나 null입니다. Inspector에서 프리팹을 할당해주세요.");
-            return;
-        }
-
-        foreach (var prefab in npcPrefabs)
-        {
-            if (prefab == null)
-            {
-                Debug.LogWarning("npcPrefabs 리스트에 null 프리팹이 포함되어 있습니다.");
-                continue;
-            }
-
-            if (!_npcPrefabDict.ContainsKey(prefab.name))
-            {
-                _npcPrefabDict.Add(prefab.name, prefab);
-            }
-            else
-            {
-                Debug.LogWarning($"[Data Duplication] NPC Prefab '{prefab.name}'이 중복됩니다.");
-            }
-        }
-        Debug.Log($"NPC Prefab Dictionary 초기화 완료: {_npcPrefabDict.Count}개");
-    }
 
     private void LoadArbeitData()
     {
@@ -171,15 +128,16 @@ public class ArbeitRepository : MonoBehaviour, IRepository
             if (arbeitData.employment_state) // 고용 상태가 true인 경우에만 npc 리스트에 추가
             {
                 // arbeitData의 personality_id를 사용하여 딕셔너리에서 해당 Personality 정보를 찾습니다.
+                npc newNpc = null;
                 if (_personalityDict.TryGetValue(arbeitData.personality_id, out Personality personality))
                 {
-                    _npcs.Add(new npc(arbeitData, personality));
+                    newNpc = new npc(arbeitData, personality);
                 }
                 else
                 {
                     //Debug.LogWarning($"ArbeitData '{arbeitData.part_timer_name}'(ID: {arbeitData.part_timer_id})에 대한 Personality ID '{arbeitData.personality_id}'를 찾을 수 없습니다.");
                     // Personality가 없는 경우에도 npc 객체를 생성함
-                    _npcs.Add(new npc(arbeitData, new Personality
+                    newNpc = new npc(arbeitData, new Personality
                     {
                         personality_id = -1,
                         personality_name = "없음",
@@ -188,11 +146,19 @@ public class ArbeitRepository : MonoBehaviour, IRepository
                         serving_ability = 0,
                         cooking_ability = 0,
                         cleaning_ability = 0
-                    }));
+                    });
                 }
+
+                // ArbeitPrefabReference 사용해서 게임을 껐다켜도
+                // 기존 NPC의 portraitSprite와 prefab_name 복구
+                if (ArbeitManager.Instance != null && ArbeitManager.Instance.arbeitPrefabReference != null)
+                {
+                    RestoreNpcVisualData(newNpc, arbeitData);
+                }
+
+                _npcs.Add(newNpc);
             }
         }
-        Debug.Log($"고용된 npc {_npcs.Count}명을 생성했습니다.");
     }
 
     public List<npc> GetNpcs()
@@ -210,141 +176,97 @@ public class ArbeitRepository : MonoBehaviour, IRepository
         return _npcs.Where(n => n.employment_state).ToList();
     }
 
-    #region NPC Spawn Methods
+    #region NPC Data Query Methods
     /// <summary>
-    /// DataManager.npcs 리스트를 기반으로 고용된 NPC를 씬에 스폰합니다.
-    /// BuildingRepository.SpawnConstructedBuildings()와 유사한 방식으로 동작합니다.
+    /// NPC의 초상화 스프라이트와 매칭되는 프리팹을 찾습니다.
     /// </summary>
-    public void SpawnNpcs()
+    public GameObject GetMatchingPrefabByPortrait(npc npcData)
     {
-        try
-        {
-            // DataManager의 조합 데이터(npcs)를 사용
-            var npcsToSpawn = DataManager.Instance.npcs;
+        if (npcData.portraitSprite == null) return null;
 
-            if (npcsToSpawn == null || npcsToSpawn.Count == 0)
+        var prefabRef = ArbeitManager.Instance.arbeitPrefabReference;
+        List<ArbeitPrefabToSpritePair> pairs = null;
+
+        // 종족에 따라 적절한 리스트 선택
+        switch (npcData.race)
+        {
+            case "Human":
+                pairs = prefabRef.Human_Pairs;
+                break;
+            case "Oak":
+                pairs = prefabRef.Oak_Pairs;
+                break;
+            case "Vampire":
+                pairs = prefabRef.Vampire_Pairs;
+                break;
+            default:
+                Debug.LogWarning($"[ArbeitRepository] 알 수 없는 종족: {npcData.race}");
+                return null;
+        }
+
+        // 초상화 스프라이트로 매칭되는 프리팹 찾기
+        if (pairs != null)
+        {
+            foreach (var pair in pairs)
             {
-                Debug.LogWarning("스폰할 NPC가 없습니다.");
-                return;
+                if (pair.PairPortrait == npcData.portraitSprite && pair.PairPrefab != null)
+                {
+                    return pair.PairPrefab;
+                }
             }
-
-            foreach (var npcData in npcsToSpawn)
-            {
-                SpawnSingleNpc(npcData);
-            }
-
-            Debug.Log($"NPC {_spawnedNpcs.Count}명 스폰 완료.");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"NPC 스폰 중 오류 발생: {ex}");
-        }
-    }
-
-    /// <summary>
-    /// 개별 NPC를 스폰합니다.
-    /// </summary>
-    /// <param name="npcData">스폰할 NPC의 데이터</param>
-    /// <returns>스폰된 GameObject (실패 시 null)</returns>
-    private GameObject SpawnSingleNpc(npc npcData)
-    {
-        if (npcData == null)
-        {
-            Debug.LogWarning("NPC 데이터가 null입니다.");
-            return null;
         }
 
-        if (string.IsNullOrEmpty(npcData.prefab_name))
-        {
-            Debug.LogWarning($"NPC '{npcData.part_timer_name}'(ID: {npcData.part_timer_id})의 prefab_name이 비어있습니다.");
-            return null;
-        }
-
-        // prefab_name에서 실제 프리팹 이름으로 변환 (예: "Human_1" -> "Human1")
-        string actualPrefabName = ConvertPrefabName(npcData.prefab_name);
-        GameObject prefab = GetNpcPrefab(actualPrefabName);
-
-        if (prefab == null)
-        {
-            Debug.LogWarning($"NPC '{npcData.part_timer_name}'(ID: {npcData.part_timer_id})의 프리팹 '{actualPrefabName}'을 찾을 수 없습니다.");
-            return null;
-        }
-
-        // 스폰 위치 결정 (각 NPC마다 약간씩 오프셋을 주어 겹치지 않도록)
-        Vector3 baseSpawnPosition = defaultSpawnPoint != null ? defaultSpawnPoint.position : Vector3.zero;
-        Vector3 spawnPosition = baseSpawnPosition + new Vector3(_spawnedNpcs.Count * 1.5f, 0, 0); // X축으로 1.5씩 간격
-
-        // 프리팹 인스턴스화
-        GameObject spawnedNpc = Instantiate(prefab, spawnPosition, Quaternion.identity);
-        spawnedNpc.name = $"{npcData.part_timer_name}_{npcData.part_timer_id}";
-
-        // ArbeitController 초기화 (이미 프리팹에 있다면 가져오고, 없으면 추가)
-        ArbeitController controller = spawnedNpc.GetComponent<ArbeitController>();
-        if (controller == null)
-        {
-            controller = spawnedNpc.AddComponent<ArbeitController>();
-        }
-        controller.Initialize(npcData);
-
-        _spawnedNpcs.Add(spawnedNpc);
-
-        return spawnedNpc;
-    }
-
-    /// <summary>
-    /// prefab_name을 실제 프리팹 파일 이름으로 변환합니다.
-    /// 예: "Human_1" -> "Human1", "Vampire_3" -> "Vam3"
-    /// </summary>
-    private string ConvertPrefabName(string prefabName)
-    {
-        if (string.IsNullOrEmpty(prefabName)) return string.Empty;
-
-        // 종족 이름 매핑 (JSON의 race/prefab_name -> 실제 프리팹 이름)
-        // 예: "Vampire" -> "Vam", "Elf" -> "Oak" 등
-        Dictionary<string, string> raceMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "Vampire", "Vam" },
-            { "Elf", "Oak" },
-            { "Human", "Human" },
-            { "Oak", "Oak" },
-            { "Vam", "Vam" } // 이미 줄여진 경우도 지원
-        };
-
-        // prefab_name을 '_' 기준으로 분리 (예: "Vampire_3" -> ["Vampire", "3"])
-        string[] parts = prefabName.Split('_');
-        if (parts.Length != 2)
-        {
-            // '_'가 없거나 형식이 맞지 않으면 그대로 반환 (기존 동작 유지)
-            return prefabName.Replace("_", "");
-        }
-
-        string race = parts[0];
-        string id = parts[1];
-
-        // 종족 이름 매핑 적용
-        if (raceMapping.TryGetValue(race, out string mappedRace))
-        {
-            // 매핑된 종족 이름 + ID 조합 (예: "Vam" + "3" -> "Vam3")
-            return mappedRace + id;
-        }
-        else
-        {
-            // 매핑이 없으면 원래 종족 이름 사용 (예: "Human_1" -> "Human1")
-            return race + id;
-        }
-    }
-
-    /// <summary>
-    /// 프리팹 이름으로 NPC 프리팹을 조회합니다.
-    /// </summary>
-    private GameObject GetNpcPrefab(string prefabName)
-    {
-        if (_npcPrefabDict.TryGetValue(prefabName, out GameObject prefab))
-        {
-            return prefab;
-        }
         return null;
     }
+
+    /// <summary>
+    /// 기존 NPC의 portraitSprite를 ArbeitPrefabReference를 사용하여 복구합니다.
+    /// prefab_name이 null일 경우 "[종족]_[part_timer_id]" 형식으로 생성합니다.
+    /// </summary>
+    private void RestoreNpcVisualData(npc npcData, ArbeitData arbeitData)
+    {
+        // prefab_name이 null이면 생성
+        if (string.IsNullOrEmpty(npcData.prefab_name))
+        {
+            npcData.prefab_name = $"{npcData.race}_{npcData.part_timer_id}";
+            arbeitData.prefab_name = npcData.prefab_name;
+        }
+
+        // portraitSprite가 null이면 ArbeitPrefabReference에서 복구 시도
+        if (npcData.portraitSprite == null)
+        {
+            var prefabRef = ArbeitManager.Instance.arbeitPrefabReference;
+            List<ArbeitPrefabToSpritePair> pairs = null;
+
+            switch (npcData.race)
+            {
+                case "Human":
+                    pairs = prefabRef.Human_Pairs;
+                    break;
+                case "Oak":
+                case "Orc":
+                    pairs = prefabRef.Oak_Pairs;
+                    break;
+                case "Vampire":
+                    pairs = prefabRef.Vampire_Pairs;
+                    break;
+            }
+
+            // prefab_name이나 part_timer_id로 매칭되는 초상화 찾기
+            // 예: "Human_1" -> Human Pairs에서 첨 번째 초상화 사용 (part_timer_id 기반)
+            if (pairs != null && pairs.Count > 0)
+            {
+                // part_timer_id를 인덱스로 사용 (순환 방지)
+                int index = (npcData.part_timer_id - 1) % pairs.Count;
+                if (index >= 0 && index < pairs.Count && pairs[index].PairPortrait != null)
+                {
+                    npcData.portraitSprite = pairs[index].PairPortrait;
+                }
+            }
+        }
+    }
+
+
 
     /// <summary>
     /// prefab_name과 npc 데이터를 비교하여 매칭되는 NPC를 찾습니다.
@@ -368,29 +290,6 @@ public class ArbeitRepository : MonoBehaviour, IRepository
             n.part_timer_id == npcId);
     }
 
-    /// <summary>
-    /// 스폰된 모든 NPC GameObject를 반환합니다.
-    /// </summary>
-    public List<GameObject> GetSpawnedNpcs()
-    {
-        return _spawnedNpcs;
-    }
-
-    /// <summary>
-    /// 특정 NPC의 GameObject를 반환합니다.
-    /// </summary>
-    public GameObject GetSpawnedNpcByPartTimerId(int partTimerId)
-    {
-        return _spawnedNpcs.Find(go =>
-        {
-            var controller = go.GetComponent<ArbeitController>();
-            if (controller == null) return false;
-
-            // ArbeitController의 npc 데이터에서 part_timer_id 확인
-            // 참고: ArbeitController에 part_timer_id를 반환하는 프로퍼티가 필요할 수 있습니다.
-            return go.name.EndsWith($"_{partTimerId}");
-        });
-    }
     #endregion
 
     #region 알바생 후보 생성 및 관리
@@ -403,7 +302,7 @@ public class ArbeitRepository : MonoBehaviour, IRepository
     {
         List<TempNpcData> candidates = new List<TempNpcData>();
 
-        string[] races = { "Human", "Orc", "Vampire" };
+        string[] races = { "Human", "Oak", "Vampire" };
 
         for (int i = 0; i < count; i++)
         {
@@ -421,24 +320,34 @@ public class ArbeitRepository : MonoBehaviour, IRepository
             candidate.base_cooking_ability = UnityEngine.Random.Range(1, 4);
             candidate.base_cleaning_ability = UnityEngine.Random.Range(1, 4);
 
-            // 종족에 맞는 초상화 스프라이트 할당
-            switch (candidate.race)
+            // 종족에 맞는 초상화 스프라이트 할당 (ArbeitPrefabReference 사용)
+            if (ArbeitManager.Instance != null && ArbeitManager.Instance.arbeitPrefabReference != null)
             {
-                case "Human":
-                    candidate.Portrait = ArbeitManager.Instance.arbeitSpriteReference.
-                    Human_portraits[UnityEngine.Random.Range(0, ArbeitManager.Instance.arbeitSpriteReference.Human_portraits.Count)];
-                    break;
-                case "Orc":
-                    candidate.Portrait = ArbeitManager.Instance.arbeitSpriteReference.
-                    Oak_portraits[UnityEngine.Random.Range(0, ArbeitManager.Instance.arbeitSpriteReference.Oak_portraits.Count)];
-                    break;
-                case "Vampire":
-                    candidate.Portrait = ArbeitManager.Instance.arbeitSpriteReference.
-                    Vampire_portraits[UnityEngine.Random.Range(0, ArbeitManager.Instance.arbeitSpriteReference.Vampire_portraits.Count)];
-                    break;
-                default:
-                    candidate.Portrait = null;
-                    break;
+                var prefabRef = ArbeitManager.Instance.arbeitPrefabReference;
+                switch (candidate.race)
+                {
+                    case "Human":
+                        if (prefabRef.Human_portraits.Count > 0)
+                            candidate.Portrait = prefabRef.Human_portraits[UnityEngine.Random.Range(0, prefabRef.Human_portraits.Count)];
+                        break;
+                    case "Oak":
+                        if (prefabRef.Oak_portraits.Count > 0)
+                            candidate.Portrait = prefabRef.Oak_portraits[UnityEngine.Random.Range(0, prefabRef.Oak_portraits.Count)];
+                        break;
+                    case "Vampire":
+                        if (prefabRef.Vampire_portraits.Count > 0)
+                            candidate.Portrait = prefabRef.Vampire_portraits[UnityEngine.Random.Range(0, prefabRef.Vampire_portraits.Count)];
+                        break;
+                    default:
+                        Debug.LogWarning($"[ArbeitRepository] 알 수 없는 종족: {candidate.race}");
+                        candidate.Portrait = null;
+                        break;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[ArbeitRepository] ArbeitManager 또는 arbeitPrefabReference가 null입니다.");
+                candidate.Portrait = null;
             }
 
             // 5% 확률로 성격 부여
@@ -463,16 +372,16 @@ public class ArbeitRepository : MonoBehaviour, IRepository
                 candidate.personality_cleaning_bonus = 0;
             }
 
-            // TODO : 예상 일급 계산 로직 필요
-            // ex : candidate.estimated_daily_wage = ~~~
-            candidate.estimated_daily_wage = 0;
+            int SumAbility = candidate.base_serving_ability + candidate.base_cooking_ability + candidate.base_cleaning_ability
+            + candidate.personality_serving_bonus + candidate.personality_cooking_bonus + candidate.personality_cleaning_bonus;
+
+            candidate.estimated_daily_wage = Mathf.RoundToInt((SumAbility - 3) * (100f / 12f) + 50);
 
             candidate.is_hired = false;
 
             candidates.Add(candidate);
         }
 
-        Debug.Log($"[ArbeitRepository] 임시 후보 {candidates.Count}명 생성 완료");
         return candidates;
     }
 
@@ -493,6 +402,9 @@ public class ArbeitRepository : MonoBehaviour, IRepository
         // 새로운 part_timer_id 생성 (기존 최대값 + 1)
         int newId = _arbeitDatas.Count > 0 ? _arbeitDatas.Max(a => a.part_timer_id) + 1 : 1;
 
+        // prefab_name을 "[종족]_[part_timer_id]" 형식으로 생성
+        string generatedPrefabName = $"{tempData.race}_{newId}";
+
         // TempArbeitData를 토대로 ArbeitData 생성
         ArbeitData newArbeitData = new ArbeitData
         {
@@ -505,7 +417,8 @@ public class ArbeitRepository : MonoBehaviour, IRepository
             cleaning_ability = tempData.FinalCleaningAbility,
             hire_date = DateTime.Now,
             employment_state = true,
-            daily_wage = tempData.estimated_daily_wage
+            daily_wage = tempData.estimated_daily_wage,
+            prefab_name = generatedPrefabName,
         };
 
         // ArbeitData 리스트에 추가
@@ -535,12 +448,57 @@ public class ArbeitRepository : MonoBehaviour, IRepository
         }
         // 만약 성격이 없으면 없는 npc로 생성, 있으면 해당 성격으로 npc 생성
         npc newNpc = new npc(newArbeitData, personality);
+
+        // TempNpcData의 초상화 스프라이트를 기반으로 알바생 프리팹 매칭
+        if (tempData.Portrait != null && ArbeitManager.Instance != null && ArbeitManager.Instance.arbeitPrefabReference != null)
+        {
+            newNpc.portraitSprite = tempData.Portrait;
+
+            // 초상화 스프라이트로 매칭되는 프리팹 찾기
+            var prefabRef = ArbeitManager.Instance.arbeitPrefabReference;
+            List<ArbeitPrefabToSpritePair> pairs = null;
+
+            switch (newNpc.race)
+            {
+                case "Human":
+                    pairs = prefabRef.Human_Pairs;
+                    break;
+                case "Oak":
+                    pairs = prefabRef.Oak_Pairs;
+                    break;
+                case "Vampire":
+                    pairs = prefabRef.Vampire_Pairs;
+                    break;
+            }
+
+            // 매칭 성공 여부 확인
+            if (pairs != null)
+            {
+                bool found = false;
+                foreach (var pair in pairs)
+                {
+                    if (pair.PairPortrait == tempData.Portrait && pair.PairPrefab != null)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    Debug.LogWarning($"[ArbeitRepository] '{newNpc.part_timer_name}'의 초상화와 매칭되는 프리팹을 찾을 수 없음");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[ArbeitRepository] Portrait 또는 ArbeitPrefabReference가 없어 스프라이트 매칭을 건너뜀");
+        }
+
         _npcs.Add(newNpc);
 
         // JSON 에 알바 데이터 저장
         _jsonDataHandler.SaveArbeitData(_arbeitDatas);
-
-        Debug.Log($"[ArbeitRepository] '{tempData.part_timer_name}' 고용 완료 (ID: {newId})");
 
         return newNpc;
     }
