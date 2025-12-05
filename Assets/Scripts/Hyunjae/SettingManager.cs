@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 설정 화면 스크롤 UI
@@ -36,6 +37,23 @@ public class SettingManager : BaseScrollUI<SettingData, SettingButtonUI>
     protected override void Awake()
     {
         base.Awake();
+        
+        // UI 이벤트 시스템 자동 설정
+        EnsureUIEventSystem();
+    }
+    
+    /// <summary>
+    /// BaseScrollUI의 InitializeButtons를 오버라이드하여 openButton 연결을 방지
+    /// SettingScene은 StartScene에서 설정 버튼을 눌러 들어오므로 openButton이 필요 없음
+    /// </summary>
+    protected override void InitializeButtons()
+    {
+        // openButton은 사용하지 않으므로 연결하지 않음
+        // closeButton만 연결
+        if (closeButton != null)
+        {
+            closeButton.onClick.AddListener(OnCloseButtonClicked);
+        }
     }
 
     private void Start()
@@ -44,6 +62,10 @@ public class SettingManager : BaseScrollUI<SettingData, SettingButtonUI>
         if (backButton != null)
         {
             backButton.onClick.AddListener(GoBackToStart);
+        }
+        else
+        {
+            Debug.LogWarning("SettingManager: BackButton이 Inspector에 할당되지 않았습니다.");
         }
         
         // 탭 버튼 이벤트 연결
@@ -64,27 +86,150 @@ public class SettingManager : BaseScrollUI<SettingData, SettingButtonUI>
     }
     
     /// <summary>
+    /// UI 이벤트 시스템이 제대로 설정되어 있는지 확인하고 없으면 생성
+    /// </summary>
+    private void EnsureUIEventSystem()
+    {
+        // EventSystem 확인 및 생성
+        if (EventSystem.current == null)
+        {
+            Debug.LogWarning("SettingManager: EventSystem이 없습니다. 자동으로 생성합니다.");
+            GameObject eventSystemObj = new GameObject("EventSystem");
+            eventSystemObj.AddComponent<EventSystem>();
+            eventSystemObj.AddComponent<StandaloneInputModule>();
+            Debug.Log("SettingManager: EventSystem 생성 완료");
+        }
+        
+        // Canvas 확인 및 GraphicRaycaster 추가
+        Canvas[] canvases = FindObjectsOfType<Canvas>();
+        foreach (Canvas canvas in canvases)
+        {
+            if (canvas.GetComponent<GraphicRaycaster>() == null)
+            {
+                Debug.LogWarning($"SettingManager: Canvas '{canvas.name}'에 GraphicRaycaster가 없습니다. 자동으로 추가합니다.");
+                canvas.gameObject.AddComponent<GraphicRaycaster>();
+                Debug.Log($"SettingManager: Canvas '{canvas.name}'에 GraphicRaycaster 추가 완료");
+            }
+        }
+    }
+    
+    /// <summary>
     /// 탭 버튼 초기화 및 이벤트 연결
     /// </summary>
     private void InitializeTabButtons()
     {
+        // Display 탭 버튼 설정
         if (displayTabButton != null)
         {
+            // 버튼 상태 확인
+            CheckButtonState(displayTabButton, "Display");
+            
             displayTabButton.onClick.RemoveAllListeners();
-            displayTabButton.onClick.AddListener(() => SwitchTab("Display"));
+            displayTabButton.onClick.AddListener(() => {
+                Debug.Log("SettingManager: Display 버튼 클릭됨!");
+                SwitchTab("Display");
+            });
+            Debug.Log("SettingManager: Display 탭 버튼 이벤트 연결 완료");
+        }
+        else
+        {
+            Debug.LogError("SettingManager: DisplayTabButton이 Inspector에 할당되지 않았습니다. 버튼이 동작하지 않습니다!");
         }
         
+        // Audio 탭 버튼 설정
         if (audioTabButton != null)
         {
+            // 버튼 상태 확인
+            CheckButtonState(audioTabButton, "Audio");
+            
             audioTabButton.onClick.RemoveAllListeners();
-            audioTabButton.onClick.AddListener(() => SwitchTab("Audio"));
+            audioTabButton.onClick.AddListener(() => {
+                Debug.Log("SettingManager: Audio 버튼 클릭됨!");
+                SwitchTab("Audio");
+            });
+            Debug.Log("SettingManager: Audio 탭 버튼 이벤트 연결 완료");
+        }
+        else
+        {
+            Debug.LogError("SettingManager: AudioTabButton이 Inspector에 할당되지 않았습니다. 버튼이 동작하지 않습니다!");
         }
         
+        // Control 탭 버튼 설정
         if (controlTabButton != null)
         {
+            // 버튼 상태 확인
+            CheckButtonState(controlTabButton, "Control");
+            
             controlTabButton.onClick.RemoveAllListeners();
-            controlTabButton.onClick.AddListener(() => SwitchTab("Control"));
+            controlTabButton.onClick.AddListener(() => {
+                Debug.Log("SettingManager: Control 버튼 클릭됨!");
+                SwitchTab("Control");
+            });
+            Debug.Log("SettingManager: Control 탭 버튼 이벤트 연결 완료");
         }
+        else
+        {
+            Debug.LogError("SettingManager: ControlTabButton이 Inspector에 할당되지 않았습니다. 버튼이 동작하지 않습니다!");
+        }
+    }
+    
+    /// <summary>
+    /// 버튼 상태를 확인하고 문제가 있으면 경고를 출력하고 수정 시도
+    /// </summary>
+    private void CheckButtonState(Button button, string buttonName)
+    {
+        if (button == null) return;
+        
+        // 버튼이 활성화되어 있는지 확인
+        if (!button.gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning($"SettingManager: {buttonName} 버튼의 GameObject가 비활성화되어 있습니다!");
+            button.gameObject.SetActive(true);
+            Debug.Log($"SettingManager: {buttonName} 버튼 GameObject 활성화 완료");
+        }
+        
+        // 버튼이 상호작용 가능한지 확인
+        if (!button.interactable)
+        {
+            Debug.LogWarning($"SettingManager: {buttonName} 버튼의 Interactable이 false입니다!");
+            button.interactable = true;
+            Debug.Log($"SettingManager: {buttonName} 버튼 Interactable 활성화 완료");
+        }
+        
+        // 버튼의 Image 컴포넌트에서 Raycast Target 확인
+        Image buttonImage = button.GetComponent<Image>();
+        if (buttonImage != null && !buttonImage.raycastTarget)
+        {
+            Debug.LogWarning($"SettingManager: {buttonName} 버튼의 Image Raycast Target이 false입니다!");
+            buttonImage.raycastTarget = true;
+            Debug.Log($"SettingManager: {buttonName} 버튼 Image Raycast Target 활성화 완료");
+        }
+        
+        // 버튼에 GraphicRaycaster가 필요한지 확인 (Canvas에 있어야 함)
+        Canvas canvas = button.GetComponentInParent<Canvas>();
+        if (canvas != null)
+        {
+            GraphicRaycaster raycaster = canvas.GetComponent<GraphicRaycaster>();
+            if (raycaster == null)
+            {
+                Debug.LogWarning($"SettingManager: Canvas에 GraphicRaycaster가 없습니다! 자동으로 추가합니다.");
+                canvas.gameObject.AddComponent<GraphicRaycaster>();
+                Debug.Log($"SettingManager: Canvas에 GraphicRaycaster 추가 완료");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"SettingManager: {buttonName} 버튼이 Canvas 하위에 없습니다!");
+        }
+        
+        // EventSystem 확인
+        if (EventSystem.current == null)
+        {
+            Debug.LogError("SettingManager: EventSystem이 씬에 없습니다! 자동으로 생성합니다.");
+            EnsureUIEventSystem();
+        }
+        
+        Debug.Log($"SettingManager: {buttonName} 버튼 상태 - Active: {button.gameObject.activeInHierarchy}, Interactable: {button.interactable}, Enabled: {button.enabled}, RaycastTarget: {(buttonImage != null ? buttonImage.raycastTarget.ToString() : "N/A")}");
     }
     
     /// <summary>
@@ -93,6 +238,8 @@ public class SettingManager : BaseScrollUI<SettingData, SettingButtonUI>
     /// <param name="tabName">전환할 탭 이름 (Display, Audio, Control)</param>
     public void SwitchTab(string tabName)
     {
+        Debug.Log($"SettingManager: SwitchTab 호출됨 - {tabName}");
+        
         // 모든 패널 비활성화
         if (displayPanel != null) displayPanel.SetActive(false);
         if (audioPanel != null) audioPanel.SetActive(false);
@@ -105,29 +252,53 @@ public class SettingManager : BaseScrollUI<SettingData, SettingButtonUI>
         switch (tabName)
         {
             case "Display":
-                if (displayPanel != null) displayPanel.SetActive(true);
+                if (displayPanel != null)
+                {
+                    displayPanel.SetActive(true);
+                    Debug.Log("SettingManager: Display 패널 활성화됨");
+                }
+                else
+                {
+                    Debug.LogWarning("SettingManager: DisplayPanel이 할당되지 않았습니다.");
+                }
                 SetTabButtonColor(displayTabButton, selectedTabColor);
                 currentActiveTab = "Display";
                 break;
                 
             case "Audio":
-                if (audioPanel != null) audioPanel.SetActive(true);
+                if (audioPanel != null)
+                {
+                    audioPanel.SetActive(true);
+                    Debug.Log("SettingManager: Audio 패널 활성화됨");
+                }
+                else
+                {
+                    Debug.LogWarning("SettingManager: AudioPanel이 할당되지 않았습니다.");
+                }
                 SetTabButtonColor(audioTabButton, selectedTabColor);
                 currentActiveTab = "Audio";
                 break;
                 
             case "Control":
-                if (controlPanel != null) controlPanel.SetActive(true);
+                if (controlPanel != null)
+                {
+                    controlPanel.SetActive(true);
+                    Debug.Log("SettingManager: Control 패널 활성화됨");
+                }
+                else
+                {
+                    Debug.LogWarning("SettingManager: ControlPanel이 할당되지 않았습니다.");
+                }
                 SetTabButtonColor(controlTabButton, selectedTabColor);
                 currentActiveTab = "Control";
                 break;
                 
             default:
-                Debug.LogWarning($"알 수 없는 탭 이름: {tabName}");
+                Debug.LogWarning($"SettingManager: 알 수 없는 탭 이름: {tabName}");
                 return;
         }
         
-        Debug.Log($"탭 전환: {tabName}");
+        Debug.Log($"SettingManager: 탭 전환 완료 - {tabName}");
     }
     
     /// <summary>
@@ -174,11 +345,6 @@ public class SettingManager : BaseScrollUI<SettingData, SettingButtonUI>
                 Debug.LogWarning($"알 수 없는 설정 항목: {data.Setting_Name}");
                 break;
         }
-    }
-
-    protected override void OnOpenButtonClicked()
-    {
-        base.OnOpenButtonClicked();
     }
 
     protected override void OnCloseButtonClicked()
