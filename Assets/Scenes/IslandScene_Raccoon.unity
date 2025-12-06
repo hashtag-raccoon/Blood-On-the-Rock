@@ -6708,7 +6708,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1340458986
 RectTransform:
   m_ObjectHideFlags: 0
@@ -36755,7 +36755,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0.002436554}
-  m_SizeDelta: {x: 0, y: 1060}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1489899746
 MonoBehaviour:
@@ -39465,11 +39465,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9cd27f68e629c84385d3b42017e74d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arbeitPrefabReference: {fileID: 11400000, guid: 51c73beae47b50043886a1206ae7355c, type: 2}
+  arbeitSpriteReference: {fileID: 11400000, guid: 32d080fcf40d9484692df0fe79022aca, type: 2}
   maxDeployedArbeiters: 3
   deployedArbeiters: []
   arbeitPoint: {fileID: 0}
   pathfinder: {fileID: 0}
+  clickColliderTemplate: {fileID: 340170186503454478, guid: d7da65b79b4e3a7458fbf352f3a6098e, type: 3}
+  clickLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  clickColliderLayerName: ClickCollider
   BarSceneName: BarScene_Raccoon
 --- !u!1 &2012967149
 GameObject:

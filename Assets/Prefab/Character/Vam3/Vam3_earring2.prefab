@@ -2586,10 +2586,6 @@ MonoBehaviour:
   isWalkingParameter: IsWalking
   moveYParameter: MoveY
   movementRoot: {fileID: 6639076118537939982}
-  enableRightClickMove: 1
-  moveSpeed: 3.5
-  stoppingDistance: 0.05
-  guestController: {fileID: 0}
 --- !u!95 &3219597801866059107
 Animator:
   serializedVersion: 5

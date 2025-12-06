@@ -292,7 +292,7 @@ public class DialogueUI : MonoBehaviour
             portraitImage.sprite = portrait;
             portraitImage.gameObject.SetActive(true);
 
-            // Portrait 위치를 패널 왼쪽 하단에 맞춰 조정 (Ignore Layout이므로 수동 위치 조정)
+            // Portrait 위치를 패널 왼쪽 하단에 맞춰 조정 (수동 위치 조정)
             UpdatePortraitPosition();
         }
         else
@@ -323,7 +323,6 @@ public class DialogueUI : MonoBehaviour
         if (context.Contains("$"))
         {
             context = context.Replace("$", "\n");
-            Debug.Log("줄바꿈 수행함 : " + context);
         }
 
         // '/' 기준으로 대화 내용 분할
@@ -677,5 +676,28 @@ public class DialogueUI : MonoBehaviour
         currentReplacementPortrait = null; // 치환 초상화 초기화
         currentReplacementPortraitSprite = null; // 치환 초상화 Sprite 초기화
         currentReplacementTargetName = null; // 치환 대상 이름 초기화
+    }
+
+    /// <summary>
+    /// 대화 강제 종료 (ESC 키 등으로 콜백(대화창 종료시의 이벤트) 실행 없이 종료)
+    /// </summary>
+    public void ForceEndDialogue()
+    {
+        this.gameObject.SetActive(false);
+
+        // 모든 선택지 버튼 숨김
+        if (choiceA_Button != null) choiceA_Button.gameObject.SetActive(false);
+        if (choiceB_Button != null) choiceB_Button.gameObject.SetActive(false);
+        if (choiceC_Button != null) choiceC_Button.gameObject.SetActive(false);
+
+        isWaitingForInput = false;
+
+        // 콜백을 호출하지 않고 초기화만 수행
+        onDialogueEndCallback = null;
+
+        currentReplacementName = null;
+        currentReplacementPortrait = null;
+        currentReplacementPortraitSprite = null;
+        currentReplacementTargetName = null;
     }
 }

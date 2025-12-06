@@ -13,7 +13,7 @@ public class ArbeitPrefabToSpritePair
 }
 
 [CreateAssetMenu(fileName = "ArbeitReference", menuName = "Game Data/Arbeit Prefab Reference")]
-public class ArbeitPrefabReference : ScriptableObject
+public class ArbeitSpriteReference : ScriptableObject
 {
     [Header("알바 초상화/프리팹 매핑")]
     public List<ArbeitPrefabToSpritePair> Human_Pairs = new List<ArbeitPrefabToSpritePair>();

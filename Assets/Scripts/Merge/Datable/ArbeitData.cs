@@ -69,9 +69,20 @@ public class npc : IScrollItemData
         personality_name = personality.personality_name;
         description = personality.description;
         specificity = personality.specificity;
-        serving_ability = personality.serving_ability;
-        cooking_ability = personality.cooking_ability;
-        cleaning_ability = personality.cleaning_ability;
+        
+        // 성격이 없으면 기본 능력치 사용
+        if (personality_id == -1)
+        {
+            serving_ability = arbeitData.serving_ability;
+            cooking_ability = arbeitData.cooking_ability;
+            cleaning_ability = arbeitData.cleaning_ability;
+        }
+        else
+        {
+            serving_ability = personality.serving_ability;
+            cooking_ability = personality.cooking_ability;
+            cleaning_ability = personality.cleaning_ability;
+        }
 
         total_ability = serving_ability + cooking_ability + cleaning_ability;
 

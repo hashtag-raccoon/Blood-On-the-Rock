@@ -15,47 +15,42 @@ MonoBehaviour:
   raceId: 2
   raceName: Vampire
   prefixVisualSets:
-  - prefixName: "\uD608\uB9F9 \uC7A5\uAD70"
-    customerPrefabs:
-    - {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
-    - {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
-    portraitSprites:
-    - {fileID: 21300000, guid: 0793e5ffab51ca04c8bfdde94ba43ebc, type: 3}
-    - {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
-  - prefixName: "\uC21C\uD608 \uC9D1\uD589\uAD00"
-    customerPrefabs:
-    - {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
-    - {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
-    portraitSprites:
-    - {fileID: 21300000, guid: 0793e5ffab51ca04c8bfdde94ba43ebc, type: 3}
-    - {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
-  - prefixName: "\uAC00\uBB38 \uAC10\uC2DC\uC790"
-    customerPrefabs:
-    - {fileID: 7998863298994752275, guid: 13bf4ced8f8c24a4a8f04bdbd30146e0, type: 3}
-    - {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
-    portraitSprites:
-    - {fileID: 21300000, guid: 858a6456407d4ad428e93080b8ba36a1, type: 3}
-    - {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
-  - prefixName: "\uC804\uD1B5 \uC2EC\uD310\uC790"
-    customerPrefabs:
-    - {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
-    - {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
-    portraitSprites:
-    - {fileID: 21300000, guid: 0793e5ffab51ca04c8bfdde94ba43ebc, type: 3}
-    - {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
-  - prefixName: "\uACE0\uBB38\uD5CC \uC218\uD638\uC790"
-    customerPrefabs:
-    - {fileID: 7998863298994752275, guid: 13bf4ced8f8c24a4a8f04bdbd30146e0, type: 3}
-    - {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
-    portraitSprites:
-    - {fileID: 21300000, guid: 858a6456407d4ad428e93080b8ba36a1, type: 3}
-    - {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
-  - prefixName: "\uC77C\uBC18"
-    customerPrefabs:
-    - {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
-    - {fileID: 7998863298994752275, guid: 13bf4ced8f8c24a4a8f04bdbd30146e0, type: 3}
-    - {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
-    portraitSprites:
-    - {fileID: 21300000, guid: 0793e5ffab51ca04c8bfdde94ba43ebc, type: 3}
-    - {fileID: 21300000, guid: 858a6456407d4ad428e93080b8ba36a1, type: 3}
-    - {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
+    _serializedList:
+    - Key: "\uD608\uB9F9 \uC7A5\uAD70"
+      Value:
+      - customerPrefab: {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
+        portraitSprite: {fileID: 21300000, guid: 0793e5ffab51ca04c8bfdde94ba43ebc, type: 3}
+      - customerPrefab: {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
+        portraitSprite: {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
+    - Key: "\uC21C\uD608 \uC9D1\uD589\uAD00"
+      Value:
+      - customerPrefab: {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
+        portraitSprite: {fileID: 21300000, guid: 0793e5ffab51ca04c8bfdde94ba43ebc, type: 3}
+      - customerPrefab: {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
+        portraitSprite: {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
+    - Key: "\uAC00\uBB38 \uAC10\uC2DC\uC790"
+      Value:
+      - customerPrefab: {fileID: 7998863298994752275, guid: 13bf4ced8f8c24a4a8f04bdbd30146e0, type: 3}
+        portraitSprite: {fileID: 21300000, guid: 858a6456407d4ad428e93080b8ba36a1, type: 3}
+      - customerPrefab: {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
+        portraitSprite: {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
+    - Key: "\uC804\uD1B5 \uC2EC\uD310\uC790"
+      Value:
+      - customerPrefab: {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
+        portraitSprite: {fileID: 21300000, guid: 0793e5ffab51ca04c8bfdde94ba43ebc, type: 3}
+      - customerPrefab: {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
+        portraitSprite: {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
+    - Key: "\uACE0\uBB38\uD5CC \uC218\uD638\uC790"
+      Value:
+      - customerPrefab: {fileID: 7998863298994752275, guid: 13bf4ced8f8c24a4a8f04bdbd30146e0, type: 3}
+        portraitSprite: {fileID: 21300000, guid: 858a6456407d4ad428e93080b8ba36a1, type: 3}
+      - customerPrefab: {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
+        portraitSprite: {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}
+    - Key: "\uC77C\uBC18"
+      Value:
+      - customerPrefab: {fileID: 3215572665505261899, guid: a820d736a37e93543a6d6cc6e1c3dd15, type: 3}
+        portraitSprite: {fileID: 21300000, guid: 0793e5ffab51ca04c8bfdde94ba43ebc, type: 3}
+      - customerPrefab: {fileID: 7998863298994752275, guid: 13bf4ced8f8c24a4a8f04bdbd30146e0, type: 3}
+        portraitSprite: {fileID: 21300000, guid: 858a6456407d4ad428e93080b8ba36a1, type: 3}
+      - customerPrefab: {fileID: 8725499790975822834, guid: 9f73870f66265084ea39c73bad6e4057, type: 3}
+        portraitSprite: {fileID: 21300000, guid: e0820fcf7ce96b342b9ef5c40858d7de, type: 3}

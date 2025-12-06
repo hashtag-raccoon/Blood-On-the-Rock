@@ -499,6 +499,13 @@ public class DataManager : MonoBehaviour
     }
     #endregion
 
+    #region Npc Methods
+    public List<npc> GetAllHiredNpc()
+    {
+        return npcs.FindAll(n => n.employment_state == true);
+    }
+    #endregion
+
     #region ScriptableObject Getter Methods
     /// <summary>
     /// 재료 정보(술, 음료, 얼음, 가니쉬)를 담고 있는 ScriptableObject를 반환합니다.

@@ -48,19 +48,24 @@ public class TableManager : MonoBehaviour
 
     [Header("손님 이동 경로")]
     [SerializeField] private IsometricPathfinder CustomerPath;
+    // 예약 테이블
 
     [HideInInspector]
     public Dictionary<GameObject, (int count, List<GameObject> customers)> reservedTables = new Dictionary<GameObject, (int, List<GameObject>)>();
 
+    // 빈 테이블
     [HideInInspector]
     public List<GameObject> availableTables = new List<GameObject>();
 
+    // 테이블 예약 정보
     [HideInInspector]
     public Dictionary<GameObject, List<GameObject>> tableReservations = new Dictionary<GameObject, List<GameObject>>();
 
+    // 손님 대기열
     [HideInInspector]
     public List<GameObject> waitingLine = new List<GameObject>();
 
+    // 현재 손님이 앉아있는 테이블 배열
     [HideInInspector]
     public GameObject[] tablesInCustomer;
 
@@ -171,7 +176,7 @@ public class TableManager : MonoBehaviour
                         case 1:
                             int RaceID = Random.Range(0, 3);
                             string GuestName = null;
-                            string RaceName;
+                            string RaceName = "Unknown";
                             string prefix = null;
                             RaceVisualData visualData = null;
 
@@ -197,15 +202,38 @@ public class TableManager : MonoBehaviour
                                     break;
                             }
 
-                            // 종족 및 접두사에 맞는 프리팹과 초상화 가져오기
-                            GameObject customerPrefab = visualData?.GetRandomCustomerPrefab(prefix);
-                            Sprite portraitSprite = visualData?.GetRandomPortraitSprite(prefix);
-
-                            if (customerPrefab == null)
+                            // visualData null 체크
+                            if (visualData == null)
                             {
-                                Debug.LogWarning($"[TableManager] '{prefix}' 접두사의 손님 프리팹을 찾을 수 없습니다.");
+                                Debug.LogError($"[TableManager] {RaceName}의 RaceVisualData가 Inspector에 할당되지 않았습니다! (RaceID: {RaceID})");
                                 break;
                             }
+
+                            // 종족 및 접두사에 맞는 세트(집합)를(을) 먼저 선택
+                            // 선택 후 해당 세트 중에 랜덤으로 프리팹과 초상화를 가져옴
+                            PrefixVisualSet visualSet = visualData?.GetRandomVisualSetByPrefix(prefix);
+                            if (visualSet == null || visualSet.customerPrefab == null)
+                            {
+                                Debug.LogWarning($"[TableManager] '{prefix}' 접두사의 손님 비주얼 세트를 찾을 수 없습니다.");
+                                Debug.LogWarning($"[TableManager] 디버그 정보:");
+                                Debug.LogWarning($"  - 종족: {RaceName} (RaceID: {RaceID})");
+                                Debug.LogWarning($"  - 접두사: '{prefix}'");
+                                Debug.LogWarning($"  - visualData null 여부: {visualData == null}");
+                                if (visualData != null)
+                                {
+                                    Debug.LogWarning($"  - visualData 종족 이름: {visualData.raceName}");
+                                    Debug.LogWarning($"  - visualData raceId: {visualData.raceId}");
+                                    Debug.LogWarning($"  - visualSet null 여부: {visualSet == null}");
+                                    if (visualSet != null)
+                                    {
+                                        Debug.LogWarning($"  - customerPrefab null 여부: {visualSet.customerPrefab == null}");
+                                    }
+                                }
+                                break;
+                            }
+
+                            GameObject customerPrefab = visualSet.customerPrefab;
+                            Sprite portraitSprite = visualSet.portraitSprite;
 
                             // 프리팹 => 씬에서 쓰이는 실 객체로 인스턴스화
                             GameObject customer = Instantiate(customerPrefab, CustomerTransform.transform.position, Quaternion.identity);
@@ -244,7 +272,7 @@ public class TableManager : MonoBehaviour
                             int RaceID_party = Random.Range(0, 3);
                             for (int j = 0; j < 2; j++)
                             {
-                                string RaceName_party;
+                                string RaceName_party = "Unknown";
                                 string prefix_party = null;
                                 RaceVisualData visualData_party = null;
                                 GuestName = null;
@@ -271,15 +299,38 @@ public class TableManager : MonoBehaviour
                                         break;
                                 }
 
-                                // 종족 및 접두사에 맞는 프리팹과 초상화 가져오기
-                                GameObject customerPrefab_party = visualData_party?.GetRandomCustomerPrefab(prefix_party);
-                                Sprite portraitSprite_party = visualData_party?.GetRandomPortraitSprite(prefix_party);
-
-                                if (customerPrefab_party == null)
+                                // visualData_party null 체크
+                                if (visualData_party == null)
                                 {
-                                    Debug.LogWarning($"[TableManager] '{prefix_party}' 접두사의 손님 프리팹을 찾을 수 없습니다.");
+                                    Debug.LogError($"[TableManager] {RaceName_party}의 RaceVisualData가 Inspector에 할당되지 않았습니다! (RaceID: {RaceID_party})");
                                     continue;
                                 }
+
+                                // 종족 및 접두사에 맞는 세트(집합)를(을) 먼저 선택
+                                // 선택 후 해당 세트 중에 랜덤으로 프리팹과 초상화를 가져옴
+                                PrefixVisualSet visualSet_party = visualData_party?.GetRandomVisualSetByPrefix(prefix_party);
+                                if (visualSet_party == null || visualSet_party.customerPrefab == null)
+                                {
+                                    Debug.LogWarning($"[TableManager] '{prefix_party}' 접두사의 손님 비주얼 세트를 찾을 수 없습니다.");
+                                    Debug.LogWarning($"[TableManager] 디버그 정보 (2인 파티):");
+                                    Debug.LogWarning($"  - 종족: {RaceName_party} (RaceID: {RaceID_party})");
+                                    Debug.LogWarning($"  - 접두사: '{prefix_party}'");
+                                    Debug.LogWarning($"  - visualData_party null 여부: {visualData_party == null}");
+                                    if (visualData_party != null)
+                                    {
+                                        Debug.LogWarning($"  - visualData_party 종족 이름: {visualData_party.raceName}");
+                                        Debug.LogWarning($"  - visualData_party raceId: {visualData_party.raceId}");
+                                        Debug.LogWarning($"  - visualSet_party null 여부: {visualSet_party == null}");
+                                        if (visualSet_party != null)
+                                        {
+                                            Debug.LogWarning($"  - customerPrefab null 여부: {visualSet_party.customerPrefab == null}");
+                                        }
+                                    }
+                                    continue;
+                                }
+
+                                GameObject customerPrefab_party = visualSet_party.customerPrefab;
+                                Sprite portraitSprite_party = visualSet_party.portraitSprite;
 
                                 // 프리팹 => 씬에서 쓰이는 실 객체로 인스턴스화
                                 GameObject customer_party = Instantiate(customerPrefab_party, CustomerTransform.transform.position, Quaternion.identity);
@@ -397,6 +448,9 @@ public class TableManager : MonoBehaviour
     #endregion
 
     #region 테이블 예약 관리
+    /// <summary>
+    /// 테이블 예약 관리
+    /// </summary>
     public void ReserveTable(GameObject table, GameObject guest) // 손님이 테이블 예약
     {
         if (table == null || guest == null)

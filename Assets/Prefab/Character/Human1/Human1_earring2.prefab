@@ -1555,10 +1555,6 @@ MonoBehaviour:
   isWalkingParameter: IsWalking
   moveYParameter: MoveY
   movementRoot: {fileID: 8466804503870193574}
-  enableRightClickMove: 1
-  moveSpeed: 3.5
-  stoppingDistance: 0.05
-  guestController: {fileID: 0}
 --- !u!95 &8652629203680195009
 Animator:
   serializedVersion: 5
@@ -1596,6 +1592,8 @@ MonoBehaviour:
   moveSpeed: 5
   tableManager: {fileID: 0}
   desiredPartySize: 1
+  groupPartner: {fileID: 0}
+  UIDelay: 3
 --- !u!1 &6851218199502552431
 GameObject:
   m_ObjectHideFlags: 0

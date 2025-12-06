@@ -31,7 +31,29 @@ public class ArbeitController : MonoBehaviour
     [SerializeField] private float taskUI_Y_Offset = 1.5f; // 업무 UI Y축 오프셋
     private List<GameObject> taskUIObjects = new List<GameObject>(); // 업무 UI 오브젝트 리스트
 
+    // 대화 대기열
+    private struct DialogQueueItem
+    {
+        public TaskInfo task;
+        public Vector2? panelSize;
+        public int startIndex;
+        public string replacementName;
+        public string portraitName;
+        public Sprite portraitSprite;
+        public bool useSprite;
+    }
+    private Queue<DialogQueueItem> dialogQueue = new Queue<DialogQueueItem>();
+
     private Camera mainCamera;
+
+    [Header("클릭 감지 레이어")]
+    [SerializeField] private LayerMask clickLayer;
+
+    public LayerMask ClickLayerMask
+    {
+        get => clickLayer;
+        set => clickLayer = value;
+    }
 
     private void Awake()
     {
@@ -42,6 +64,11 @@ public class ArbeitController : MonoBehaviour
         }
     }
 
+    public void SetClickLayer(LayerMask layer)
+    {
+        clickLayer = layer;
+    }
+
     #region Initialization
     /// <summary>
     /// 초기화
@@ -50,7 +77,7 @@ public class ArbeitController : MonoBehaviour
     public void Initialize(npc npcData)
     {
         this.myNpcData = npcData;
-        // 이동 속도 보정 등이 필요할 경우 여기에 추가할 것
+        // 데이터를 통해 이동 속도 보정 등이 필요할 경우 여기에 추가할 것
         // ex: moveSpeed += npcData.serving_ability * 0.1f;
     }
 
@@ -123,14 +150,18 @@ public class ArbeitController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 pos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            int layerMask = clickLayer != 0 ? clickLayer : ~0;
+            if (clickLayer == 0 && CameraManager.instance != null)
+            {
+                layerMask = ~CameraManager.instance.ignoreLayerMask.value;
+            }
 
-            // ignoreLayerMask를 반전시켜서 해당 레이어를 제외하고 Raycast
-            int layerMask = ~CameraManager.instance.ignoreLayerMask.value;
             RaycastHit2D hitCollider = Physics2D.Raycast(pos, Vector2.zero, 0, layerMask);
 
             if (hitCollider.collider != null)
             {
-                if (hitCollider.transform == this.transform)
+                Transform hitTransform = hitCollider.transform;
+                if (hitTransform == this.transform || hitTransform.IsChildOf(this.transform))
                 {
                     OrderingManager.Instance.ToggleSelected(this.gameObject);
                 }
@@ -187,7 +218,6 @@ public class ArbeitController : MonoBehaviour
             if (Vector3.Distance(transform.position, waitingPos) < 0.1f)
             {
                 isWaiting = true;
-                Debug.Log($"[ArbeitController] {myNpcData?.part_timer_name}이(가) 대기 위치에 도착했습니다.");
                 return;
             }
         }
@@ -197,11 +227,12 @@ public class ArbeitController : MonoBehaviour
             GuestController guest = currentTask.targetObject.GetComponent<GuestController>();
             string csvName = "Human_OrderDialogue";
             int dialogueIndex = 0;
-            string[] prefixes = null; // 스코프를 넓혀서 나중에도 사용 가능하게 함
+            string[] prefixes = null;
 
             if (guest != null && guest.customerData != null)
             {
                 // 종족에 따라 다른 CSV 파일과 접두사 배열 설정
+                // 현재는 하드 코딩 했지만 추후에 다른 방식으로 관리할 예정
                 switch (guest.customerData.race_id)
                 {
                     case 0: // Human
@@ -345,8 +376,6 @@ public class ArbeitController : MonoBehaviour
     /// </summary>
     private void ProcessTakeOrder(TaskInfo task)
     {
-        // TODO: 후에 섬 -> 씬으로 Npc 데이터 전달할때, 밑에 Debug.Log 삭제
-        Debug.Log($"{myNpcData?.part_timer_name}이(가) 주문을 받습니다.");
         SetTarget(task.targetObject.transform); // Target을 향해 이동 시작함
     }
 
@@ -412,7 +441,6 @@ public class ArbeitController : MonoBehaviour
     {
         if (currentTask != null)
         {
-            OrderingManager.Instance.RemoveTask(currentTask);
             currentTask = null;
 
             // 대기 위치로 복귀
@@ -430,7 +458,6 @@ public class ArbeitController : MonoBehaviour
         // 현재 실행 중인 업무인지 확인
         if (currentTask != null && currentTask == task)
         {
-            Debug.Log("Cancelling current task: " + task.taskType); // 당분간 없으면 곤란
             CancelCurrentTask();
             return;
         }
@@ -438,7 +465,6 @@ public class ArbeitController : MonoBehaviour
         // 큐에 있는 업무인지 확인
         if (taskQueue.Contains(task))
         {
-            Debug.Log("Removing task from queue: " + task.taskType); // 당분간 없으면 곤란
             taskQueue.Remove(task);
             UpdateTaskUI();
         }
@@ -460,7 +486,8 @@ public class ArbeitController : MonoBehaviour
         TaskInfo matchingTask = taskQueue.Find(t => t.targetObject == completedTask.targetObject);
         if (matchingTask != null)
         {
-            RemoveTaskFromQueue(matchingTask);
+            taskQueue.Remove(matchingTask);
+            UpdateTaskUI();
         }
     }
 
@@ -529,10 +556,37 @@ public class ArbeitController : MonoBehaviour
 
     /// <summary>
     /// 업무 추가 가능 여부 확인
+    /// 현재 수행중인 업무를 추가하려고 할때, 최대 업무 수에 도달하였을때
+    /// 이미 업무 큐에 있는 업무를 추가하려고 할 때 업무 추가를 막음
     /// </summary>
     public bool CanAddTask(GameObject taskUI)
     {
-        return GetTaskCount() < MAX_TASKS || OrderingManager.Instance.HasTask(taskUI.GetComponent<TaskUIController>().assignedTask);
+        // 최대 업무 수를 초과하면 추가 불가
+        if (GetTaskCount() >= MAX_TASKS)
+        {
+            return false;
+        }
+
+        // 이미 동일한 업무가 있는지 확인
+        TaskInfo newTask = taskUI.GetComponent<TaskUIController>().assignedTask;
+        if (newTask != null)
+        {
+            // 현재 수행 중인 업무와 동일한지 확인
+            if (currentTask != null && currentTask == newTask)
+            {
+                Debug.LogWarning($"[ArbeitController] 이미 수행 중인 동일한 업무입니다: {newTask.taskType}");
+                return false;
+            }
+
+            // 대기 중인 업무 큐에 동일한 업무가 있는지 확인
+            if (taskQueue.Contains(newTask))
+            {
+                Debug.LogWarning($"[ArbeitController] 이미 대기 중인 동일한 업무입니다: {newTask.taskType}");
+                return false;
+            }
+        }
+
+        return true;
     }
     #endregion
 
@@ -570,7 +624,7 @@ public class ArbeitController : MonoBehaviour
     }
 
     /// <summary>
-    /// 대기 위치 업데이트 (다른 알바가 제거되었을 때 호출)
+    /// 대기 위치 업데이트 (다른 알바가 제거되었을 때 호출됨)
     /// </summary>
     public void UpdateWaitingPosition(int newPosition)
     {
@@ -586,6 +640,72 @@ public class ArbeitController : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region 대화 대기열 관리
+    /// <summary>
+    /// 대화 대기열에 추가 (String 버전)
+    /// </summary>
+    public void AddToDialogQueue(TaskInfo task, Vector2? panelSize, int startIndex, string replacementName, string portraitName)
+    {
+        dialogQueue.Enqueue(new DialogQueueItem
+        {
+            task = task,
+            panelSize = panelSize,
+            startIndex = startIndex,
+            replacementName = replacementName,
+            portraitName = portraitName,
+            useSprite = false
+        });
+    }
+
+    /// <summary>
+    /// 대화 대기열에 추가 (Sprite 버전)
+    /// </summary>
+    public void AddToDialogQueue(TaskInfo task, Vector2? panelSize, int startIndex, string replacementName, Sprite portraitSprite)
+    {
+        dialogQueue.Enqueue(new DialogQueueItem
+        {
+            task = task,
+            panelSize = panelSize,
+            startIndex = startIndex,
+            replacementName = replacementName,
+            portraitSprite = portraitSprite,
+            useSprite = true
+        });
+    }
+
+    /// <summary>
+    /// 대화 대기열에 항목이 있는지 확인
+    /// </summary>
+    public bool HasDialogInQueue()
+    {
+        return dialogQueue.Count > 0;
+    }
+
+    /// <summary>
+    /// 다음 대화 처리
+    /// </summary>
+    public void ProcessNextDialog()
+    {
+        if (dialogQueue.Count == 0)
+        {
+            return;
+        }
+
+        DialogQueueItem item = dialogQueue.Dequeue();
+
+        if (item.useSprite)
+        {
+            OrderingManager.Instance.OpenDialog(this.gameObject, item.task, item.panelSize, item.startIndex, item.replacementName, item.portraitSprite);
+        }
+        else
+        {
+            OrderingManager.Instance.OpenDialog(this.gameObject, item.task, item.panelSize, item.startIndex, item.replacementName, item.portraitName);
+        }
+    }
+    #endregion
+
     private void OnDestroy()
     {
         // 대기 타겟 오브젝트 제거
@@ -600,5 +720,4 @@ public class ArbeitController : MonoBehaviour
             arbeitPoint.RemoveFromWaitingLine(this.gameObject);
         }
     }
-    #endregion
 }
