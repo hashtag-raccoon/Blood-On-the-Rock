@@ -15,6 +15,7 @@ MonoBehaviour:
   RecipeId: 0
   CocktailId: 0
   Technique: 1
-  CocktailName: Sample
+  CocktailName: Q
   Description: Sample
   RecipeOrder: Sample
+  isUnlock: 0

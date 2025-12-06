@@ -14,6 +14,7 @@ public class CocktailSystem : MonoBehaviour
 
     private int selectedTechnique = -1; // -1 = 미선택
     private int selectedGlassId = -1;   // -1 = 미선택
+    private int selectedTool = -1;      // -1 = 미선택, 0 = 쉐이커, 1 = 바스푼
 
     public void Awake()
     {
@@ -45,6 +46,14 @@ public class CocktailSystem : MonoBehaviour
     }
 
     /// <summary>
+    /// UI에서 사용자가 선택한 도구를 설정합니다.
+    /// </summary>
+    public void SetSelectedTool(int toolId)
+    {
+        selectedTool = toolId;
+    }
+
+    /// <summary>
     /// UI에서 사용자가 추가한 재료를 저장합니다.
     /// </summary>
     public void AddIngredient(int ingredientId, Ingridiant ingredient)
@@ -60,6 +69,35 @@ public class CocktailSystem : MonoBehaviour
         Ingridiants.Clear();
         selectedTechnique = -1;
         selectedGlassId = -1;
+        selectedTool = -1;
+    }
+
+    /// <summary>
+    /// 선택된 도구가 레시피의 기법과 호환되는지 확인합니다.
+    /// </summary>
+    /// <param name="recipeTechnique">레시피의 기법 (0=Build, 1=Floating, 2=Shaking)</param>
+    /// <returns>호환 여부</returns>
+    public bool IsToolCompatibleWithTechnique(int recipeTechnique)
+    {
+        if (selectedTool == -1)
+        {
+            Debug.LogWarning("도구가 선택되지 않았습니다.");
+            return false;
+        }
+
+        // Shaker (0) → Shaking(2)만 가능
+        if (selectedTool == 0)
+        {
+            return recipeTechnique == 2;
+        }
+
+        // BarSpoon (1) → Build(0) 또는 Floating(1) 가능
+        if (selectedTool == 1)
+        {
+            return recipeTechnique == 0 || recipeTechnique == 1;
+        }
+
+        return false;
     }
     #endregion
 

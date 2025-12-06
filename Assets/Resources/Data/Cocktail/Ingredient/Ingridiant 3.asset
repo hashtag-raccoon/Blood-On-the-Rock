@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ingridiant 3
   m_EditorClassIdentifier: 
   Ingridiant_id: 3
-  Ingridiant_name: Sample
-  Ingridiant_type: Sample
+  Ingridiant_name: Ice
+  Ingridiant_type: Ice
   Description: Sample
   Icon: {fileID: 21300000, guid: 5d9ba4e7d0964044ea54abe409d81dfd, type: 3}

@@ -11,6 +11,7 @@ public class JsonDataHandler
     private readonly string constructedBuildingProductionPath;
     private readonly string BuildingPositonPath;
     private readonly string cocktailProgressPath;
+    private readonly string glassProgressPath;
 
     public JsonDataHandler()
     {
@@ -19,6 +20,7 @@ public class JsonDataHandler
         constructedBuildingProductionPath = Path.Combine(Application.persistentDataPath, "ConstructedBuildingProduction.json");
         BuildingPositonPath = Path.Combine(Application.persistentDataPath, "BuildingPosition.json");
         cocktailProgressPath = Path.Combine(Application.persistentDataPath, "CocktailProgress.json");
+        glassProgressPath = Path.Combine(Application.persistentDataPath, "GlassProgress.json");
     }
 
     public void InitializeFiles()
@@ -27,6 +29,7 @@ public class JsonDataHandler
         CreateFileIfNotExists(constructedBuildingProductionPath);
         CreateFileIfNotExists(BuildingPositonPath);
         CreateFileIfNotExists(cocktailProgressPath);
+        CreateFileIfNotExists(glassProgressPath);
     }
 
     private void CreateFileIfNotExists(string path)
@@ -235,9 +238,76 @@ public class JsonDataHandler
             return new CocktailProgressData();
         }
 
-        string jsonData = File.ReadAllText(cocktailProgressPath);
-        CocktailProgressData progressData = JsonConvert.DeserializeObject<CocktailProgressData>(jsonData);
-        return progressData ?? new CocktailProgressData();
+        try
+        {
+            string jsonData = File.ReadAllText(cocktailProgressPath);
+
+            // 빈 배열이거나 잘못된 형식인 경우 기본값 반환
+            if (string.IsNullOrWhiteSpace(jsonData) || jsonData.Trim() == "[]")
+            {
+                Debug.LogWarning("CocktailProgress.json이 빈 배열이거나 잘못된 형식입니다. 기본값으로 초기화합니다.");
+                return new CocktailProgressData();
+            }
+
+            CocktailProgressData progressData = JsonConvert.DeserializeObject<CocktailProgressData>(jsonData);
+            return progressData ?? new CocktailProgressData();
+        }
+        catch (JsonException ex)
+        {
+            Debug.LogWarning($"CocktailProgress.json 역직렬화 실패: {ex.Message}. 기본값으로 초기화합니다.");
+            return new CocktailProgressData();
+        }
+    }
+
+    #endregion
+
+    #region Glass Progress
+
+    /// <summary>
+    /// 잔 소유 정보를 저장
+    /// </summary>
+    public void SaveGlassProgress(List<int> ownedGlassIds)
+    {
+        var progressData = new GlassProgressData
+        {
+            ownedGlassIds = ownedGlassIds
+        };
+
+        string jsonData = JsonConvert.SerializeObject(progressData, Formatting.Indented);
+        File.WriteAllText(glassProgressPath, jsonData);
+        Debug.Log($"GlassProgress 데이터를 저장했습니다. 소유 잔: {ownedGlassIds.Count}개");
+    }
+
+    /// <summary>
+    /// 잔 소유 정보를 로드
+    /// </summary>
+    public GlassProgressData LoadGlassProgress()
+    {
+        if (!File.Exists(glassProgressPath))
+        {
+            Debug.LogWarning($"{glassProgressPath} 파일이 존재하지 않습니다. 기본값을 반환합니다.");
+            return new GlassProgressData();
+        }
+
+        try
+        {
+            string jsonData = File.ReadAllText(glassProgressPath);
+
+            // 빈 배열이거나 잘못된 형식인 경우 기본값 반환
+            if (string.IsNullOrWhiteSpace(jsonData) || jsonData.Trim() == "[]")
+            {
+                Debug.LogWarning("GlassProgress.json이 빈 배열이거나 잘못된 형식입니다. 기본값으로 초기화합니다.");
+                return new GlassProgressData();
+            }
+
+            GlassProgressData progressData = JsonConvert.DeserializeObject<GlassProgressData>(jsonData);
+            return progressData ?? new GlassProgressData();
+        }
+        catch (JsonException ex)
+        {
+            Debug.LogWarning($"GlassProgress.json 역직렬화 실패: {ex.Message}. 기본값으로 초기화합니다.");
+            return new GlassProgressData();
+        }
     }
 
     #endregion
@@ -250,4 +320,13 @@ public class JsonDataHandler
 public class CocktailProgressData
 {
     public List<int> unlockedRecipeIds = new List<int>();
+}
+
+/// <summary>
+/// 잔 소유 정보를 저장하기 위한 데이터 클래스
+/// </summary>
+[Serializable]
+public class GlassProgressData
+{
+    public List<int> ownedGlassIds = new List<int>();
 }

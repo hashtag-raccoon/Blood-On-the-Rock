@@ -87,6 +87,21 @@ public class TechniqueSelectionUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 외부에서 기법을 자동으로 설정합니다 (ToolSelectionUI에서 호출)
+    /// </summary>
+    /// <param name="techniqueId">설정할 기법 ID (0=Build, 1=Floating, 2=Shaking)</param>
+    public void SetTechnique(int techniqueId)
+    {
+        if (techniqueId < 0 || techniqueId > 2)
+        {
+            Debug.LogWarning($"잘못된 기법 ID: {techniqueId}");
+            return;
+        }
+
+        SelectTechnique(techniqueId);
+    }
+
     public void ResetSelection()
     {
         selectedTechnique = -1;

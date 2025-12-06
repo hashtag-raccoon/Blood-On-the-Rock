@@ -54,11 +54,36 @@ public class CocktailRepository : MonoBehaviour, IRepository
         DataManager.Instance.RegisterRepository(this);
     }
 
+    /// <summary>
+    /// IRepository 인터페이스 구현 - 기본 초기화 (빈 해금 목록)
+    /// </summary>
     public void Initialize()
+    {
+        Initialize(new List<int>());
+    }
+
+    /// <summary>
+    /// CocktailRepository 초기화 (DataManager로부터 해금 레시피 데이터 전달받음)
+    /// </summary>
+    /// <param name="unlockedRecipeIds">DataManager가 JSON에서 로드한 해금 레시피 ID 목록</param>
+    public void Initialize(List<int> unlockedRecipeIds)
     {
         InitializeDictionaries();
         CreateOrderedCocktailsList();
-        LoadUnlockedRecipes();
+
+        // DataManager로부터 전달받은 해금 레시피 데이터 사용
+        _unlockedRecipeIds.Clear();
+        if (unlockedRecipeIds != null && unlockedRecipeIds.Count > 0)
+        {
+            _unlockedRecipeIds.AddRange(unlockedRecipeIds);
+            Debug.Log($"저장된 레시피 {_unlockedRecipeIds.Count}개를 로드했습니다.");
+        }
+        else
+        {
+            // JSON이 없거나 비어있으면 기본 레시피 3개 자동 해금
+            LoadDefaultRecipes();
+        }
+
         IsInitialized = true;
         Debug.Log("CocktailRepository 초기화 완료.");
     }
@@ -131,15 +156,10 @@ public class CocktailRepository : MonoBehaviour, IRepository
     #region 레시피 해금 시스템
 
     /// <summary>
-    /// 저장된 해금 레시피 정보를 로드합니다.
-    /// JSON 파일이 없으면 기본 레시피 3개를 자동으로 해금합니다.
+    /// 기본 레시피 3개를 자동으로 해금합니다.
     /// </summary>
-    private void LoadUnlockedRecipes()
+    private void LoadDefaultRecipes()
     {
-        _unlockedRecipeIds.Clear();
-
-        // JsonDataHandler를 통해 저장된 해금 정보 로드 (Phase 3에서 구현)
-        // 현재는 기본 레시피 자동 해금
         if (_cocktailDataDict.Count > 0)
         {
             int count = 0;

@@ -10,8 +10,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Glass", menuName = "Cocktail/Glass", order = 1)]
 public class Glass : ScriptableObject
 {
-    public int Glass_id { get; private set; }
-    public string Glass_name { get; private set; }
-    public string Description { get; private set; }
-    public Sprite Icon { get; private set; }
+    [SerializeField] public int Glass_id;
+    [SerializeField] public string Glass_name;
+    [SerializeField] public string Description;
+    [SerializeField] public Sprite Icon;
 }

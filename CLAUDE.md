@@ -93,6 +93,22 @@ Repositories under [Assets/Scripts/Merge/Repository/](Assets/Scripts/Merge/Repos
 - ResourceRepository
 
 #### 3. ScriptableObject Data Containers
+
+> **⚠️ IMPORTANT: Serialization Issue**
+> 
+> ScriptableObject와 Serializable 클래스의 필드는 반드시 `public` 필드 또는 `[SerializeField]`로 선언해야 합니다.
+> `{ get; private set; }` 프로퍼티는 Unity Inspector에서 값을 설정할 수 없어 null이 됩니다.
+> 
+> **❌ 잘못된 예:**
+> ```csharp
+> public Sprite Icon { get; private set; } // Inspector에서 설정 불가!
+> ```
+> 
+> **✅ 올바른 예:**
+> ```csharp
+> [SerializeField] public Sprite Icon; // Inspector에서 설정 가능
+> ```
+
 Static game data is defined using ScriptableObjects with `[CreateAssetMenu]`:
 
 ```csharp
@@ -109,7 +125,27 @@ Examples in [Assets/Scripts/Merge/Datable/ScriptableObject/](Assets/Scripts/Merg
 - PersonalityDataSO - NPC personality data
 - CocktailDataSO - Cocktail recipes
 
-#### 4. Inspector Serialization
+#### 4. UI Event Pattern (Selection Events)
+UI 선택 이벤트는 `System.Action<T>` 이벤트를 사용하여 구현합니다:
+
+```csharp
+// GlassSelectionUI.cs 패턴 예시
+public class GlassSelectionUI : MonoBehaviour
+{
+    public event System.Action<Glass> OnGlassSelectedEvent;
+
+    private void OnGlassSelected(int glassId)
+    {
+        Glass glass = GlassRepository.Instance.GetGlassById(glassId);
+        OnGlassSelectedEvent?.Invoke(glass);
+    }
+}
+
+// CocktailMakingUI.cs에서 구독
+glassSelectionUI.OnGlassSelectedEvent += OnGlassSelectedInUI;
+```
+
+#### 5. Inspector Serialization
 For complex types like dictionaries in the Unity Inspector, use [SerializableDictionary](Assets/Scripts/Yoon/SerializableDictionary.cs):
 
 ```csharp
@@ -119,14 +155,12 @@ using Sherbert.Framework.Generic;
 public class StringIntDictionary : SerializableDictionary<string, int> { }
 ```
 
-This allows dictionaries to be edited in the Unity Inspector.
-
 ### Data Flow
 
 1. **Static Data**: ScriptableObjects → Repositories (loaded on Initialize)
 2. **Runtime Data**: DataManager holds live game state (resources, buildings, NPCs, cocktails)
 3. **Save/Load**: JSON files in `Assets/Scripts/Merge/Datable/Json/` using Newtonsoft.Json
-4. **UI Updates**: Managers notify UI components directly (no event system)
+4. **UI Updates**: Managers notify UI components directly (event system)
 
 ## Key Systems
 
@@ -143,6 +177,17 @@ This allows dictionaries to be edited in the Unity Inspector.
 - Dialogue system with DialogueManager and DialogueUI
 - Table assignment via TableManager
 
+### Cocktail Making System
+칵테일 제작 시스템의 주요 컴포넌트:
+
+- [CocktailMakingUI](Assets/Scripts/Raccoon/Manager/CocktailMakingUI.cs) - 메인 UI 관리
+- [IngredientSelectionUI](Assets/Scripts/Merge/UI/IngredientSelectionUI.cs) - 재료 선택
+- [GlassSelectionUI](Assets/Scripts/Merge/UI/GlassSelectionUI.cs) - 잔 선택
+- [TechniqueSelectionUI](Assets/Scripts/Merge/UI/TechniqueSelectionUI.cs) - 기법 선택
+- [ToolSelectionUI](Assets/Scripts/Merge/UI/ToolSelectionUI.cs) - 도구 선택
+- [CocktailSystem](Assets/Scripts/Yoon/CocktailSystem.cs) - 점수 계산 및 검증
+- [DraggableIngredient](Assets/Scripts/Yoon/DraggableIngredient.cs) - 드래그 가능 재료 UI
+
 ### Character Animation
 Managed by [AnimationManager](Assets/Scripts/Hyunjae/AnimationManager.cs), with rigging helpers in [Assets/Scripts/Merge/Character/](Assets/Scripts/Merge/Character/)
 
@@ -150,9 +195,16 @@ Managed by [AnimationManager](Assets/Scripts/Hyunjae/AnimationManager.cs), with 
 
 ### When Adding New Data Types
 1. Define data class in appropriate `Datable/` folder
-2. Create ScriptableObject wrapper with `[CreateAssetMenu]`
-3. Add repository if complex query logic is needed
-4. Create sample asset in Unity Editor to verify Inspector functionality
+2. **Use `public` fields or `[SerializeField]` - NOT `{ get; private set; }`**
+3. Create ScriptableObject wrapper with `[CreateAssetMenu]`
+4. Add repository if complex query logic is needed
+5. Create sample asset in Unity Editor to verify Inspector functionality
+
+### When Adding UI Selection Features
+1. 기존 패턴 재활용 (GlassSelectionUI 참고)
+2. `event System.Action<DataType>` 이벤트 선언
+3. 선택 메서드에서 이벤트 발생: `OnSelectedEvent?.Invoke(data)`
+4. CocktailMakingUI에서 구독 및 처리
 
 ### When Modifying Runtime Logic
 - Check if manager is singleton with `DontDestroyOnLoad` - changes persist across scenes
@@ -201,6 +253,18 @@ var buildingData = BuildingRepository.Instance.GetBuildingById(buildingId);
 ### Creating UI Elements
 Use TextMeshProUGUI for all text. UI scripts typically in `UI/` subdirectories of each namespace.
 
+### Draggable UI Elements
+드래그 가능한 UI 요소 구현 시 [DraggableIngredient.cs](Assets/Scripts/Yoon/DraggableIngredient.cs) 참고:
+
+```csharp
+public class DraggableElement : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+{
+    public void OnBeginDrag(PointerEventData eventData) { /* ... */ }
+    public void OnDrag(PointerEventData eventData) { /* ... */ }
+    public void OnEndDrag(PointerEventData eventData) { /* ... */ }
+}
+```
+
 ### Temporary/Work-in-Progress Code
 Some folders contain `(임시파일)` (temporary files) - avoid refactoring these without team discussion.
 
@@ -211,3 +275,6 @@ Some folders contain `(임시파일)` (temporary files) - avoid refactoring thes
 - [SerializableDictionary.cs](Assets/Scripts/Yoon/SerializableDictionary.cs) - Inspector serialization pattern
 - [BuildingDataSO.cs](Assets/Scripts/Merge/Datable/ScriptableObject/BuildingDataSO.cs) - ScriptableObject pattern
 - [IRepository.cs](Assets/Scripts/Merge/Repository/IRepository.cs) - Repository interface
+- [GlassSelectionUI.cs](Assets/Scripts/Merge/UI/GlassSelectionUI.cs) - UI event pattern example
+- [DraggableIngredient.cs](Assets/Scripts/Yoon/DraggableIngredient.cs) - Draggable UI pattern
+

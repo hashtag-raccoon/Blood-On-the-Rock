@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ingridiant 2
   m_EditorClassIdentifier: 
   Ingridiant_id: 2
-  Ingridiant_name: Sample
-  Ingridiant_type: Sample
+  Ingridiant_name: Drink
+  Ingridiant_type: Drink
   Description: Sample
-  Icon: {fileID: 21300000, guid: 5d9ba4e7d0964044ea54abe409d81dfd, type: 3}
+  Icon: {fileID: 21300000, guid: da7129ed6a246f048a49d8d97de2d2d4, type: 3}

@@ -25,10 +25,10 @@ public class GlassSelectionUI : MonoBehaviour
     {
         ClearGlasses();
 
-        // GlassRepository에서 사용 가능한 잔 목록 가져오기
+        // GlassRepository에서 소유한 잔 목록만 가져오기
         if (GlassRepository.Instance != null)
         {
-            var glasses = GlassRepository.Instance.GetAllGlasses();
+            var glasses = GlassRepository.Instance.GetOwnedGlasses();
             foreach (var glass in glasses)
             {
                 CreateGlassButton(glass);
@@ -50,11 +50,37 @@ public class GlassSelectionUI : MonoBehaviour
             btn.onClick.AddListener(() => OnGlassSelected(glassData.Glass_id));
         }
 
-        // 잔 정보 표시
-        Image icon = button.GetComponentInChildren<Image>();
+        // 잔 아이콘 표시 - "Icon"이라는 이름의 자식 오브젝트를 먼저 찾기
+        Image icon = null;
+        Transform iconTransform = button.transform.Find("Icon");
+        if (iconTransform != null)
+        {
+            icon = iconTransform.GetComponent<Image>();
+        }
+
+        // "Icon" 이름의 오브젝트가 없으면 자식들 중에서 버튼 자신이 아닌 Image 찾기
+        if (icon == null)
+        {
+            Image[] images = button.GetComponentsInChildren<Image>();
+            foreach (var img in images)
+            {
+                // 버튼 자체의 Image가 아닌 자식 Image 찾기
+                if (img.gameObject != button)
+                {
+                    icon = img;
+                    break;
+                }
+            }
+        }
+
         if (icon != null && glassData.Icon != null)
         {
             icon.sprite = glassData.Icon;
+            Debug.Log($"잔 아이콘 설정됨: {glassData.Glass_name}");
+        }
+        else if (glassData.Icon == null)
+        {
+            Debug.LogWarning($"잔 '{glassData.Glass_name}'의 Icon이 null입니다. ScriptableObject에서 Icon을 할당해주세요.");
         }
 
         TextMeshProUGUI nameText = button.GetComponentInChildren<TextMeshProUGUI>();
@@ -64,11 +90,23 @@ public class GlassSelectionUI : MonoBehaviour
         }
     }
 
+    public event System.Action<Glass> OnGlassSelectedEvent;
+
     private void OnGlassSelected(int glassId)
     {
         selectedGlassId = glassId;
         cocktailSystem.SetSelectedGlass(glassId);
         Debug.Log($"잔 선택: ID {glassId}");
+
+        // 선택된 잔 정보를 이벤트로 알림
+        if (GlassRepository.Instance != null)
+        {
+            Glass glass = GlassRepository.Instance.GetGlassById(glassId);
+            if (glass != null)
+            {
+                OnGlassSelectedEvent?.Invoke(glass);
+            }
+        }
     }
 
     private void ClearGlasses()

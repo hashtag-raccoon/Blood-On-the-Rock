@@ -58,6 +58,10 @@ public class DataManager : MonoBehaviour
     [SerializeField] public List<OrderedCocktail> OrderedCocktails = new List<OrderedCocktail>();
     [SerializeField] public List<ConstructedBuilding> EditMode_InventoryBuildings = new List<ConstructedBuilding>();
     [SerializeField] public List<InteriorData> InteriorDatas = new List<InteriorData>();
+
+    // JSON에서 로드된 진행 상황 데이터
+    private List<int> ownedGlassIds = new List<int>();  // 잔 소유 정보
+    private List<int> unlockedRecipeIds = new List<int>();  // 칵테일 레시피 해금 정보
     #endregion
 
     #region Game Resources
@@ -97,8 +101,18 @@ public class DataManager : MonoBehaviour
         // Repository 초기화
         foreach (var repo in _repositories)
         {
+            // CocktailRepository - 해금 레시피 데이터 전달
+            if (repo is CocktailRepository cocktailRepo)
+            {
+                cocktailRepo.Initialize(unlockedRecipeIds);
+            }
+            // GlassRepository - 잔 소유 데이터 전달
+            else if (repo is GlassRepository glassRepo)
+            {
+                glassRepo.Initialize(ownedGlassIds);
+            }
             // BuildingRepository와 같이 특별한 데이터가 필요한 경우
-            if (repo is BuildingRepository buildingRepo)
+            else if (repo is BuildingRepository buildingRepo)
             {
                 buildingRepo.Initialize(ConstructedBuildingProductions, ConstructedBuildingPositions);
             }
@@ -128,6 +142,7 @@ public class DataManager : MonoBehaviour
         UpdateConstructedBuildingPositionsFromConstructedBuildings();
         UpdateAndSaveArbeitData();
         SaveCocktailProgress();
+        SaveGlassProgress();
         SaveConstructedBuildingProductions();
         SaveConstructedBuidlingPositions();
     }
@@ -175,6 +190,32 @@ public class DataManager : MonoBehaviour
 
         ConstructedBuildingPositions = jsonDataHandler.LoadBuildingPositions();
         Debug.Log($"ConstructedBuildingPositions {ConstructedBuildingPositions.Count}개를 JSON에서 로드했습니다.");
+
+        // 잔 소유 정보 로드
+        var glassProgressData = jsonDataHandler.LoadGlassProgress();
+        if (glassProgressData != null && glassProgressData.ownedGlassIds != null)
+        {
+            ownedGlassIds = glassProgressData.ownedGlassIds;
+            Debug.Log($"OwnedGlassIds {ownedGlassIds.Count}개를 JSON에서 로드했습니다.");
+        }
+        else
+        {
+            ownedGlassIds = new List<int>();
+            Debug.Log("잔 소유 정보가 없습니다. 기본값으로 초기화합니다.");
+        }
+
+        // 칵테일 레시피 해금 정보 로드
+        var cocktailProgressData = jsonDataHandler.LoadCocktailProgress();
+        if (cocktailProgressData != null && cocktailProgressData.unlockedRecipeIds != null)
+        {
+            unlockedRecipeIds = cocktailProgressData.unlockedRecipeIds;
+            Debug.Log($"UnlockedRecipeIds {unlockedRecipeIds.Count}개를 JSON에서 로드했습니다.");
+        }
+        else
+        {
+            unlockedRecipeIds = new List<int>();
+            Debug.Log("칵테일 해금 정보가 없습니다. 기본값으로 초기화합니다.");
+        }
     }
     #endregion
 
@@ -385,6 +426,17 @@ public class DataManager : MonoBehaviour
 
         List<int> unlockedRecipeIds = CocktailRepository.Instance.GetUnlockedRecipeIds();
         jsonDataHandler.SaveCocktailProgress(unlockedRecipeIds);
+    }
+
+    /// <summary>
+    /// 잔 소유 정보를 JSON 파일에 저장합니다.
+    /// </summary>
+    private void SaveGlassProgress()
+    {
+        if (GlassRepository.Instance == null) return;
+
+        List<int> ownedGlassIds = GlassRepository.Instance.GetOwnedGlassIds();
+        jsonDataHandler.SaveGlassProgress(ownedGlassIds);
     }
     #endregion
 

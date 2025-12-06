@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: IngridiantSO
   m_EditorClassIdentifier: 
   ingridiants_Alchol:
-  - {fileID: 11400000, guid: 5d5e3a0c18d8fa54bbfbc9af12af15d1, type: 2}
+  - {fileID: 11400000, guid: 4c74b0870490021468ffce884133a4bb, type: 2}
   ingridiants_Drink:
   - {fileID: 11400000, guid: 97e8372dbdeb27949823a6145cf948c9, type: 2}
   ingridiants_Ice:
-  - {fileID: 11400000, guid: 4c74b0870490021468ffce884133a4bb, type: 2}
+  - {fileID: 11400000, guid: 5d5e3a0c18d8fa54bbfbc9af12af15d1, type: 2}
   ingridiants_Garnish:
   - {fileID: 11400000, guid: 3f7b2e3ba583b654692dd17dbd470cac, type: 2}

@@ -27,18 +27,38 @@ public class CocktailMakingUI : MonoBehaviour
     [Header("Crafting UI")]
     [SerializeField] private TextMeshProUGUI craftingCocktailNameText; // 제작 중인 칵테일 이름 표시
     [SerializeField] private Button backButton; // 주문 목록으로 돌아가기 버튼
+    [SerializeField] private Button nextStepButton; // 다음 단계 버튼
     [SerializeField] private Button completeButton; // 제작 완료 버튼
+    [SerializeField] private Image selectedGlassDisplayImage; // 선택된 잔을 표시할 이미지 (Table 위)
 
     [Header("Crafting Sub-UIs")]
     [SerializeField] private IngredientSelectionUI ingredientSelectionUI; // 재료 선택 UI
     [SerializeField] private TechniqueSelectionUI techniqueSelectionUI; // 기법 선택 UI (Build/Floating/Shaking)
     [SerializeField] private GlassSelectionUI glassSelectionUI; // 잔 선택 UI
+    [SerializeField] private ToolSelectionUI toolSelectionUI; // 도구 선택 UI (쉐이커/바스푼)
+
+    [Header("Toast Message UI")]
+    [SerializeField] private ToastMessageUI toastMessageUI; // 토스트 메시지 UI
+
+    [Header("Table Ingredient Display")]
+    [SerializeField] private Transform tableIngredientArea; // 테이블 위 재료 표시 영역
+    [SerializeField] private GameObject draggableIngredientPrefab; // 드래그 가능 재료 프리팹
 
     // ========== 내부 변수들 ==========
 
     private List<GameObject> instantiatedOrderItems = new List<GameObject>(); // 생성된 주문 아이템 UI 목록 (메모리 관리용)
+    private List<GameObject> instantiatedTableIngredients = new List<GameObject>(); // 테이블 위 재료 UI 목록
     private CocktailRecipeScript currentCraftingRecipe; // 현재 제작 중인 칵테일 레시피
     private CocktailSystem cocktailSystem; // 칵테일 검증 시스템 (점수 계산)
+
+    // 제작 단계 관리
+    private enum CraftingStep
+    {
+        ToolSelection = 0,    // 1단계: 도구 선택
+        GlassSelection = 1,   // 2단계: 잔 선택
+        IngredientSelection = 2 // 3단계: 재료 선택
+    }
+    private CraftingStep currentStep = CraftingStep.ToolSelection;
 
     /// <summary>
     /// 초기화: CocktailSystem 찾기, 버튼 이벤트 등록, 서브 UI 초기화
@@ -60,6 +80,12 @@ public class CocktailMakingUI : MonoBehaviour
             backButton.onClick.AddListener(ShowOrderListView);
         }
 
+        // "다음 단계" 버튼 클릭 시 다음 제작 단계로 이동
+        if (nextStepButton != null)
+        {
+            nextStepButton.onClick.AddListener(OnNextStepClicked);
+        }
+
         // "제작 완료" 버튼 클릭 시 칵테일 검증 및 완료 처리
         if (completeButton != null)
         {
@@ -68,13 +94,22 @@ public class CocktailMakingUI : MonoBehaviour
 
         // 서브 UI들에게 CocktailSystem 전달 (재료/기법/잔 선택 시 CocktailSystem에 저장)
         if (ingredientSelectionUI != null)
+        {
             ingredientSelectionUI.Initialize(cocktailSystem);
+            ingredientSelectionUI.OnIngredientSelectedEvent += OnIngredientSelectedInUI;
+        }
 
         if (techniqueSelectionUI != null)
             techniqueSelectionUI.Initialize(cocktailSystem);
 
         if (glassSelectionUI != null)
+        {
             glassSelectionUI.Initialize(cocktailSystem);
+            glassSelectionUI.OnGlassSelectedEvent += OnGlassSelectedInUI;
+        }
+
+        if (toolSelectionUI != null)
+            toolSelectionUI.Initialize(cocktailSystem, techniqueSelectionUI);
 
         // [FIX] 주문 목록 UI 겹침 문제 해결을 위한 레이아웃 컴포넌트 자동 설정
         if (orderListContent != null)
@@ -292,7 +327,7 @@ public class CocktailMakingUI : MonoBehaviour
     /// 제작 화면 초기화
     /// - 제작할 칵테일 이름 표시
     /// - 이전에 선택한 재료/기법/잔 초기화
-    /// - 재료/기법/잔 선택 UI 표시
+    /// - 1단계(도구 선택)부터 시작
     /// </summary>
     private void InitializeCraftingView()
     {
@@ -306,6 +341,9 @@ public class CocktailMakingUI : MonoBehaviour
 
         // CocktailSystem 초기화 (이전에 선택한 재료/기법/잔 모두 제거)
         cocktailSystem.ClearIngredients();
+
+        // 테이블 위 재료 초기화 (이전 제작 시 추가된 재료 제거)
+        ClearTableIngredients();
 
         // 재료 선택 UI 초기화 (사용 가능한 재료 목록 표시)
         if (ingredientSelectionUI != null)
@@ -321,6 +359,82 @@ public class CocktailMakingUI : MonoBehaviour
             glassSelectionUI.ShowAvailableGlasses();
             glassSelectionUI.ResetSelection();
         }
+
+        // 선택된 잔 이미지 초기화 (숨김)
+        if (selectedGlassDisplayImage != null)
+        {
+            selectedGlassDisplayImage.gameObject.SetActive(false);
+            selectedGlassDisplayImage.sprite = null;
+        }
+
+        // 도구 선택 UI 초기화 (쉐이커/바스푼 선택 해제)
+        if (toolSelectionUI != null)
+        {
+            toolSelectionUI.SetCurrentRecipe(currentCraftingRecipe);
+            toolSelectionUI.ResetSelection();
+        }
+
+        // 1단계(도구 선택)부터 시작
+        currentStep = CraftingStep.ToolSelection;
+        ShowCraftingStep(currentStep);
+    }
+
+    /// <summary>
+    /// 현재 제작 단계에 맞는 패널을 표시합니다.
+    /// </summary>
+    private void ShowCraftingStep(CraftingStep step)
+    {
+        // 모든 단계 패널 비활성화
+        if (toolSelectionUI != null) toolSelectionUI.gameObject.SetActive(false);
+        if (glassSelectionUI != null) glassSelectionUI.gameObject.SetActive(false);
+        if (ingredientSelectionUI != null) ingredientSelectionUI.gameObject.SetActive(false);
+
+        // 현재 단계 패널만 활성화
+        switch (step)
+        {
+            case CraftingStep.ToolSelection:
+                if (toolSelectionUI != null) toolSelectionUI.gameObject.SetActive(true);
+                // 다음 단계 버튼 표시, 완료 버튼 숨김
+                if (nextStepButton != null) nextStepButton.gameObject.SetActive(true);
+                if (completeButton != null) completeButton.gameObject.SetActive(false);
+                break;
+
+            case CraftingStep.GlassSelection:
+                if (glassSelectionUI != null) glassSelectionUI.gameObject.SetActive(true);
+                // 다음 단계 버튼 표시, 완료 버튼 숨김
+                if (nextStepButton != null) nextStepButton.gameObject.SetActive(true);
+                if (completeButton != null) completeButton.gameObject.SetActive(false);
+                break;
+
+            case CraftingStep.IngredientSelection:
+                if (ingredientSelectionUI != null) ingredientSelectionUI.gameObject.SetActive(true);
+                // 다음 단계 버튼 숨김, 완료 버튼 표시
+                if (nextStepButton != null) nextStepButton.gameObject.SetActive(false);
+                if (completeButton != null) completeButton.gameObject.SetActive(true);
+                break;
+        }
+
+        Debug.Log($"제작 단계 전환: {step}");
+    }
+
+    /// <summary>
+    /// "다음 단계" 버튼 클릭 시 호출
+    /// </summary>
+    private void OnNextStepClicked()
+    {
+        // 다음 단계로 이동
+        switch (currentStep)
+        {
+            case CraftingStep.ToolSelection:
+                currentStep = CraftingStep.GlassSelection;
+                break;
+
+            case CraftingStep.GlassSelection:
+                currentStep = CraftingStep.IngredientSelection;
+                break;
+        }
+
+        ShowCraftingStep(currentStep);
     }
 
     /// <summary>
@@ -332,6 +446,20 @@ public class CocktailMakingUI : MonoBehaviour
     private void OnCompleteCraftingClicked()
     {
         if (currentCraftingRecipe == null) return;
+
+        // 도구 검증: 선택한 도구가 레시피의 기법과 호환되는지 확인
+        if (!cocktailSystem.IsToolCompatibleWithTechnique(currentCraftingRecipe.Technique))
+        {
+            if (toastMessageUI != null)
+            {
+                toastMessageUI.ShowToast("해당 레시피와 맞지 않는 기법입니다");
+            }
+            else
+            {
+                Debug.LogWarning("ToastMessageUI가 할당되지 않았습니다.");
+            }
+            return; // 검증 실패 시 제작 중단
+        }
 
         // CocktailRepository에서 칵테일 데이터 가져오기 (성공 기준 점수 확인용)
         CocktailData cocktailData = CocktailRepository.Instance.GetCocktailDataById(currentCraftingRecipe.CocktailId);
@@ -359,6 +487,67 @@ public class CocktailMakingUI : MonoBehaviour
     }
 
     /// <summary>
+    /// GlassSelectionUI에서 잔이 선택되었을 때 호출됨
+    /// </summary>
+    /// <param name="glass">선택된 잔 데이터</param>
+    private void OnGlassSelectedInUI(Glass glass)
+    {
+        if (selectedGlassDisplayImage != null && glass != null)
+        {
+            selectedGlassDisplayImage.sprite = glass.Icon;
+            selectedGlassDisplayImage.gameObject.SetActive(true);
+
+            // Native Size로 설정하여 비율 유지 (필요 시)
+            selectedGlassDisplayImage.SetNativeSize();
+        }
+    }
+
+    /// <summary>
+    /// IngredientSelectionUI에서 재료가 선택되었을 때 호출됨
+    /// </summary>
+    /// <param name="ingredient">선택된 재료 데이터</param>
+    private void OnIngredientSelectedInUI(Ingridiant ingredient)
+    {
+        if (ingredient != null)
+        {
+            CreateDraggableIngredient(ingredient);
+        }
+    }
+
+    /// <summary>
+    /// 테이블 위에 드래그 가능한 재료 아이콘을 생성합니다.
+    /// </summary>
+    /// <param name="ingredient">표시할 재료 데이터</param>
+    private void CreateDraggableIngredient(Ingridiant ingredient)
+    {
+        if (draggableIngredientPrefab == null || tableIngredientArea == null) return;
+
+        GameObject ingredientObj = Instantiate(draggableIngredientPrefab, tableIngredientArea);
+        instantiatedTableIngredients.Add(ingredientObj);
+
+        // DraggableIngredient 컴포넌트에 재료 데이터 전달
+        var draggable = ingredientObj.GetComponent<DraggableIngredient>();
+        if (draggable != null)
+        {
+            draggable.SetIngredient(ingredient);
+        }
+
+        Debug.Log($"테이블에 재료 추가: {ingredient.Ingridiant_name}");
+    }
+
+    /// <summary>
+    /// 테이블 위의 모든 재료를 제거합니다. (새 칵테일 제작 시 호출)
+    /// </summary>
+    private void ClearTableIngredients()
+    {
+        foreach (GameObject ingredientObj in instantiatedTableIngredients)
+        {
+            Destroy(ingredientObj);
+        }
+        instantiatedTableIngredients.Clear();
+    }
+
+    /// <summary>
     /// 컴포넌트 파괴 시 이벤트 리스너 정리 (메모리 누수 방지)
     /// </summary>
     private void OnDestroy()
@@ -368,9 +557,24 @@ public class CocktailMakingUI : MonoBehaviour
             backButton.onClick.RemoveListener(ShowOrderListView);
         }
 
+        if (nextStepButton != null)
+        {
+            nextStepButton.onClick.RemoveListener(OnNextStepClicked);
+        }
+
         if (completeButton != null)
         {
             completeButton.onClick.RemoveListener(OnCompleteCraftingClicked);
+        }
+
+        if (glassSelectionUI != null)
+        {
+            glassSelectionUI.OnGlassSelectedEvent -= OnGlassSelectedInUI;
+        }
+
+        if (ingredientSelectionUI != null)
+        {
+            ingredientSelectionUI.OnIngredientSelectedEvent -= OnIngredientSelectedInUI;
         }
     }
 }

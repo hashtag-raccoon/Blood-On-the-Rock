@@ -12,3 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 562a6835524353440b92ce225723841f, type: 3}
   m_Name: Glass1
   m_EditorClassIdentifier: 
+  Glass_id: 1
+  Glass_name: "\uAE38\uCB49\uD55C \uC794"
+  Description: "\uAE38\uCB49\uD55C \uC794\uC774\uB2E4."
+  Icon: {fileID: 0}
